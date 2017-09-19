@@ -118,6 +118,7 @@
         <module>Kitodo-SchemaConverter</module>
         <module>Kitodo-Validation</module>
         <module>Kitodo</module>
+        <module>Kitodo-Frontend</module>
     </modules>
 
     <profiles>
