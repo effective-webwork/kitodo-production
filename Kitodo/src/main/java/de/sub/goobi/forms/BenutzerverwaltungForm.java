@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
+import org.kitodo.api.frontend.FrontendInterface;
 import org.kitodo.data.database.beans.LdapGroup;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.User;
@@ -49,6 +50,7 @@ import org.kitodo.dto.UserDTO;
 import org.kitodo.dto.UserGroupDTO;
 import org.kitodo.model.LazyDTOModel;
 import org.kitodo.security.SecurityPasswordEncoder;
+import org.kitodo.serviceloader.KitodoServiceLoader;
 import org.kitodo.services.ServiceManager;
 
 @Named("BenutzerverwaltungForm")
@@ -97,6 +99,18 @@ public class BenutzerverwaltungForm extends BasisForm {
     @PostConstruct
     public void initializeUserList() {
         filterAll();
+        initialiseFrontendModule();
+    }
+
+    private FrontendInterface initialiseFrontendModule() {
+        KitodoServiceLoader<FrontendInterface> loader = new KitodoServiceLoader<>(FrontendInterface.class,
+                ConfigCore.getParameter("moduleFolder"));
+        return loader.loadModule();
+    }
+
+    public String filterKeinMitZurueck() {
+        filterKein();
+        return this.zurueck;
     }
 
     /**
