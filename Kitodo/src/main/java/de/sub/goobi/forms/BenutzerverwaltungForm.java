@@ -15,21 +15,15 @@ import de.sub.goobi.config.ConfigCore;
 import de.sub.goobi.helper.Helper;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.nio.file.*;
 import java.security.CodeSource;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
@@ -38,8 +32,6 @@ import javax.faces.model.SelectItem;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -57,8 +49,6 @@ import org.kitodo.model.LazyDTOModel;
 import org.kitodo.security.SecurityPasswordEncoder;
 import org.kitodo.serviceloader.KitodoServiceLoader;
 import org.kitodo.services.ServiceManager;
-
-import static org.jboss.weld.util.Preconditions.checkNotNull;
 
 @Named("BenutzerverwaltungForm")
 @SessionScoped
