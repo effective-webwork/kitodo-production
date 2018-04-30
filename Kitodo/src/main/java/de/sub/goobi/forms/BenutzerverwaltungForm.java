@@ -96,7 +96,6 @@ public class BenutzerverwaltungForm extends BasisForm {
     @PostConstruct
     public void initializeUserList() throws IOException, URISyntaxException {
         initialiseFrontendModule();
-        copyXhtmlFilesAsSymLinks();
         filterAll();
     }
 
@@ -104,11 +103,6 @@ public class BenutzerverwaltungForm extends BasisForm {
         KitodoServiceLoader<FrontendInterface> loader = new KitodoServiceLoader<>(FrontendInterface.class,
                 ConfigCore.getParameter("moduleFolder"));
         return loader.loadModule();
-    }
-
-    public String filterKeinMitZurueck() {
-        filterKein();
-        return this.zurueck;
     }
 
     /**
