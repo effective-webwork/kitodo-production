@@ -14,6 +14,7 @@ package org.kitodo.production.forms.dataeditor;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +39,7 @@ import org.kitodo.api.dataformat.MediaUnit;
 import org.kitodo.api.dataformat.View;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
+import org.kitodo.exceptions.StructureNotEmptyException;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.metadata.MetadataEditor;
 import org.kitodo.production.security.SecurityUserDetails;
@@ -121,7 +123,7 @@ public class StructurePanel implements Serializable {
         severalAssignments = new LinkedList<>();
     }
 
-    void deleteSelectedStructure() {
+    void deleteSelectedStructure() throws StructureNotEmptyException {
         Optional<IncludedStructuralElement> selectedStructure = getSelectedStructure();
         if (!selectedStructure.isPresent()) {
             /*
@@ -138,7 +140,12 @@ public class StructurePanel implements Serializable {
         IncludedStructuralElement parent = ancestors.getLast();
 
         Collection<View> subViews = new ArrayList<>();
-        subViews = getAllSubViews(selectedStructure.get(), subViews);
+        getAllSubViews(selectedStructure.get(), subViews);
+
+        if (!subViews.isEmpty()) {
+            throw new StructureNotEmptyException(MessageFormat.format(
+                    Helper.getTranslation("dataEditor.structureContainsMediaUnits"), subViews.size()));
+        }
         parent.getViews().addAll(subViews);
 
         parent.getChildren().remove(selectedStructure.get());
@@ -146,14 +153,13 @@ public class StructurePanel implements Serializable {
         dataEditor.getGalleryPanel().updateStripes();
     }
 
-    private Collection<View> getAllSubViews(IncludedStructuralElement selectedStructure, Collection<View> views) {
+    private void getAllSubViews(IncludedStructuralElement selectedStructure, Collection<View> views) {
         if (Objects.nonNull(selectedStructure.getViews())) {
             views.addAll(selectedStructure.getViews());
         }
         for (IncludedStructuralElement child : selectedStructure.getChildren()) {
             getAllSubViews(child, views);
         }
-        return views;
     }
 
     void deleteSelectedMediaUnit() {

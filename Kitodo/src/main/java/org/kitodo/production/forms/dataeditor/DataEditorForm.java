@@ -52,6 +52,7 @@ import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
+import org.kitodo.exceptions.StructureNotEmptyException;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.interfaces.RulesetSetupInterface;
@@ -342,7 +343,12 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
      * clicked on the shortcut menu entry to clear the outline point.
      */
     public void deleteStructure() {
-        structurePanel.deleteSelectedStructure();
+        try {
+            structurePanel.deleteSelectedStructure();
+        } catch (StructureNotEmptyException e) {
+            Helper.setErrorMessage(Helper.getTranslation("dataEditor.structureDeletionError")
+                    + " (" + e.getLocalizedMessage() + ")");
+        }
     }
 
     /**
