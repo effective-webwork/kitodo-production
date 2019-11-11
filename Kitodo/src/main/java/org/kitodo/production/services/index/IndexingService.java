@@ -60,6 +60,7 @@ public class IndexingService {
     // messages for web socket communication
     private static final String INDEXING_STARTED_MESSAGE = "indexing_started";
     static final String INDEXING_FINISHED_MESSAGE = "indexing_finished";
+    public static final String INDEXING_CANCELED = "indexing_canceled";
 
     public static final String DELETION_STARTED_MESSAGE = "deletion_started";
     private static final String DELETION_FINISHED_MESSAGE = "deletion_finished";
@@ -78,8 +79,10 @@ public class IndexingService {
     private IndexStates currentState = IndexStates.NO_STATE;
 
     private Thread indexerThread = null;
-    
+
     private static IndexRestClient indexRestClient = IndexRestClient.getInstance();
+
+    private IndexAllThread indexAllThread;
 
     /**
      * Return singleton variable of type IndexingService.
@@ -393,6 +396,12 @@ public class IndexingService {
         }
     }
 
+    public void cancelIndexing() {
+        if (Objects.nonNull(this.indexAllThread)) {
+            this.indexAllThread.interrupt();
+        }
+    }
+
     private boolean isMappingValid(String mapping) {
         return isMappingEqualTo(mapping);
     }
@@ -518,7 +527,7 @@ public class IndexingService {
      * Start indexing of all database objects in separate thread.
      */
     public void startAllIndexing(PushContext context) {
-        IndexAllThread indexAllThread = new IndexAllThread(context, this);
+        indexAllThread = new IndexAllThread(context, this);
         indexAllThread.setName("IndexAllThread");
         indexAllThread.start();
     }

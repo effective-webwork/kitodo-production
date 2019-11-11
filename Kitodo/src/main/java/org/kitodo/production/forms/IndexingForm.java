@@ -26,6 +26,7 @@ import javax.json.JsonArrayBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.data.elasticsearch.Index;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.production.enums.IndexStates;
@@ -224,6 +225,10 @@ public class IndexingForm {
         pollingChannel.send(IndexingService.DELETION_STARTED_MESSAGE);
         String updateMessage = ServiceManager.getIndexingService().deleteIndex();
         pollingChannel.send(updateMessage);
+    }
+
+    public void cancelIndexing() {
+        ServiceManager.getIndexingService().cancelIndexing();
     }
 
     /**

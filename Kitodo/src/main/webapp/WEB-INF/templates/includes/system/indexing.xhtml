@@ -71,6 +71,19 @@
                                 <p:graphicImage id="delete-index-success" alt="success" value="/pages/images/success.svg" style="max-height: 20px;" rendered="#{!indexingForm.indexingInProgress() and indexingForm.indexState == 'DELETING_SUCCESSFUL'}"/>
                             </td>
                         </tr>
+                        <!-- Cancel indexing -->
+                        <tr>
+                            <td colspan="2">
+                                <p:commandButton widgetVar="cancelIndexing"
+                                                 id="cancelIndexingButton"
+                                                 rendered="#{SecurityAccessController.hasAuthorityToEditIndex()}"
+                                                 value="#{msgs.cancelIndexing}"
+                                                 style="width: 100%;"
+                                                 action="#{indexingForm.cancelIndexing()}"
+                                                 disabled="#{not indexingForm.indexingInProgress()}"
+                                                 update="indexingTable"/>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                     <table id="indexingTable">
