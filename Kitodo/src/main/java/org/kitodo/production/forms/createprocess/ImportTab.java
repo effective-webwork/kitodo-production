@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.externaldatamanagement.SingleHit;
+import org.kitodo.api.schemaconverter.ExemplarRecord;
 import org.kitodo.exceptions.NoRecordFoundException;
 import org.kitodo.exceptions.ProcessGenerationException;
 import org.kitodo.exceptions.UnsupportedFormatException;
@@ -127,6 +128,10 @@ public class ImportTab implements Serializable {
         getRecordById(Helper.getRequestParameter(ID_PARAMETER_NAME));
         Ajax.update(FORM_CLIENTID);
         this.createProcessForm.setEditActiveTabIndex(ADDITIONAL_FIELDS_TAB_INDEX);
+        // if more than one exemplar record was found, display a selection dialog to the user
+        if (ServiceManager.getImportService().getExemplarRecords().size() > 0) {
+            PrimeFaces.current().executeScript("PF('exemplarRecordsDialog').show();");
+        }
     }
 
     private void getRecordById(String recordId) {
@@ -189,5 +194,30 @@ public class ImportTab implements Serializable {
      */
     public void setImportDepth(int depth) {
         importDepth = depth;
+    }
+
+    /**
+     * Get exemplarRecords.
+     *
+     * @return value of exemplarRecords
+     */
+    public LinkedList<ExemplarRecord> getExemplarRecords() {
+        return ServiceManager.getImportService().getExemplarRecords();
+    }
+
+    /**
+     * Set selectedExemplarRecord.
+     *
+     * @param selectedExemplarRecord as org.kitodo.api.schemaconverter.ExemplarRecord
+     */
+    public void setSelectedExemplarRecord(ExemplarRecord selectedExemplarRecord) {
+        for (ProcessDetail processDetail : this.createProcessForm.getProcessMetadataTab().getProcessDetailsElements()) {
+            if ("Owner".equals(processDetail.getMetadataID())) {
+                ImportService.setProcessDetailValue(processDetail, selectedExemplarRecord.getOwner());
+            } else if ("shelfmarksource".equals(processDetail.getMetadataID())) {
+                ImportService.setProcessDetailValue(processDetail, selectedExemplarRecord.getSignature());
+            }
+        }
+        Ajax.update(FORM_CLIENTID);
     }
 }

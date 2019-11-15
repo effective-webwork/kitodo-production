@@ -123,6 +123,10 @@ public class OPACConfig {
         return getCatalog(catalogName).getString("identifierParameter[@value]");
     }
 
+    public static String getExemplarFieldXPath(String catalogName) {
+        return getCatalog(catalogName).getString("exemplarField[@xpath]");
+    }
+
     /**
      * Retrieve the list of catalogs' titles from config file.
      * @return List of Strings containing all catalog titles.
