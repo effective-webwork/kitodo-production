@@ -47,6 +47,7 @@ public class ImportTab implements Serializable {
 
     private CreateProcessForm createProcessForm;
     private static final int ADDITIONAL_FIELDS_TAB_INDEX = 2;
+    private static final int NO_LIMIT = -1;
     private static final String ID_PARAMETER_NAME = "ID";
     private static final String FORM_CLIENTID = "editForm";
     private static final String HITSTABLE_NAME = "hitlistDialogForm:hitlistDialogTable";
@@ -54,6 +55,9 @@ public class ImportTab implements Serializable {
             "PF('notifications').renderMessage({'summary':'SUMMARY','detail':'DETAIL','severity':'SEVERITY'});";
 
     private int importDepth = 2;
+
+    private boolean importChildren = false;
+    private boolean importAllAncestors = false;
 
     /**
      * Standard constructor.
@@ -137,9 +141,10 @@ public class ImportTab implements Serializable {
 
     private void getRecordById(String recordId) {
         try {
+            int importLevels = this.importAllAncestors ? NO_LIMIT : this.importDepth;
             LinkedList<TempProcess> processes = ServiceManager.getImportService().importProcessHierarchy(recordId,
                     this.hitModel.getSelectedCatalog(), this.createProcessForm.getProject().getId(),
-                    this.createProcessForm.getTemplate().getId(), this.importDepth);
+                    this.createProcessForm.getTemplate().getId(), importLevels);
             this.createProcessForm.setProcesses(processes);
 
             // Fill metadata fields in metadata tab on successful import
@@ -205,6 +210,43 @@ public class ImportTab implements Serializable {
      */
     public void setImportDepth(int depth) {
         importDepth = depth;
+    }
+
+
+    /**
+     * Get importChildren.
+     *
+     * @return value of importChildren
+     */
+    public boolean isImportChildren() {
+        return importChildren;
+    }
+
+    /**
+     * Set importChildren.
+     *
+     * @param importChildren as boolean
+     */
+    public void setImportChildren(boolean importChildren) {
+        this.importChildren = importChildren;
+    }
+
+    /**
+     * Get importAllAncestors.
+     *
+     * @return value of importAllAncestors
+     */
+    public boolean isImportAllAncestors() {
+        return importAllAncestors;
+    }
+
+    /**
+     * Set importAllAncestors.
+     *
+     * @param importAllAncestors as boolean
+     */
+    public void setImportAllAncestors(boolean importAllAncestors) {
+        this.importAllAncestors = importAllAncestors;
     }
 
     /**

@@ -339,7 +339,7 @@ public class ImportService {
      * @param opac the name of the catalog from which the record is imported
      * @param projectId the ID of the project for which a process is created
      * @param templateId the ID of the template from which a process is created
-     * @param importDepth the number of hierarchical processes that will be imported from the catalog
+     * @param importDepth the number of hierarchical processes that will be imported from the catalog; -1 for no limit
      * @return List of TempProcess
      */
     public LinkedList<TempProcess> importProcessHierarchy(String recordId, String opac, int projectId,
@@ -351,7 +351,7 @@ public class ImportService {
         LinkedList<TempProcess> processes = new LinkedList<>();
         String parentID = importProcessAndReturnParentID(recordId, processes, opac, projectId, templateId);
         int level = 1;
-        while (Objects.nonNull(parentID) && level < importDepth) {
+        while (Objects.nonNull(parentID) && (level < importDepth || importDepth < 0)) {
             try {
                 parentID = importProcessAndReturnParentID(parentID, processes, opac, projectId, templateId);
                 level++;
@@ -368,7 +368,6 @@ public class ImportService {
     private DataRecord importRecord(String opac, String identifier, boolean extractExemplars) throws NoRecordFoundException,
             UnsupportedFormatException, URISyntaxException, IOException, XPathExpressionException,
             ParserConfigurationException, SAXException {
-        // ################ IMPORT #################
         importModule = initializeImportModule();
         DataRecord dataRecord = importModule.getFullRecordById(opac, identifier);
 
@@ -376,8 +375,7 @@ public class ImportService {
             exemplarRecords = extractExemplarRecords(dataRecord, opac);
         }
 
-        // ################# CONVERT ################
-        // depending on metadata and return form, call corresponding schema converter module!
+        // depending on metadata and return format, call corresponding schema converter module!
         SchemaConverterInterface converter = getSchemaConverter(dataRecord);
 
         // transform dataRecord to Kitodo internal format using appropriate SchemaConverter!

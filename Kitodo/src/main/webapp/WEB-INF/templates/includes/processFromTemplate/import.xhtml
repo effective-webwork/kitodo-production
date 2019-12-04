@@ -18,7 +18,10 @@
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
         xmlns:p="http://primefaces.org/ui">
 
-    <p:panelGrid layout="grid" columns="2" cellpadding="10">
+    <p:panelGrid id="importGrid"
+                 layout="grid"
+                 columns="2"
+                 cellpadding="10">
         <p:row>
             <div>
                 <p:outputLabel for="catalogueSelectMenu"
@@ -30,14 +33,12 @@
                     <f:selectItem itemValue="#{null}" itemLabel="-- #{msgs.selectCatalog} --" noSelectionOption="true"/>
                     <f:selectItems value="#{CreateProcessForm.importTab.catalogs}" var="step" itemLabel="#{step}"
                                    itemValue="#{step}"/>
-                    <p:ajax update="editForm:processFromTemplateTabView:fieldSelectMenu,
-                                    editForm:processFromTemplateTabView:searchTerm,
-                                    editForm:processFromTemplateTabView:importDepth,
-                                    editForm:processFromTemplateTabView:catalogSearchButton"/>
+                    <p:ajax update="editForm:processFromTemplateTabView:importGrid"/>
                 </p:selectOneMenu>
             </div>
             <div>
                 <p:outputLabel for="fieldSelectMenu"
+                               styleClass="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog ? 'ui-state-disabled' : ''}"
                                value="#{msgs.field}"/>
                 <p:selectOneMenu id="fieldSelectMenu"
                                  disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog}"
@@ -53,16 +54,37 @@
         <p:row>
             <div>
                 <p:outputLabel for="importDepth"
+                               styleClass="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog or CreateProcessForm.importTab.importAllAncestors ? 'ui-state-disabled' : ''}"
                                value="#{msgs.importDepth}"/>
                 <p:spinner id="importDepth"
                            class="input"
-                           disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog}"
+                           disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog or CreateProcessForm.importTab.importAllAncestors}"
                            value="#{CreateProcessForm.importTab.importDepth}"
                            min="1"
                            max="5"/>
+
+                <p:outputLabel for="importAllAncestors"
+                               styleClass="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog ? 'ui-state-disabled' : ''}"
+                               value="Import all ancestor documents"/>
+                <p:selectBooleanCheckbox id="importAllAncestors"
+                                         styleClass="input"
+                                         disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog}"
+                                         value="#{CreateProcessForm.importTab.importAllAncestors}">
+                    <p:ajax event="change"
+                            update="importGrid"/>
+                </p:selectBooleanCheckbox>
+
+                <p:outputLabel for="importChildren"
+                               styleClass="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog ? 'ui-state-disabled' : ''}"
+                               value="Import child documents"/>
+                <p:selectBooleanCheckbox id="importChildren"
+                                         styleClass="input"
+                                         disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog}"
+                                         value="#{CreateProcessForm.importTab.importChildren}"/>
             </div>
             <div>
                 <p:outputLabel for="searchTerm"
+                               styleClass="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog ? 'ui-state-disabled' : ''}"
                                value="#{msgs.value}"/>
                 <p:inputText id="searchTerm"
                              onkeypress="if (event.keyCode === 13) { document.getElementById('editForm:processFromTemplateTabView:performCatalogSearch').click(); return false; }"
