@@ -1909,6 +1909,15 @@ body .m-0{
     padding: 0;
 }
 
+/* Helper classes for colors */
+.red {
+    color: var(--focused-orange);
+}
+
+.green {
+    color: var(--focused-green);
+}
+
 /* Messages */
 body .ui-messages > div {
     margin: 0;

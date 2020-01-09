@@ -4439,6 +4439,59 @@ kbd {
 }
 
 /*----------------------------------------------------------------------
+System page
+----------------------------------------------------------------------*/
+
+#systemTabView .messageWrapper {
+    border: 1px solid var(--carbon-blue);
+    border-radius: var(--default-border-radius);
+    margin: auto;
+    padding: var(--default-double-size);
+    width: 50%;
+}
+
+#systemTabView\:systemWarningForm\:warningText {
+    height: 100px;
+}
+
+#systemTabView\:systemWarningForm\:sendWarningButton {
+    margin-top: var(--default-half-size);
+}
+
+#acknowledgeSystemWarningForm\:okButton {
+    margin-right: var(--default-double-size);
+}
+
+#acknowledgeSystemWarningForm\:systemMessageLabel {
+    font-style: italic;
+    font-weight: bold;
+}
+
+#acknowledgeSystemWarningForm\:messageWrapper {
+    padding: 0 var(--default-double-size);
+}
+
+#systemMessagePanel {
+    background-color: white;
+    border: 3px solid red;
+    color: red;
+    height: 70px;
+    left: calc(50% - 320px);
+    opacity: 80%;
+    padding: var(--default-full-size);
+    pointer-events: none;
+    position: absolute;
+    text-align: center;
+    top: 10px;
+    width: 640px;
+    z-index: 9999;
+}
+
+#systemTabView\:messagePanel.ui-accordion .ui-accordion-content {
+    padding: 0;
+}
+
+/*----------------------------------------------------------------------
 Workflow Editor
 ----------------------------------------------------------------------*/
 

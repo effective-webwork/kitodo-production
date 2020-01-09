@@ -27,16 +27,24 @@
             </ui:insert>
         </h:head>
         <h:body styleClass="#{LoginForm.firstVisit ? 'first-visit' : ''}" lang="#{LanguageForm.locale}">
+            <ui:fragment rendered="#{not request.requestURI.contains('login.jsf')}">
+                <h:panelGroup id="systemMessageWrapper">
+                    <p:outputPanel id="systemMessagePanel"
+                                   rendered="#{SystemMessageChannel.showSystemMessage}">
+                        <h2>#{SystemMessageChannel.message}</h2>
+                    </p:outputPanel>
+                    <h:form id="systemMessageDialogUpdateForm">
+                        <p:remoteCommand name="updateSystemMessageDialog"
+                                         oncomplete="PF('systemMessageDialog').show();"/>
+                    </h:form>
+                </h:panelGroup>
+            </ui:fragment>
             <h:outputStylesheet name="css/kitodo.css"/>
             <h:outputStylesheet name="css/pattern-library.css"/>
             <h:outputStylesheet library="webjars" name="font-awesome/4.7.0/css/font-awesome-jsf.css" />
             <p:ajaxStatus onstart="$('html').addClass('progressCursor')"
                           oncomplete="$('html').removeClass('progressCursor')" />
-            <p:growl id="notifications" widgetVar="notifications" severity="info" escape="false"/>
-            <p:growl id="sticky-notifications" widgetVar="sticky-notifications" sticky="true" severity="info"/>
-            <h:panelGroup id="indexErrorPanel" layout="block" rendered="#{empty indexingForm.serverInformation}">
-               <p:ajax event="click" onclick="PF('sticky-notifications').renderMessage({'summary':'The elastic search server is not running.','detail':'Elastic Search','severity':'info'});"/>
-            </h:panelGroup>
+
             <div id="loadingScreen">
                 <div>
                     <h:graphicImage name="images/kitodo-logo-animatable.svg" alt="Kitodo.Production" height="108" width="309" id="kitodo-logo-animatable"/>
@@ -44,6 +52,13 @@
                 </div>
                 <span class="sr-only">Loading...</span>
             </div>
+
+            <p:growl id="notifications" widgetVar="notifications" severity="info" escape="false"/>
+            <p:growl id="sticky-notifications" widgetVar="sticky-notifications" sticky="true" severity="info"/>
+            <h:panelGroup id="indexErrorPanel" layout="block" rendered="#{empty indexingForm.serverInformation}">
+               <p:ajax event="click" onclick="PF('sticky-notifications').renderMessage({'summary':'The elastic search server is not running.','detail':'Elastic Search','severity':'info'});"/>
+            </h:panelGroup>
+
             <div class="flex-container">
                 <header class="flex-item" role="banner" id="portal-header">
                     <div class="wrapper">
@@ -109,6 +124,15 @@
                               ontimerstep="updateLogoutCountdown(intervalData)"
                               ontimercomplete="window.location.replace('/kitodo/logout');"/>
                 </h:form>
+            </ui:fragment>
+            <ui:fragment rendered="#{not request.requestURI.contains('login.jsf')}">
+                <ui:include src="includes/base/systemMessageDialog.xhtml"/>
+                <h:outputScript name="js/systemMessage.js"
+                                target="body" />
+                <f:websocket id="messageChannel"
+                             channel="messageChannel"
+                             onmessage="onMessage"
+                             onclose="onChannelClose"/>
             </ui:fragment>
         </h:body>
     </f:view>
