@@ -1,0 +1,67 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="systemWarningForm">
+        <p:remoteCommand name="updateUserTable"
+                         update="systemTabView:systemWarningForm:loggedInUserTable"/>
+        <h:panelGroup layout="block">
+            <p:dataTable id="loggedInUserTable"
+                         widgetVar="loggedInUserTable"
+                         styleClass="default-layout"
+                         var="username"
+                         value="#{SystemMessageChannel.currentUsers}">
+                <p:autoUpdate/>
+                <p:column headerText="#{msgs['loggedInUsers']}">
+                    <h:outputText value="#{username}"/>
+                </p:column>
+                <p:column headerText="#{msgs['acknowledged']}">
+                    <ui:fragment rendered="#{not empty SystemMessageChannel.acknowledged(username)}">
+                        <i class="fa #{SystemMessageChannel.acknowledged(username) ? 'fa-check green' : 'fa-times red'}"/>
+                    </ui:fragment>
+                </p:column>
+            </p:dataTable>
+        </h:panelGroup>
+
+        <p:separator/>
+
+        <h:panelGroup styleClass="messageWrapper"
+                      layout="block">
+            <p:inputTextarea id="warningText"
+                             styleClass="input"
+                             immediate="true"
+                             value="#{SystemMessageChannel.message}">
+                <p:ajax event="change"/>
+            </p:inputTextarea>
+            <p/>
+            <p:outputLabel for="showStaticMessageSwitch" value="Display static message"/>
+            <p:selectBooleanCheckbox id="showStaticMessageSwitch"
+                                     styleClass="switch input"
+                                     value="#{SystemMessageChannel.showSystemMessage}">
+                <p:ajax event="change"/>
+            </p:selectBooleanCheckbox>
+            <p:commandButton id="sendWarningButton"
+                             styleClass="primary"
+                             actionListener="#{SystemMessageChannel.setUserName(LoginForm.loggedUser.fullName)}"
+                             action="#{SystemMessageChannel.sendMessage}"
+                             update="systemMessageDialog"
+                             value="#{msgs.send}">
+            </p:commandButton>
+        </h:panelGroup>
+    </h:form>
+
+</ui:composition>
