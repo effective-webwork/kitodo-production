@@ -56,7 +56,7 @@
                                value="#{msgs.importDepth}"/>
                 <p:spinner id="importDepth"
                            class="input"
-                           disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog}"
+                           disabled="#{empty CreateProcessForm.importTab.hitModel.selectedCatalog or not CreateProcessForm.importTab.parentMetadataConfigured}"
                            value="#{CreateProcessForm.importTab.importDepth}"
                            min="1"
                            max="5"/>

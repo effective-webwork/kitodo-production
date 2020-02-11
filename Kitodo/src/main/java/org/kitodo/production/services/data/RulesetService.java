@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
@@ -229,5 +230,10 @@ public class RulesetService extends ClientSearchService<Ruleset, RulesetDTO, Rul
         RulesetManagementInterface openRuleset = ServiceManager.getRulesetManagementService().getRulesetManagement();
         openRuleset.load(new File(rulesetPath));
         return openRuleset;
+    }
+
+    public static boolean higherLevelIdentifierConfigured(RulesetManagementInterface ruleset, String docType) {
+        // TODO: check, if retrieved functional metadata is allowed for documents of given type "doc type"!
+        return !ruleset.getFunctionalKeys(FunctionalMetadata.HIGHERLEVEL_IDENTIFIER).isEmpty();
     }
 }

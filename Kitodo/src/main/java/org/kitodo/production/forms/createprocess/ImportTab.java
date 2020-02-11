@@ -45,6 +45,7 @@ import org.kitodo.production.helper.TempProcess;
 import org.kitodo.production.model.LazyHitModel;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.ImportService;
+import org.kitodo.production.services.data.RulesetService;
 import org.omnifaces.util.Ajax;
 import org.primefaces.PrimeFaces;
 import org.primefaces.component.datatable.DataTable;
@@ -276,5 +277,22 @@ public class ImportTab implements Serializable {
             Helper.setErrorMessage("newProcess.catalogueSearch.exemplarRecordParameterNotFoundError",
                     new Object[] {e.getMessage(), this.hitModel.getSelectedCatalog() });
         }
+    }
+
+    /**
+     * Check and return whether a parent ID metadata field for the selected doc type is configured in the in the
+     * current ruleset.
+     *
+     * @return whether the a parent ID metadata field is configured or not
+     */
+    public boolean getParentMetadataConfigured() {
+        boolean parentIDMetadataConfigured = RulesetService.higherLevelIdentifierConfigured(
+                this.createProcessForm.getRuleset(), this.createProcessForm.getProcessDataTab().getDocType());
+        if (!parentIDMetadataConfigured) {
+            Helper.setErrorMessage("Parent ID metadata not defined in ruleset '"
+                    + this.createProcessForm.getRuleset().toString() + "' for selected doc type '"
+                    + this.createProcessForm.getProcessDataTab().getDocType() + "'!");
+        }
+        return parentIDMetadataConfigured;
     }
 }
