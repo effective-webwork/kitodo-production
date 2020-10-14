@@ -31,6 +31,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.inject.Named;
+import javax.xml.bind.UnmarshalException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,6 +54,7 @@ import org.kitodo.exceptions.InvalidImagesException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
 import org.kitodo.exceptions.RulesetNotFoundException;
+import org.kitodo.production.forms.BaseForm;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.interfaces.RulesetSetupInterface;
@@ -222,13 +224,21 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
             ruleset = openRuleset(process.getRuleset());
             openMetsFile();
             if (!workpiece.getId().equals(process.getId().toString())) {
-                Helper.setErrorMessage("metadataConfusion", new Object[] {process.getId(), workpiece.getId() });
+                Helper.setErrorMessage("metadataConfusion", new Object[]{process.getId(), workpiece.getId()});
                 return referringView;
             }
             selectedMedia = new LinkedList<>();
             init();
             MetadataLock.setLocked(process.getId(), user);
-        } catch (IOException | DAOException | InvalidImagesException | NoSuchElementException | RulesetNotFoundException e) {
+        } catch (IOException e) {
+            if (e.getCause() instanceof UnmarshalException) {
+                BaseForm.handleUnmarshalException((UnmarshalException) e.getCause(),
+                        "Error reading ruleset file for process" + processID);
+            } else {
+                Helper.setErrorMessage(e.getMessage(), logger, e);
+            }
+            return referringView;
+        } catch (DAOException | InvalidImagesException | NoSuchElementException | RulesetNotFoundException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
             return referringView;
         }

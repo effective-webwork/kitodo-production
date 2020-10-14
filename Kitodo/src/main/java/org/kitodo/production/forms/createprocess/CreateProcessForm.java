@@ -27,6 +27,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.xml.bind.UnmarshalException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -95,17 +96,13 @@ public class CreateProcessForm extends BaseForm implements RulesetSetupInterface
      * @param ruleset as Ruleset
      * @throws RulesetNotFoundException thrown if ruleset could not be found
      */
-    public void updateRulesetAndDocType(Ruleset ruleset) throws RulesetNotFoundException {
+    public void updateRulesetAndDocType(Ruleset ruleset) throws RulesetNotFoundException, IOException {
         setRulesetManagementInterface(ruleset);
         processDataTab.setAllDocTypes(getAllRulesetDivisions());
     }
 
-    private void setRulesetManagementInterface(Ruleset ruleset) throws RulesetNotFoundException {
-        try {
-            this.rulesetManagementInterface = ServiceManager.getRulesetService().openRuleset(ruleset);
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
-        }
+    private void setRulesetManagementInterface(Ruleset ruleset) throws RulesetNotFoundException, IOException {
+        this.rulesetManagementInterface = ServiceManager.getRulesetService().openRuleset(ruleset);
     }
 
     private List<SelectItem> getAllRulesetDivisions() {
@@ -370,7 +367,13 @@ public class CreateProcessForm extends BaseForm implements RulesetSetupInterface
 
                 }
             }
-        } catch (ProcessGenerationException | RulesetNotFoundException | DataException | DAOException | IOException e) {
+        } catch (IOException e) {
+            if (e.getCause() instanceof UnmarshalException) {
+                handleUnmarshalException((UnmarshalException) e.getCause(), "Error reading ruleset file");
+            } else {
+                Helper.setErrorMessage(e.getMessage(), logger, e);
+            }
+        } catch (ProcessGenerationException | RulesetNotFoundException | DataException | DAOException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
         }
     }

@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.faces.model.SelectItem;
+import javax.xml.bind.UnmarshalException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.ListColumn;
 import org.kitodo.data.database.beans.Project;
@@ -35,6 +37,7 @@ import org.kitodo.production.services.data.RoleService;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.PageEvent;
+import org.xml.sax.SAXParseException;
 
 public class BaseForm implements Serializable {
 
@@ -404,6 +407,26 @@ public class BaseForm implements Serializable {
     public void resetPaginator(String keepPagination) {
         if (keepPagination.isEmpty()) {
             this.setFirstRow(0);
+        }
+    }
+
+    /**
+     * Handle UnmarshalException and send detailed error message to output if UnmarshalException contains a linked
+     * exception of type SAXParseException. Send error message of UnmarshalException to output otherwise.
+     *
+     * @param unmarshalException
+     *          UnmarshalException to handle
+     */
+    public static void handleUnmarshalException(UnmarshalException unmarshalException, String errorMessage) {
+        if (Objects.nonNull(unmarshalException.getLinkedException())
+                && unmarshalException.getLinkedException() instanceof SAXParseException) {
+            SAXParseException saxParseException = (SAXParseException) unmarshalException.getLinkedException();
+            Helper.setErrorMessage(errorMessage, "XML parser exception: " + saxParseException.getSystemId()
+                    + " - line " + saxParseException.getLineNumber()
+                    + ", column " + saxParseException.getColumnNumber()
+                    + ": " + StringEscapeUtils.unescapeHtml(saxParseException.getMessage()));
+        } else {
+            Helper.setErrorMessage(unmarshalException.getMessage());
         }
     }
 }
