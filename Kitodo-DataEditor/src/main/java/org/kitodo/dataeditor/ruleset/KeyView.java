@@ -243,10 +243,7 @@ class KeyView extends AbstractKeyView<UniversalKey> implements DatesSimpleMetada
          * apply.
          */
         Optional<Pattern> optionalPattern = universal.getPattern();
-        if (!optionalPattern.isPresent()) {
-            return true;
-        }
-        return optionalPattern.get().matcher(value).matches();
+        return optionalPattern.map(pattern -> pattern.matcher(value).matches()).orElse(true);
     }
 
     void setScheme(String scheme) {

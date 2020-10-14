@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.tuple.Pair;
@@ -450,7 +448,7 @@ public class ProcessFieldedMetadata extends ProcessDetail implements Serializabl
         } catch (NoSuchMetadataFieldException e) {
             throw new IllegalStateException("never happening exception");
         }
-        result.setGroup(metadata instanceof List ? (List<Metadata>) metadata : new ArrayList<>(metadata));
+        result.setGroup(metadata instanceof List ? metadata : new ArrayList<>(metadata));
         return Collections.singletonList(result);
     }
 

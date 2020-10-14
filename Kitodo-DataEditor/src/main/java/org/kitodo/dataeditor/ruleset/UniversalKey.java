@@ -120,11 +120,7 @@ class UniversalKey extends Labeled {
     }
 
     Optional<Domain> getDomain() {
-        if (optionalKey.isPresent()) {
-            return Optional.ofNullable(optionalKey.get().getDomain());
-        } else {
-            return Optional.empty();
-        }
+        return optionalKey.map(Key::getDomain);
     }
 
     /**

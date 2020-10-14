@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,7 +46,11 @@ public class ProcessBooleanMetadata extends ProcessSimpleMetadata implements Ser
      */
     ProcessBooleanMetadata(ProcessFieldedMetadata container, SimpleMetadataViewInterface settings, MetadataEntry data) {
         super(container, settings, settings.getLabel());
-        this.active = Objects.nonNull(data) || settings.getBooleanDefaultValue();
+        if (Objects.nonNull(data)) {
+            this.active = Boolean.parseBoolean(data.getValue());
+        } else {
+            settings.getBooleanDefaultValue();
+        }
     }
 
     private ProcessBooleanMetadata(ProcessBooleanMetadata template) {
@@ -73,18 +76,14 @@ public class ProcessBooleanMetadata extends ProcessSimpleMetadata implements Ser
     @Override
     public Collection<Metadata> getMetadata() throws InvalidMetadataValueException {
         if (!isValid()) {
-            throw new InvalidMetadataValueException(label, settings.convertBoolean(active).orElse(""));
+            throw new InvalidMetadataValueException(label, settings.convertBoolean(active));
         }
-        Optional<String> value = settings.convertBoolean(active);
-        if (value.isPresent()) {
-            MetadataEntry entry = new MetadataEntry();
-            entry.setKey(settings.getId());
-            entry.setDomain(DOMAIN_TO_MDSEC.get(settings.getDomain().orElse(Domain.DESCRIPTION)));
-            entry.setValue(value.get());
-            return Collections.singletonList(entry);
-        } else {
-            return Collections.emptyList();
-        }
+        String value = settings.convertBoolean(active);
+        MetadataEntry entry = new MetadataEntry();
+        entry.setKey(settings.getId());
+        entry.setDomain(DOMAIN_TO_MDSEC.get(settings.getDomain().orElse(Domain.DESCRIPTION)));
+        entry.setValue(value);
+        return Collections.singletonList(entry);
     }
 
     @Override
@@ -93,9 +92,9 @@ public class ProcessBooleanMetadata extends ProcessSimpleMetadata implements Ser
 
         if (settings.getDomain().orElse(Domain.DESCRIPTION).equals(Domain.METS_DIV)) {
             if (!isValid()) {
-                throw new InvalidMetadataValueException(label, settings.convertBoolean(active).orElse(""));
+                throw new InvalidMetadataValueException(label, settings.convertBoolean(active));
             }
-            return Pair.of(super.getStructureFieldSetters(settings), settings.convertBoolean(active).orElse(null));
+            return Pair.of(super.getStructureFieldSetters(settings), settings.convertBoolean(active));
         } else {
             return null;
         }
@@ -112,8 +111,7 @@ public class ProcessBooleanMetadata extends ProcessSimpleMetadata implements Ser
 
     @Override
     public boolean isValid() {
-        Optional<String> value = settings.convertBoolean(active);
-        return !value.isPresent() || settings.isValid(value.get());
+        return true;
     }
 
     /**

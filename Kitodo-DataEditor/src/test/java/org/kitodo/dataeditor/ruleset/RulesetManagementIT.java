@@ -297,7 +297,7 @@ public class RulesetManagementIT {
         assertFalse(booleanMvi.isComplex());
         assertTrue(booleanMvi instanceof SimpleMetadataViewInterface);
         SimpleMetadataViewInterface booleanSmvi = (SimpleMetadataViewInterface) booleanMvi;
-        assertTrue(booleanSmvi.isValid(booleanSmvi.convertBoolean(true).get()));
+        assertTrue(booleanSmvi.isValid(booleanSmvi.convertBoolean(true)));
         assertFalse(booleanSmvi.isValid(""));
         assertFalse(booleanSmvi.isValid("botch"));
 

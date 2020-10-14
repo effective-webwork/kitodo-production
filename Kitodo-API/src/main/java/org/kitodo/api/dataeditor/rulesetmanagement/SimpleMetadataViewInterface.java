@@ -11,9 +11,9 @@
 
 package org.kitodo.api.dataeditor.rulesetmanagement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Provides an interface for the metadata key view service. The metadata key
@@ -28,11 +28,8 @@ public interface SimpleMetadataViewInterface extends MetadataViewInterface {
      * @return value to save as a metadata entry. If absent, delete the
      *         metadata entry.
      */
-    default Optional<String> convertBoolean(boolean value) {
-        if (getSelectItems().isEmpty()) {
-            return Optional.empty();
-        }
-        return value ? Optional.of(getSelectItems().entrySet().iterator().next().getKey()) : Optional.empty();
+    default String convertBoolean(boolean value) {
+        return Boolean.valueOf(value).toString();
     }
 
     /**
@@ -41,7 +38,12 @@ public interface SimpleMetadataViewInterface extends MetadataViewInterface {
      * @return the default value
      */
     default boolean getBooleanDefaultValue() {
-        return !getDefaultItems().isEmpty();
+        ArrayList<String> defaultItems = new ArrayList<>(getDefaultItems());
+        if (defaultItems.size() < 1) {
+            return false;
+        } else if (defaultItems.size() > 1) {
+            return true;
+        } else return Boolean.TRUE.toString().equals(defaultItems.get(0));
     }
 
     /**
@@ -89,7 +91,7 @@ public interface SimpleMetadataViewInterface extends MetadataViewInterface {
 
     /**
      * Returns whether values under this key can be edited in this view.
-     * 
+     *
      * @return whether values can be edited
      */
     boolean isEditable();
