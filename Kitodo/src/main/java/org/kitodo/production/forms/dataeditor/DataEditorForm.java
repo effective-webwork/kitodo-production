@@ -91,6 +91,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
      */
     private final EditPagesDialog editPagesDialog;
 
+    private final UploadFileDialog uploadFileDialog ;
     /**
      * Backing bean for the gallery panel.
      */
@@ -186,6 +187,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
         this.addMediaUnitDialog = new AddMediaUnitDialog(this);
         this.changeDocStrucTypeDialog = new ChangeDocStrucTypeDialog(this);
         this.editPagesDialog = new EditPagesDialog(this);
+        this.uploadFileDialog = new UploadFileDialog(this);
         acquisitionStage = "edit";
     }
 
@@ -832,5 +834,14 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
             logger.error("Could not save DataEditorSettings with userId {} and templateTaskId {}", user.getId(),
                 templateTaskId);
         }
+    }
+
+    /**
+     * Get uploadFileDialog.
+     *
+     * @return value of uploadFileDialog
+     */
+    public UploadFileDialog getUploadFileDialog() {
+        return uploadFileDialog;
     }
 }
