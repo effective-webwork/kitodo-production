@@ -30,6 +30,8 @@
 
         <p:remoteCommand name="preserveMetadata"
                          actionListener="#{DataEditorForm.metadataPanel.preserve}"/>
+        <p:remoteCommand name="close"
+                         actionListener="#{DataEditorForm.close}"/>
 
         <!--@elvariable id="viewStructure" type="boolean"-->
         <ui:param name="viewStructure" value="#{SecurityAccessController.hasAuthorityToViewProcessStructureData()}"/>
@@ -224,6 +226,21 @@
         <h:outputScript name="js/scroll.js" target="body"/>
         <h:outputScript name="js/metadata_editor.js" target="body"/>
         <h:outputScript name="js/pf_contextMenu_custom.js" target="body"/>
+        <h:outputScript target="body">
+            window.addEventListener("beforeunload", function (e) {
+                var confirmationMessage = "test";
+                (e || window.Event).returnValue = confirmationMessage;
+                return confirmationMessage;
+            });
+
+            window.addEventListener('unload', function() {
+                close();
+            });
+            window.addEventListener('pagehide', function() {
+                close();
+            });
+
+        </h:outputScript>
         <h:outputScript>
             PrimeFaces.widget.VerticalTree.prototype.bindKeyEvents = function () {
                 // Prevent PrimeFaces' default keyboard event handling for VerticalTrees.

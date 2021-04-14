@@ -303,7 +303,15 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
      *
      * @return the referring view, to return there
      */
-    public String close() {
+    public String redirect() {
+        if (referringView.contains("?")) {
+            return referringView + "&faces-redirect=true";
+        } else {
+            return referringView + "?faces-redirect=true";
+        }
+    }
+
+    public void close(){
         metadataPanel.clear();
         structurePanel.clear();
         workpiece = null;
@@ -315,11 +323,6 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
         MetadataLock.setFree(process.getId());
         process = null;
         user = null;
-        if (referringView.contains("?")) {
-            return referringView + "&faces-redirect=true";
-        } else {
-            return referringView + "?faces-redirect=true";
-        }
     }
 
     /**
@@ -374,7 +377,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
                 ServiceManager.getMetsService().save(workpiece, out);
                 ServiceManager.getProcessService().saveToIndex(process,false);
                 if (close) {
-                    return close();
+                    return redirect();
                 } else {
                     PrimeFaces.current().executeScript("PF('notifications').renderMessage({'summary':'"
                             + Helper.getTranslation("metadataSaved") + "','severity':'info'})");
