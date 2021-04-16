@@ -46,14 +46,14 @@
                         title="#{msgs.detailsDesSchritts}">
                     <f:param name="referer" value="desktop"/>
                     <f:param name="id" value="#{task.id}"/>
-                    <i class="fa fa-pencil-square-o fa-lg"/>
+                    <i class="fa fa-pencil-square-o fa-lg fa-fw"/>
                 </h:link>
                 <p:commandLink id="download"
                                action="#{ProcessForm.downloadToHome(task.process.id)}"
                                styleClass="action"
                                title="#{msgs.linkHomeDirectory}"
                                rendered="#{SecurityAccessController.hasAuthorityToEditProcessImages()}">
-                    <h:outputText><i class="fa fa-download"/></h:outputText>
+                    <h:outputText><i class="fa fa-download fa-fw"/></h:outputText>
                     <!-- TODO: add separate message in case it already exists and alert -->
                 </p:commandLink>
                 <!-- assign task -->
@@ -62,7 +62,7 @@
                                styleClass="action"
                                rendered="#{(task.processingStatus == 'OPEN' and !task.batchStep) || (task.processingStatus == 'OPEN' and task.batchStep and !task.batchAvailable)}"
                                title="#{msgs.bearbeitungDiesesSchrittsUebernehmen}" icon="fa fa-bell-o">
-                    <h:outputText><i class="fa fa-bell-o"/></h:outputText>
+                    <h:outputText><i class="fa fa-bell-o fa-fw"/></h:outputText>
                     <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
                 </h:commandLink>
                 <!-- already assigned task (this user) -->
@@ -71,7 +71,7 @@
                                styleClass="action"
                                rendered="#{(task.processingStatus == 'INWORK' and task.processingUser.id == LoginForm.loggedUser.id and !task.batchStep) || (task.processingStatus == 'INWORK' and task.processingUser.id == LoginForm.loggedUser.id and task.batchStep and !task.batchAvailable)}"
                                title="#{msgs.inBearbeitungDurch}: #{task.processingUser!=null and task.processingUser.id!=0 ? task.processingUser.fullName:''}">
-                    <h:outputText><i class="fa fa-bell"/></h:outputText>
+                    <h:outputText><i class="fa fa-bell fa-fw"/></h:outputText>
                     <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
                     <f:param name="id" value="#{task.id}"/>
                 </h:commandLink>
@@ -81,7 +81,7 @@
                                styleClass="action"
                                rendered="#{task.processingStatus == 'INWORK' and task.processingUser.id != LoginForm.loggedUser.id and (!task.batchStep || !task.batchAvailable)}"
                                title="#{msgs.inBearbeitungDurch}: #{(task.processingUser!=null and task.processingUser.id!=0 ? task.processingUser.fullName : '')}">
-                    <h:outputText><i class="fa fa-bell-slash"/></h:outputText>
+                    <h:outputText><i class="fa fa-bell-slash fa-fw"/></h:outputText>
                     <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
                 </h:commandLink>
 
