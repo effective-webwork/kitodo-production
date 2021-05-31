@@ -404,6 +404,19 @@ public class GalleryPanel {
         cachingUUID = UUID.randomUUID().toString();
 
         previewFolder = new Subfolder(process, project.getPreview());
+        updateMedia();
+
+        addStripesRecursive(dataEditor.getWorkpiece().getRootElement());
+        int imagesInStructuredView = stripes.parallelStream().mapToInt(stripe -> stripe.getMedias().size()).sum();
+        if (imagesInStructuredView > 200) {
+            logger.warn("Number of images in structured view: {}", imagesInStructuredView);
+        }
+    }
+
+    void updateMedia() {
+        List<MediaUnit> mediaUnits = dataEditor.getWorkpiece().getAllMediaUnitChildrenFilteredByTypePageAndSorted();
+        medias = new ArrayList<>(mediaUnits.size());
+        previewImageResolver = new HashMap<>();
         for (MediaUnit mediaUnit : mediaUnits) {
             View wholeMediaUnitView = new View();
             wholeMediaUnitView.setMediaUnit(mediaUnit);
@@ -412,12 +425,6 @@ public class GalleryPanel {
             if (mediaContent.isShowingInPreview()) {
                 previewImageResolver.put(mediaContent.getId(), mediaContent);
             }
-        }
-
-        addStripesRecursive(dataEditor.getWorkpiece().getRootElement());
-        int imagesInStructuredView = stripes.parallelStream().mapToInt(stripe -> stripe.getMedias().size()).sum();
-        if (imagesInStructuredView > 200) {
-            logger.warn("Number of images in structured view: {}", imagesInStructuredView);
         }
     }
 

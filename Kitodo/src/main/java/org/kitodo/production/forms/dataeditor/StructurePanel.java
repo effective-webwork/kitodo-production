@@ -179,19 +179,30 @@ public class StructurePanel implements Serializable {
     }
 
     void deleteSelectedMediaUnit() {
-        Optional<MediaUnit> selectedMediaUnit = getSelectedMediaUnit();
-        if (!selectedMediaUnit.isPresent()) {
-            return;
+        for (Pair<MediaUnit, IncludedStructuralElement> selectedMedia : dataEditor.getSelectedMedia()) {
+            if (!dataEditor.getUnsavedDeletedMedia().contains(selectedMedia.getKey())) {
+                if (selectedMedia.getKey().getIncludedStructuralElements().size() > 1) {
+                    Helper.setMessage(selectedMedia.getKey().toString() + ": is removed fom all assigned structural elements");
+                }
+                for (IncludedStructuralElement structuralElement : selectedMedia.getKey().getIncludedStructuralElements()) {
+                    structuralElement.getViews().removeIf(v -> v.getMediaUnit().equals(selectedMedia.getKey()));
+                }
+                selectedMedia.getKey().getIncludedStructuralElements().clear();
+                LinkedList<MediaUnit> ancestors = MetadataEditor.getAncestorsOfMediaUnit(selectedMedia.getKey(),
+                        dataEditor.getWorkpiece().getMediaUnit());
+                if (ancestors.isEmpty()) {
+                    // The selected element is the root node of the tree.
+                    return;
+                }
+                MediaUnit parent = ancestors.getLast();
+                parent.getChildren().remove(selectedMedia.getKey());
+                dataEditor.getUnsavedDeletedMedia().add(selectedMedia.getKey());
+            }
         }
-        LinkedList<MediaUnit> ancestors = MetadataEditor.getAncestorsOfMediaUnit(selectedMediaUnit.get(),
-                dataEditor.getWorkpiece().getMediaUnit());
-        if (ancestors.isEmpty()) {
-            // The selected element is the root node of the tree.
-            return;
-        }
-        MediaUnit parent = ancestors.getLast();
-        parent.getChildren().remove(selectedMediaUnit.get());
         show();
+        dataEditor.getSelectedMedia().clear();
+        dataEditor.getGalleryPanel().updateMedia();
+        dataEditor.getGalleryPanel().updateStripes();
     }
 
     /**
