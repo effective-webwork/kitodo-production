@@ -25,7 +25,7 @@
                 <ui:include src="/WEB-INF/templates/includes/head.xhtml" />
             </ui:insert>
         </h:head>
-        <h:body lang="#{LanguageForm.locale}">
+        <h:body styleClass="#{LoginForm.firstVisit ? 'first-visit' : ''}" lang="#{LanguageForm.locale}">
             <ui:fragment rendered="#{not request.requestURI.contains('login.jsf')}">
                 <p:outputPanel id="systemMessagePanel"
                                rendered="#{SystemMessageChannel.showSystemMessage}">
