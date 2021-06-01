@@ -42,6 +42,7 @@
                     iconPos="right"
                     onclick="PF('systemMessageDialog').hide()"
                     action="#{SystemMessageChannel.acknowledge(LoginForm.loggedUser)}"
+                    update="systemMessageWrapper"
                     immediate="true"/>
         </h:form>
     </p:dialog>

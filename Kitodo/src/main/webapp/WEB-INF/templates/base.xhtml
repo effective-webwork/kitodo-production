@@ -27,14 +27,16 @@
         </h:head>
         <h:body styleClass="#{LoginForm.firstVisit ? 'first-visit' : ''}" lang="#{LanguageForm.locale}">
             <ui:fragment rendered="#{not request.requestURI.contains('login.jsf')}">
-                <p:outputPanel id="systemMessagePanel"
-                               rendered="#{SystemMessageChannel.showSystemMessage}">
-                    <h2>#{SystemMessageChannel.staticSystemMessage}</h2>
-                </p:outputPanel>
-                <h:form id="systemMessageDialogUpdateForm">
-                    <p:remoteCommand name="updateSystemMessageDialog"
-                                     oncomplete="PF('systemMessageDialog').show();"/>
-                </h:form>
+                <h:panelGroup id="systemMessageWrapper">
+                    <p:outputPanel id="systemMessagePanel"
+                                   rendered="#{SystemMessageChannel.showSystemMessage}">
+                        <h2>#{SystemMessageChannel.message}</h2>
+                    </p:outputPanel>
+                    <h:form id="systemMessageDialogUpdateForm">
+                        <p:remoteCommand name="updateSystemMessageDialog"
+                                         oncomplete="PF('systemMessageDialog').show();"/>
+                    </h:form>
+                </h:panelGroup>
             </ui:fragment>
             <h:outputStylesheet name="css/kitodo.css"/>
             <h:outputStylesheet name="css/pattern-library.css"/>
