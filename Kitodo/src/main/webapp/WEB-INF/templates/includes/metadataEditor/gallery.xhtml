@@ -389,6 +389,7 @@
                                 @(.structureElementDataList)
                                 imagePreviewForm:mediaContextMenu"/>
                 <p:menuitem value="#{msgs.removeElement}"
+                            rendered="#{SecurityAccessController.hasAuthorityToDeleteMedia()}"
                             icon="fa fa-trash fa-sm"
                             styleClass="plain"
                             disabled="#{readOnly}"
