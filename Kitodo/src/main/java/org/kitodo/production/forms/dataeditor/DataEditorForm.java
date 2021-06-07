@@ -177,7 +177,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
 
     private static final String DESKTOP_LINK = "/pages/desktop.jsf";
 
-    private List<MediaUnit> notSavedUploadedMedia = new ArrayList<>();
+    private List<MediaUnit> unsavedUploadedMedia = new ArrayList<>();
 
     /**
      * Public constructor.
@@ -253,6 +253,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
                 return referringView;
             }
             selectedMedia = new LinkedList<>();
+            unsavedUploadedMedia = new ArrayList<>();
             init();
             MetadataLock.setLocked(process.getId(), user);
         } catch (IOException | DAOException | InvalidImagesException | NoSuchElementException e) {
@@ -330,7 +331,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
     private void deleteNotSavedUploadedMedia() {
         URI uri = Paths.get(ConfigCore.getKitodoDataDirectory(),
                 ServiceManager.getProcessService().getProcessDataDirectory(this.process).getPath()).toUri();
-        for (MediaUnit mediaUnit : this.notSavedUploadedMedia) {
+        for (MediaUnit mediaUnit : this.unsavedUploadedMedia) {
             for (URI fileURI : mediaUnit.getMediaFiles().values()) {
                 try {
                     ServiceManager.getFileService().delete(uri.resolve(fileURI));
@@ -339,6 +340,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
                 }
             }
         }
+        this.unsavedUploadedMedia.clear();
     }
 
     /**
@@ -392,7 +394,7 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
             try (OutputStream out = ServiceManager.getFileService().write(mainFileUri)) {
                 ServiceManager.getMetsService().save(workpiece, out);
                 ServiceManager.getProcessService().saveToIndex(process,false);
-                notSavedUploadedMedia.clear();
+                unsavedUploadedMedia.clear();
                 if (close) {
                     return close();
                 } else {
@@ -454,12 +456,12 @@ public class DataEditorForm implements RulesetSetupInterface, Serializable {
     }
 
     /**
-     * Get notSavedUploadedMedia.
+     * Get unsavedUploadedMedia.
      *
-     * @return value of notSavedUploadedMedia
+     * @return value of unsavedUploadedMedia
      */
-    public List<MediaUnit> getNotSavedUploadedMedia() {
-        return notSavedUploadedMedia;
+    public List<MediaUnit> getUnsavedUploadedMedia() {
+        return unsavedUploadedMedia;
     }
 
     /**
