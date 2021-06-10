@@ -61,19 +61,24 @@ public class XMLSchemaConverter implements SchemaConverterInterface {
     Each value contains a list of paths to XSLT files to transform the source format to internal Kitodo format.
     The order of XSLT file paths will determine the order of execution.
      */
-    private static Map<MetadataFormat, List<MetadataFormatConversion>> supportedSourceMetadataFormats = new HashMap<>();
+    private static final Map<MetadataFormat, List<MetadataFormatConversion>> supportedSourceMetadataFormats =
+            new HashMap<>();
 
     static {
-        supportedSourceMetadataFormats.put(MetadataFormat.MODS, Collections.singletonList(MetadataFormatConversion.MODS_2_KITODO));
+        supportedSourceMetadataFormats.put(MetadataFormat.MODS, Collections.singletonList(
+                MetadataFormatConversion.MODS_2_KITODO));
         supportedSourceMetadataFormats.put(MetadataFormat.MARC, Arrays.asList(
                 MetadataFormatConversion.MARC_2_MODS, MetadataFormatConversion.MODS_2_KITODO));
-        supportedSourceMetadataFormats.put(MetadataFormat.PICA, Collections.singletonList(MetadataFormatConversion.PICA_2_KITODO));
+        supportedSourceMetadataFormats.put(MetadataFormat.PICA, Collections.singletonList(
+                MetadataFormatConversion.PICA_2_KITODO));
+        supportedSourceMetadataFormats.put(MetadataFormat.EAD, Collections.singletonList(
+                MetadataFormatConversion.EAD_2_KITODO));
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
     }
 
-    private static MetadataFormat supportedTargetMetadataFormat = MetadataFormat.KITODO;
-    private static FileFormat supportedSourceFileFormat = FileFormat.XML;
-    private static FileFormat supportedTargetFileFormat = FileFormat.XML;
+    private static final MetadataFormat supportedTargetMetadataFormat = MetadataFormat.KITODO;
+    private static final FileFormat supportedSourceFileFormat = FileFormat.XML;
+    private static final FileFormat supportedTargetFileFormat = FileFormat.XML;
 
     /**
      * Converts a given DataRecord to the given MetadataFormat 'targetMetadataFormat' and FileFormat 'targetFileFormat'.

@@ -14,10 +14,11 @@ package org.kitodo.api.schemaconverter;
 public enum MetadataFormatConversion {
     MODS_2_KITODO("mods2kitodo.xsl", null),
     PICA_2_KITODO("pica2kitodo.xsl", null),
+    EAD_2_KITODO("ead2kitodo.xsl", null),
     MARC_2_MODS("marc21slim2mods.xsl", "https://www.loc.gov/standards/mods/v3/MARC21slim2MODS3-4.xsl");
 
-    private String fileName;
-    private String source;
+    private final String fileName;
+    private final String source;
 
     /**
      * Constructor setting filename and source URI for the XSL transformation file.

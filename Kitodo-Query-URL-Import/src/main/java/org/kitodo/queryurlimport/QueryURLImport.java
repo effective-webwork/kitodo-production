@@ -131,6 +131,7 @@ public class QueryURLImport implements ExternalDataImportInterface {
         formatHandlers.put(MetadataFormat.MODS.name(), new ModsResponseHandler());
         formatHandlers.put(MetadataFormat.MARC.name(), new MarcResponseHandler());
         formatHandlers.put(MetadataFormat.PICA.name(), new PicaResponseHandler());
+        formatHandlers.put(MetadataFormat.EAD.name(), new EadResponseHandler());
     }
 
     @Override
