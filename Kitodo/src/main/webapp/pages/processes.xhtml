@@ -50,6 +50,19 @@
         <h:panelGroup id="filterMenuWrapper">
             <h:form id="filterMenu"
                     rendered="#{ProcessForm.activeTabIndex eq 0}">
+                <h:panelGroup id="showClossedProcessWrapper">
+                    <p:outputLabel for="showClosedProcessesButton"
+                                   value="#{msgs['showClosedProcesses']}"
+                                   title="#{msgs['showClosedProcesses']}"/>
+                    <p:selectBooleanCheckbox id="showClosedProcessesButton"
+                                             styleClass="input switch"
+                                             process="@this"
+                                             value="#{ProcessForm.showClosedProcesses}">
+                        <p:ajax event="change"
+                                onstart="PF('processesTable').getPaginator().setPage(0);"
+                                update="processesTabView:processesForm,titleProcess"/>
+                    </p:selectBooleanCheckbox>
+                </h:panelGroup>
                 <div class="ui-inputgroup">
                     <p:inputText forceId="true"
                                  id="filterfield"
