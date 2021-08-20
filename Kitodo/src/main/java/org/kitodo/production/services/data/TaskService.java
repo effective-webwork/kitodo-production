@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.DataException;
 import org.kitodo.api.command.CommandResult;
 import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.Folder;
@@ -959,5 +960,19 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
     public void save(Task taskBean) throws DAOException {
         super.save(taskBean);
         taskBean.getRoles().parallelStream().forEach(role -> role.setUsedInWorkflow(true));
+    }
+
+    /**
+     * Reset given list of tasks to TaskStatus 'OPEN'.
+     *
+     * @param tasks list of tasks to reset
+     * @throws DataException when saving tasks after status reset fails
+     */
+    public static void resetTasksToOpen(List<Task> tasks) throws DataException, DAOException {
+        for (Task taskInProgress : tasks) {
+            ServiceManager.getTaskService().replaceProcessingUser(taskInProgress, null);
+            taskInProgress.setProcessingStatus(TaskStatus.OPEN);
+            ServiceManager.getTaskService().save(taskInProgress);
+        }
     }
 }
