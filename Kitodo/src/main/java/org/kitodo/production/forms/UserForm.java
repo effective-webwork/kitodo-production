@@ -95,6 +95,7 @@ public class UserForm extends BaseForm {
 
     private String oldPassword;
     private SortedMap<String, String> shortcuts;
+    private Integer removeClientId = null;
 
     @Named("LoginForm")
     private final LoginForm loginForm;
@@ -352,30 +353,68 @@ public class UserForm extends BaseForm {
     }
 
     /**
+     * Check whether User 'userObject' is currently assigned to any projects associated with the client
+     * identified by given ID 'clientId'. If true, the user is prompted to confirm his removal from those projects
+     * before removing the client from the user. If false, the client is remove from the user directly.
+     *
+     * @param clientId ID of client that is remove from the user
+     */
+    public void checkClientProjects(Integer clientId) {
+        List<Project> assignedClientProjects = this.userObject.getProjects().stream()
+                .filter(p -> p.getClient().getId().equals(clientId)).collect(Collectors.toList());
+        removeClientId = clientId;
+        if (assignedClientProjects.isEmpty()) {
+            deleteFromClient();
+        } else {
+            PrimeFaces.current().ajax().update("removeClientDialog");
+            PrimeFaces.current().executeScript("PF('removeClientDialog').show();");
+        }
+    }
+
+    /**
+     * Remove all projects from User 'userObject' that are associated with the client identified by ID
+     * 'removeClientId'.
+     */
+    public void removeUserFromClientProjects() {
+        if (Objects.nonNull(this.removeClientId)) {
+            this.userObject.getProjects().removeAll(this.userObject.getProjects().stream()
+                    .filter(p -> p.getClient().getId().equals(this.removeClientId)).collect(Collectors.toList()));
+        }
+    }
+
+    /**
+     * Return list of project titles that are associated with the client with ID 'removeClientId' and
+     * assigned to User 'userObject'.
+     * @return list of process titles
+     */
+    public List<String> getClientProjects() {
+        if (Objects.nonNull(this.removeClientId)) {
+            return this.userObject.getProjects().stream()
+                    .filter(project -> project.getClient().getId().equals(this.removeClientId))
+                    .map(Project::getTitle).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
      * Remove user from client.
      *
      * @return empty String
      */
     public String deleteFromClient() {
-        String idParameter = Helper.getRequestParameter(ID_PARAMETER);
-        if (Objects.nonNull(idParameter)) {
-            try {
-                int clientId = Integer.parseInt(idParameter);
-                for (Client client : this.userObject.getClients()) {
-                    if (client.getId().equals(clientId)) {
-                        this.userObject.getClients().remove(client);
-                        if (client.equals(this.userObject.getDefaultClient())) {
-                            this.userObject.setDefaultClient(null);
-                        }
-                        break;
+        if (Objects.nonNull(this.removeClientId)) {
+            for (Client client : this.userObject.getClients()) {
+                if (client.getId().equals(this.removeClientId)) {
+                    this.userObject.getClients().remove(client);
+                    if (client.equals(this.userObject.getDefaultClient())) {
+                        this.userObject.setDefaultClient(null);
                     }
+                    break;
                 }
-            } catch (NumberFormatException e) {
-                Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
             }
-        } else {
-            Helper.setErrorMessage(ERROR_PARAMETER_MISSING, new Object[] {ID_PARAMETER});
         }
+        this.removeClientId = null;
         return this.stayOnCurrentPage;
     }
 
@@ -780,5 +819,22 @@ public class UserForm extends BaseForm {
      */
     public FilterMenu getFilterMenu() {
         return filterMenu;
+    }
+
+    /**
+     * Get 'removeClientId'. ID of the client that is to be removed from User 'userObject'.
+     *
+     * @return removeClientId
+     */
+    public Integer getRemoveClientId() {
+        return removeClientId;
+    }
+
+    /**
+     * Set 'removeClientId'.
+     * @param clientId ID of the client that is to be removed from User 'userObject'.
+     */
+    public void setRemoveClientId(Integer clientId) {
+        this.removeClientId = clientId;
     }
 }
