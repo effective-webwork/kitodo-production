@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
@@ -24,6 +25,7 @@ import jakarta.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.data.database.beans.Client;
+import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.production.enums.ObjectType;
@@ -31,6 +33,7 @@ import org.kitodo.production.forms.BaseEditView;
 import org.kitodo.production.forms.LoginForm;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.TaskService;
 import org.kitodo.production.services.data.UserService;
 
 @Named("UserEditView")
@@ -131,7 +134,12 @@ public class UserEditView extends BaseEditView {
             if (userService.getAuthenticatedUser().getId().equals(this.userObject.getId())) {
                 loginForm.setLoggedUser(this.userObject);
                 ServiceManager.getSecurityAccessService().updateAuthentication(this.userObject);
-            }            
+            }
+            // check if user was removed from a client and reset tasks in progress for projects that belonged to that client
+            Integer removeClientId = clientsTab.getRemoveClientId();
+            if (Objects.nonNull(removeClientId)) {
+                TaskService.resetTasksToOpen(getTasksInProgress(userObject, removeClientId));
+            }
         } catch (DAOException | RuntimeException e) {
             Helper.setErrorMessage(ERROR_SAVING, new Object[] {ObjectType.USER.getTranslationSingular() }, logger, e);
             return this.stayOnCurrentPage;
@@ -139,5 +147,21 @@ public class UserEditView extends BaseEditView {
         
         return UserListView.VIEW_PATH  + "&" + getReferrerListOptions();
     }
+
+
+    /**
+     * Retrieve and return list of tasks that are assigned to the user, have TaskStatus "INWORK" and belong to processes
+     * of the client with the given ID 'clientId'.
+     *
+     * @param user User whose tasks are reset
+     * @param clientId ID of client by which tasks are filtered.
+     * @return list of tasks
+     */
+    private List<Task> getTasksInProgress(User user, int clientId) {
+        List<Task> tasks = ServiceManager.getTaskService().getTasksInProgress(user);
+        return tasks.stream().filter(task -> task.getProcess().getProject().getClient().getId().equals(clientId))
+                .collect(Collectors.toList());
+    }
+
 
 }
