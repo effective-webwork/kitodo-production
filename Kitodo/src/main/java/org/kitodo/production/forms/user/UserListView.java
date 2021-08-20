@@ -25,9 +25,9 @@ import jakarta.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.DataException;
 import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.User;
-import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.filters.FilterMenu;
@@ -36,6 +36,7 @@ import org.kitodo.production.helper.Helper;
 import org.kitodo.production.model.LazyUserModel;
 import org.kitodo.production.security.SecuritySession;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.TaskService;
 import org.kitodo.production.services.data.UserService;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.SortMeta;
@@ -101,15 +102,10 @@ public class UserListView extends BaseListView {
      * @param userObject user
      */
     public static void resetTasksToOpen(User userObject) {
-        List<Task> tasksInProgress = getTasksInProgress(userObject);
-        for (Task taskInProgress : tasksInProgress) {
-            ServiceManager.getTaskService().replaceProcessingUser(taskInProgress, null);
-            taskInProgress.setProcessingStatus(TaskStatus.OPEN);
-            try {
-                ServiceManager.getTaskService().save(taskInProgress);
-            } catch (DAOException e) {
-                Helper.setErrorMessage(ERROR_SAVING, new Object[]{ObjectType.TASK.getTranslationSingular()}, logger, e);
-            }
+        try {
+            TaskService.resetTasksToOpen(getTasksInProgress(userObject));
+        } catch (DataException | DAOException e) {
+            Helper.setErrorMessage(ERROR_SAVING, new Object[]{ObjectType.TASK.getTranslationSingular()}, logger, e);
         }
     }
 
