@@ -56,12 +56,15 @@
 
             <p:column id="processIdColumn"
                       rendered="#{CurrentTaskForm.showColumn('task.processId')}"
+                      styleClass="numeric"
+                      sortBy="#{item.processForTask.id}"
                       headerText="#{msgs.processId}">
                 <h:outputText title="#{item.process.id}"
                               value="#{item.process.id}"/>
             </p:column>
 
             <p:column headerText="#{msgs.process}"
+                      sortBy="#{item.processForTask.title}"
                       rendered="#{CurrentTaskForm.showColumn('task.process')}">
                 <h:link id="editProcess" outcome="/pages/processEdit" title="#{msgs.editProcess}"
                         rendered="#{SecurityAccessController.hasAuthorityToEditProcess()}">
@@ -73,6 +76,8 @@
             </p:column>
 
             <p:column headerText="#{msgs.status}"
+                      styleClass="numeric"
+                      sortBy="#{item.processingStatus}"
                       rendered="#{CurrentTaskForm.showColumn('task.state')}">
                 <h:panelGroup class="task-status"
                               title="#{item.processingStatusTitle}"
