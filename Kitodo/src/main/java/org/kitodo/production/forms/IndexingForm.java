@@ -27,7 +27,11 @@ import javax.json.JsonArrayBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.production.enums.IndexStates;
@@ -169,7 +173,15 @@ public class IndexingForm {
     public void startAllIndexing() {
         indexingStartedTime = LocalDateTime.now();
         indexingStartedUser = ServiceManager.getUserService().getAuthenticatedUser().getFullName();
+        // TODO: remove the following method call (and all subsequent code) when mass indexer works as planned!
         ServiceManager.getIndexingService().startAllIndexing(pollingChannel);
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            searchSession.massIndexer().dropAndCreateSchemaOnStart(true);
+            searchSession.massIndexer().startAndWait();
+        } catch (InterruptedException e) {
+            Helper.setErrorMessage(e);
+        }
     }
 
     /**

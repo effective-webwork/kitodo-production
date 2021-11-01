@@ -16,11 +16,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.kitodo.data.database.enums.IndexAction;
 
 /**
  * Base bean class.
  */
+@Indexed
 @MappedSuperclass
 public abstract class BaseIndexedBean extends BaseBean {
 
