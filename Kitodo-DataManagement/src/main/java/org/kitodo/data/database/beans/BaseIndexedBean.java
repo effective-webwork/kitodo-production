@@ -22,7 +22,6 @@ import org.kitodo.data.database.enums.IndexAction;
 /**
  * Base bean class.
  */
-@Indexed
 @MappedSuperclass
 public abstract class BaseIndexedBean extends BaseBean {
 

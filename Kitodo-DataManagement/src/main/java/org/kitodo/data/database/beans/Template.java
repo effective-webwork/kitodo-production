@@ -28,9 +28,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.kitodo.data.database.persistence.TemplateDAO;
 
 @Entity
+@Indexed(index = "kitodo-template")
 @Table(name = "template")
 public class Template extends BaseTemplateBean {
 
