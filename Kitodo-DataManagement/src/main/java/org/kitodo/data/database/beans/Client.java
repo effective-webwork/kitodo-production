@@ -24,12 +24,14 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.kitodo.data.database.persistence.ClientDAO;
 
 @Entity
 @Table(name = "client")
 public class Client extends BaseBean {
 
+    @GenericField
     @Column(name = "name")
     private String name;
 
