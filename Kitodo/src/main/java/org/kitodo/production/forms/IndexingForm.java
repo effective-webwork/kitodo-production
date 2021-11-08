@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
@@ -144,10 +145,18 @@ public class IndexingForm {
     public void callIndexing(ObjectType type) {
         indexingStartedTime = LocalDateTime.now();
         indexingStartedUser = ServiceManager.getUserService().getAuthenticatedUser().getFullName();
-        try {
+        // TODO: remove the following method call (and all subsequent code) when mass indexer works as planned!
+        /* try {
             ServiceManager.getIndexingService().startIndexing(pollingChannel, type);
         } catch (IllegalStateException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+        }*/
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            searchSession.massIndexer(type.getaClass()).dropAndCreateSchemaOnStart(true);
+            searchSession.massIndexer(type.getaClass()).startAndWait();
+        } catch (InterruptedException e) {
+            Helper.setErrorMessage(e);
         }
     }
 
