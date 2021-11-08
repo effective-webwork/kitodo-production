@@ -64,7 +64,7 @@ public class ProcessType extends BaseType<Process> {
         jsonObject.put(ProcessTypeField.HAS_CHILDREN.getKey(), process.getChildren().size() > 0);
         jsonObject.put(ProcessTypeField.PARENT_ID.getKey(), processParentId);
         jsonObject.put(ProcessTypeField.TASKS.getKey(), addObjectRelation(process.getTasks(), true));
-        jsonObject.put(ProcessTypeField.METADATA.getKey(), process.getMetadata());
+        //jsonObject.put(ProcessTypeField.METADATA.getKey(), process.getMetadata());
         jsonObject.put(ProcessTypeField.NUMBER_OF_METADATA.getKey(), process.getNumberOfMetadata());
         jsonObject.put(ProcessTypeField.NUMBER_OF_IMAGES.getKey(), process.getNumberOfImages());
         jsonObject.put(ProcessTypeField.NUMBER_OF_STRUCTURES.getKey(), process.getNumberOfStructures());
@@ -73,7 +73,7 @@ public class ProcessType extends BaseType<Process> {
         jsonObject.put(ProcessTypeField.IN_CHOICE_LIST_SHOWN.getKey(), process.getInChoiceListShown());
         jsonObject.put(ProcessTypeField.LAST_EDITING_USER.getKey(), ProcessConverter.getLastEditingUser(process));
         jsonObject.put(
-            ProcessTypeField.CORRECTION_COMMENT_STATUS.getKey(), 
+            ProcessTypeField.CORRECTION_COMMENT_STATUS.getKey(),
             ProcessConverter.getCorrectionCommentStatus(process).getValue()
         );
         convertLastProcessingTask(jsonObject, process);
@@ -84,24 +84,24 @@ public class ProcessType extends BaseType<Process> {
 
     /**
      * Adds last processing task dates to json object for indexing.
-     * 
+     *
      * @param jsonObject the json object used for indexing
      * @param process the process being index
      */
     private void convertLastProcessingTask(Map<String, Object> jsonObject, Process process) {
         jsonObject.put(
-            ProcessTypeField.PROCESSING_BEGIN_LAST_TASK.getKey(), 
+            ProcessTypeField.PROCESSING_BEGIN_LAST_TASK.getKey(),
             getFormattedDate(ProcessConverter.getLastProcessingBegin(process))
         );
         jsonObject.put(
-            ProcessTypeField.PROCESSING_END_LAST_TASK.getKey(), 
+            ProcessTypeField.PROCESSING_END_LAST_TASK.getKey(),
             getFormattedDate(ProcessConverter.getLastProcessingEnd(process))
         );
     }
 
     /**
      * Adds progress status properties to json object for indexing.
-     * 
+     *
      * @param jsonObject the json object used for indexing
      * @param process the process being index
      */
@@ -113,7 +113,7 @@ public class ProcessType extends BaseType<Process> {
         jsonObject.put(ProcessTypeField.PROGRESS_OPEN.getKey(), taskProgress.get(TaskStatus.OPEN));
         jsonObject.put(ProcessTypeField.PROGRESS_LOCKED.getKey(), taskProgress.get(TaskStatus.LOCKED));
         jsonObject.put(
-            ProcessTypeField.PROGRESS_COMBINED.getKey(), 
+            ProcessTypeField.PROGRESS_COMBINED.getKey(),
             ProcessConverter.getCombinedProgressFromTaskPercentages(taskProgress)
         );
     }

@@ -26,6 +26,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -104,14 +106,17 @@ public class Project extends BaseIndexedBean implements Comparable<Project> {
     private Boolean active = true;
 
     @ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"surname", "name", "id", "login"})
     private List<User> users;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"id", "title"})
     private List<Process> processes;
 
     @ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"id", "title"})
     private List<Template> templates;
 
@@ -126,6 +131,7 @@ public class Project extends BaseIndexedBean implements Comparable<Project> {
     private ImportConfiguration defaultChildProcessImportConfiguration;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"path", "urlStructure", "fileGroup", "mimeType"})
     private List<Folder> folders;
 

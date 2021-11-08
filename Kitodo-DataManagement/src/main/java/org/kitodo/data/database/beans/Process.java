@@ -35,6 +35,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -116,19 +118,23 @@ public class Process extends BaseTemplateBean {
     private Process parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST)
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Process> children;
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"title", "id"})
     @OrderBy("ordering")
     private List<Task> tasks;
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"message"})
     private List<Comment> comments;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "process_x_property", joinColumns = {
             @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_process_x_property_process_id"))}, inverseJoinColumns = {
@@ -136,6 +142,7 @@ public class Process extends BaseTemplateBean {
     private List<Property> properties;
 
     @ManyToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "template_x_property", joinColumns = {
@@ -144,6 +151,7 @@ public class Process extends BaseTemplateBean {
     private List<Property> templates;
 
     @ManyToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "workpiece_x_property", joinColumns = {
@@ -152,6 +160,7 @@ public class Process extends BaseTemplateBean {
     private List<Property> workpieces;
 
     @ManyToMany(mappedBy = "processes")
+    @LazyCollection(LazyCollectionOption.FALSE)
     @IndexedEmbedded(includePaths = {"title", "id"})
     private List<Batch> batches = new ArrayList<>();
 
