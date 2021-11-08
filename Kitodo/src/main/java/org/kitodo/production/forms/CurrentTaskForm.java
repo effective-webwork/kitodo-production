@@ -748,7 +748,7 @@ public class CurrentTaskForm extends BaseForm {
      * @param propertyName name of the property for the property value is retrieved
      * @return property value if process has property with name 'propertyName', empty String otherwise
      */
-    public static String getTaskProcessPropertyValue(TaskDTO task, String propertyName) {
+    public static String getTaskProcessPropertyValue(Task task, String propertyName) {
         return ProcessService.getPropertyValue(task.getProcess(), propertyName);
     }
 
@@ -768,7 +768,7 @@ public class CurrentTaskForm extends BaseForm {
      * @param task TaskDTO object whose process is used
      * @return process age of given tasks process
      */
-    public String getProcessDuration(TaskDTO task) {
+    public String getProcessDuration(Task task) {
         return ProcessService.getProcessDuration(task.getProcess());
     }
 
@@ -794,6 +794,41 @@ public class CurrentTaskForm extends BaseForm {
     public void setFilter(String filter) {
         super.filter = filter;
         this.lazyDTOModel.setFilterString(filter);
+    }
+
+    /**
+     * Check and return whether the process of the given task has any correction comments or not.
+     *
+     * @param task
+     *          TaskDTO to check
+     * @return 0, if process of given task has no correction comment
+     *         1, if process of given task has correction comments that are all corrected
+     *         2, if process of given task has at least one open correction comment
+     */
+    public int hasCorrectionComment(TaskDTO task) {
+        try {
+            return ProcessService.hasCorrectionComment(task.getProcess().getId()).getValue();
+        } catch (DAOException e) {
+            Helper.setErrorMessage(ERROR_LOADING_ONE, new Object[] {ObjectType.PROCESS.getTranslationSingular(),
+                    task.getProcess().getId() }, logger, e);
+            return 0;
+        }
+    }
+
+    /**
+     * Retrieve correction comments of process of given task and return them as a tooltip String.
+     *
+     * @param task
+     *          task for which comment tooltip is created and returned
+     * @return String containing correction comment messages for process of given task
+     */
+    public String getCorrectionMessages(Task task) {
+        try {
+            return ServiceManager.getProcessService().createCorrectionMessagesTooltip(task.getProcess());
+        } catch (DAOException e) {
+            Helper.setErrorMessage(e);
+            return "";
+        }
     }
 
     /**

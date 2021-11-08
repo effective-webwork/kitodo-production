@@ -68,12 +68,12 @@
                     <h:outputText><i class="fa fa-bar-chart fa-lg"/></h:outputText>
                 </h:link>
                 <h:panelGroup styleClass="action"
-                              title="#{project.hasProcesses() ? msgs.cannotDeleteProject : msgs.delete}">
+                              title="#{empty project.getProcesses() ? msgs.delete : msgs.cannotDeleteProject}">
                     <p:commandLink id="deleteProject"
                                    action="#{DesktopForm.deleteProject(project.id)}"
                                    update="projectTable"
                                    rendered="#{SecurityAccessController.hasAuthorityToDeleteProject()}"
-                                   disabled="#{project.hasProcesses()}">
+                                   disabled="#{not empty project.getProcesses()}">
                         <h:outputText><i class="fa fa-trash-o"/></h:outputText>
                         <p:confirm header="#{msgs.confirmDelete}"
                                    message="#{DesktopForm.formatString('confirmDeleteProject', project.title)}"

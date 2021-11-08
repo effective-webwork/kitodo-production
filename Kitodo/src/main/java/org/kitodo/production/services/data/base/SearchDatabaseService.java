@@ -37,7 +37,7 @@ public abstract class SearchDatabaseService<T extends BaseBean, S extends BaseDA
 
     /**
      * Load data for frontend lists. Data can be loaded from database or index.
-     * 
+     *
      * @param first
      *            searched objects
      * @param pageSize
@@ -51,7 +51,7 @@ public abstract class SearchDatabaseService<T extends BaseBean, S extends BaseDA
      *
      * @return loaded data
      */
-    public abstract List loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public abstract List<?> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException;
 
     /**

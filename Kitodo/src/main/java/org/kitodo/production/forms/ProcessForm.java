@@ -49,8 +49,6 @@ import org.kitodo.data.exceptions.DataException;
 import org.kitodo.exceptions.InvalidImagesException;
 import org.kitodo.exceptions.MediaNotFoundException;
 import org.kitodo.production.controller.SecurityAccessController;
-import org.kitodo.production.dto.ProcessDTO;
-import org.kitodo.production.dto.TaskDTO;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.filters.FilterMenu;
 import org.kitodo.production.helper.CustomListColumnInitializer;
@@ -156,19 +154,19 @@ public class ProcessForm extends TemplateBaseForm {
      * @return property value if process has property with name 'propertyName',
      *         empty String otherwise
      */
-    public static String getPropertyValue(ProcessDTO process, String propertyName) {
+    public static String getPropertyValue(Process process, String propertyName) {
         return ProcessService.getPropertyValue(process, propertyName);
     }
 
     /**
      * Calculate and return age of given process as a String.
      *
-     * @param processDTO
+     * @param process
      *            ProcessDTO object whose duration/age is calculated
      * @return process age of given process
      */
-    public static String getProcessDuration(ProcessDTO processDTO) {
-        return ProcessService.getProcessDuration(processDTO);
+    public static String getProcessDuration(Process process) {
+        return ProcessService.getProcessDuration(process);
     }
 
     /**
@@ -198,7 +196,7 @@ public class ProcessForm extends TemplateBaseForm {
 
     /**
      * Create Child for given Process.
-     * @param processDTO the process to create a child for.
+     * @param process the process to create a child for.
      * @return path to createProcessForm
      */
     public String createProcessAsChild(ProcessDTO processDTO) {
@@ -209,8 +207,15 @@ public class ProcessForm extends TemplateBaseForm {
                         + process.getProject().getId() + "&parentId=" + process.getId();
             }
         } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_READING, new Object[] {ObjectType.PROCESS.getTranslationSingular() }, logger,
-                e);
+            Helper.setErrorMessage(ERROR_READING, new Object[]{ObjectType.PROCESS.getTranslationSingular()}, logger,
+                    e);
+        }
+    }
+
+    public String createProcessAsChild(Process process) {
+        if (Objects.nonNull(process.getTemplate()) && Objects.nonNull(process.getRuleset())) {
+            return CREATE_PROCESS_PATH + "&templateId=" + process.getTemplate().getId() + "&projectId="
+                    + process.getProject().getId() + "&parentId=" + process.getId();
         }
         return "processes";
     }
@@ -648,23 +653,14 @@ public class ProcessForm extends TemplateBaseForm {
 
     private List<Process> getProcessesForActions() {
         // TODO: find a way to pass filters
-        List<ProcessDTO> filteredProcesses = new ArrayList<>();
+        List<Process> filteredProcesses = new ArrayList<>();
         for (Object object : lazyDTOModel.load(0, 100000, "",
                 SortOrder.ASCENDING, null)) {
-            if (object instanceof ProcessDTO) {
-                filteredProcesses.add((ProcessDTO) object);
+            if (object instanceof Process) {
+                filteredProcesses.add((Process) object);
             }
         }
-        List<Process> processesForActions = new ArrayList<>();
-
-        try {
-            processesForActions = ServiceManager.getProcessService().convertDtosToBeans(filteredProcesses);
-        } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_LOADING_MANY, new Object[] {ObjectType.PROCESS.getTranslationPlural() },
-                logger, e);
-        }
-
-        return processesForActions;
+        return filteredProcesses;
     }
 
     /**
@@ -1028,12 +1024,12 @@ public class ProcessForm extends TemplateBaseForm {
      * Returns a String containing titles of all current tasks of the given process, e.g. "OPEN" tasks and tasks
      * "INWORK".
      *
-     * @param processDTO
+     * @param process
      *          process for which current task titles are returned
      * @return String containing titles of current tasks of given process
      */
-    public String getCurrentTaskTitles(ProcessDTO processDTO) {
-        return ServiceManager.getProcessService().createProgressTooltip(processDTO);
+    public String getCurrentTaskTitles(Process process) {
+        return ServiceManager.getProcessService().createProgressTooltip(process);
     }
 
     /**
@@ -1067,6 +1063,41 @@ public class ProcessForm extends TemplateBaseForm {
     }
 
     /**
+     * Check and return whether the process with the ID 'processId' has any correction comments or not.
+     *
+     * @param processId
+     *          ID of process to check
+     * @return 0, if process has no correction comment
+     *         1, if process has correction comments that are all corrected
+     *         2, if process has at least one open correction comment
+     */
+    public int hasCorrectionTask(int processId) {
+        try {
+            return ProcessService.hasCorrectionComment(processId).getValue();
+        } catch (DAOException e) {
+            Helper.setErrorMessage(ERROR_LOADING_ONE, new Object[] {ObjectType.PROCESS.getTranslationSingular(),
+                processId}, logger, e);
+            return 0;
+        }
+    }
+
+    /**
+     * Retrieve correction comments of given process and return them as a tooltip String.
+     *
+     * @param process
+     *          process for which comment tooltip is created and returned
+     * @return String containing correction comment messages for given process
+     */
+    public String getCorrectionMessages(Process process) {
+        try {
+            return ServiceManager.getProcessService().createCorrectionMessagesTooltip(process);
+        } catch (DAOException e) {
+            Helper.setErrorMessage(e);
+            return "";
+        }
+    }
+
+    /**
      * Return path to processes page.
      * @return path to processes page
      */
@@ -1084,12 +1115,42 @@ public class ProcessForm extends TemplateBaseForm {
     }
 
     /**
+     * Retrieve and return UserName of last user processing a task of the current process.
+     *
+     * @param process Process for which the UserName is returned
+     * @return username
+     */
+    public String getUserHandlingLastTask(Process process) {
+        return ServiceManager.getProcessService().getUserHandlingLastTask(process);
+    }
+
+    /**
+     * Retrieve and return timestamp of last tasks processing begin.
+     *
+     * @param process Process for which the timestamp is returned
+     * @return timestamp of last tasks processing begin
+     */
+    public String getProcessingBeginOfLastTask(Process process) {
+        return ServiceManager.getProcessService().getLastProcessingStart(process);
+    }
+
+    /**
+     * Retrieve and return timestamp of last tasks processing end.
+     *
+     * @param process Process for which the timestamp is returned
+     * @return timestamp of last tasks processing end
+     */
+    public String getProcessingEndOfLastTask(Process process) {
+        return ServiceManager.getProcessService().getLastProcessingEnd(process);
+    }
+
+    /**
      * Get all tasks of given process which should be visible to the user.
-     * @param processDTO process as DTO object
+     * @param process process as DTO object
      * @return List of filtered tasks as DTO objects
      */
-    public List<TaskDTO> getCurrentTasksForUser(ProcessDTO processDTO) {
-        return ServiceManager.getProcessService().getCurrentTasksForUser(processDTO, ServiceManager.getUserService().getCurrentUser());
+    public List<Task> getCurrentTasksForUser(Process process) {
+        return ServiceManager.getProcessService().getCurrentTasksForUser(process, ServiceManager.getUserService().getCurrentUser());
     }
 
     /**
@@ -1181,5 +1242,21 @@ public class ProcessForm extends TemplateBaseForm {
      */
     public FilterMenu getFilterMenu() {
         return filterMenu;
+    }
+
+    public double getProgressClosed(Process process) {
+        return ServiceManager.getProcessService().getProgressClosed(process.getTasks(), null);
+    }
+
+    public double getProgressInProcessing(Process process) {
+        return ServiceManager.getProcessService().getProgressInProcessing(process.getTasks(), null);
+    }
+
+    public double getProgressOpen(Process process) {
+        return ServiceManager.getProcessService().getProgressOpen(process.getTasks(), null);
+    }
+
+    public double getProgressLocked(Process process) {
+        return ServiceManager.getProcessService().getProgressLocked(process.getTasks(), null);
     }
 }

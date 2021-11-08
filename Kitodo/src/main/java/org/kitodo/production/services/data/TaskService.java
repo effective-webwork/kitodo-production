@@ -31,6 +31,9 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.hibernate.Session;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.api.command.CommandResult;
 import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
@@ -44,6 +47,7 @@ import org.kitodo.data.database.enums.TaskEditType;
 import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.BaseDAO;
+import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.database.persistence.TaskDAO;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.elasticsearch.index.Indexer;
@@ -190,10 +194,14 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
     }
 
     @Override
-    public List<TaskDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public List<Task> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
-                Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            return searchSession.search(Task.class).where(f -> f.matchAll()).fetch(pageSize).hits();
+        }
+        /*return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
+                Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));*/
     }
 
     /**

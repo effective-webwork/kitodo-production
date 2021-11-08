@@ -39,12 +39,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -91,6 +92,10 @@ import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.hibernate.Session;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
@@ -121,6 +126,7 @@ import org.kitodo.data.database.enums.IndexAction;
 import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.BaseDAO;
+import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.database.persistence.ProcessDAO;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.elasticsearch.index.Indexer;
@@ -377,9 +383,13 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     }
 
     @Override
-    public List<ProcessDTO> loadData(int first, int pageSize, String sortField,
+    public List<Process> loadData(int first, int pageSize, String sortField,
             org.primefaces.model.SortOrder sortOrder, Map filters) throws DataException {
-        return loadData(first, pageSize, sortField, sortOrder, filters, false, false);
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            return searchSession.search(Process.class).where(f -> f.matchAll()).fetch(pageSize).hits();
+        }
+        //return loadData(first, pageSize, sortField, sortOrder, filters, false, false);
     }
 
     /**
@@ -998,6 +1008,56 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
         // TODO: leave it for now - right now it displays only status
         processDTO.setTasks(convertRelatedJSONObjectToDTO(jsonObject, ProcessTypeField.TASKS.getKey(),
             ServiceManager.getTaskService()));
+
+        processDTO.setProgressClosed(getProgressClosed(null, processDTO.getTasks()));
+        processDTO.setProgressInProcessing(getProgressInProcessing(null, processDTO.getTasks()));
+        processDTO.setProgressOpen(getProgressOpen(null, processDTO.getTasks()));
+        processDTO.setProgressLocked(getProgressLocked(null, processDTO.getTasks()));
+
+        if (processDTO.hasChildren()) {
+            List<Process> children;
+            try {
+                children = ServiceManager.getProcessService().getById(processDTO.getId()).getChildren();
+                processDTO.setProgressClosed(progressOfChildrenClosed(children));
+                processDTO.setProgressInProcessing(progressOfChildrenInProcessing(children));
+                processDTO.setProgressOpen(progressOfChildrenOpen(children));
+                processDTO.setProgressLocked(progressOfChildrenLocked(children));
+            } catch (DAOException dao) {
+                throw new DataException(dao);
+            }
+        }
+    }
+
+    private Double progressOfChildrenClosed(List<Process> children) {
+        DescriptiveStatistics statistics = new DescriptiveStatistics();
+        for (Process child : children) {
+            statistics.addValue(getProgressClosed(child.getTasks(), null));
+        }
+        return statistics.getMean();
+    }
+
+    private Double progressOfChildrenInProcessing(List<Process> children) {
+        DescriptiveStatistics statistics = new DescriptiveStatistics();
+        for (Process child : children) {
+            statistics.addValue(getProgressInProcessing(child.getTasks(), null));
+        }
+        return statistics.getMean();
+    }
+
+    private Double progressOfChildrenOpen(List<Process> children) {
+        DescriptiveStatistics statistics = new DescriptiveStatistics();
+        for (Process child : children) {
+            statistics.addValue(getProgressOpen(child.getTasks(), null));
+        }
+        return statistics.getMean();
+    }
+
+    private Double progressOfChildrenLocked(List<Process> children) {
+        DescriptiveStatistics statistics = new DescriptiveStatistics();
+        for (Process child : children) {
+            statistics.addValue(getProgressLocked(child.getTasks(), null));
+        }
+        return statistics.getMean();
     }
 
     private List<BatchDTO> getBatchesForProcessDTO(Map<String, Object> jsonObject) throws DataException {
@@ -1291,31 +1351,36 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
         return currentTasks;
     }
 
-    private List<TaskDTO> getOpenTasks(ProcessDTO process) {
+    private List<Task> getOpenTasks(Process process) {
         return process.getTasks().stream()
                 .filter(t -> TaskStatus.OPEN.equals(t.getProcessingStatus())).collect(Collectors.toList());
     }
 
-    private List<TaskDTO> getTasksInWork(ProcessDTO process) {
+    private List<Task> getTasksInWork(Process process) {
         return process.getTasks().stream()
                 .filter(t -> TaskStatus.INWORK.equals(t.getProcessingStatus())).collect(Collectors.toList());
+    }
+
+    private List<Task> getCompletedTasks(Process process) {
+        return process.getTasks().stream()
+                .filter(t -> TaskStatus.DONE.equals(t.getProcessingStatus())).collect(Collectors.toList());
     }
 
     /**
      * Create and return String used as progress tooltip for a given process. Tooltip contains OPEN tasks and tasks
      * INWORK.
      *
-     * @param processDTO
-     *          process for which the tooltop is created
+     * @param process
+     *          process for which the tooltip is created
      * @return String containing the progress tooltip for the given process
      */
-    public String createProgressTooltip(ProcessDTO processDTO) {
-        String openTasks = getOpenTasks(processDTO).stream()
+    public String createProgressTooltip(Process process) {
+        String openTasks = getOpenTasks(process).stream()
                 .map(t -> " - " + Helper.getTranslation(t.getTitle())).collect(Collectors.joining(NEW_LINE_ENTITY));
         if (!openTasks.isEmpty()) {
             openTasks = Helper.getTranslation(TaskStatus.OPEN.getTitle()) + ":" + NEW_LINE_ENTITY + openTasks;
         }
-        String tasksInWork = getTasksInWork(processDTO).stream()
+        String tasksInWork = getTasksInWork(process).stream()
                 .map(t -> " - " + Helper.getTranslation(t.getTitle())).collect(Collectors.joining(NEW_LINE_ENTITY));
         if (!tasksInWork.isEmpty()) {
             tasksInWork = Helper.getTranslation(TaskStatus.INWORK.getTitle()) + ":" + NEW_LINE_ENTITY + tasksInWork;
@@ -1346,6 +1411,150 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             }
         }
         return null;
+    }
+
+    /**
+     * Get full progress for process.
+     *
+     * @param tasksBean
+     *            list of Task bean objects
+     * @return string
+     */
+    public String getProgress(List<Task> tasksBean, List<TaskDTO> taskDTOS) {
+        Map<String, Integer> tasks = getCalculationForProgress(tasksBean, taskDTOS);
+
+        double closed = calculateProgressClosed(tasks);
+        double inProcessing = calculateProgressInProcessing(tasks);
+        double open = calculateProgressOpen(tasks);
+        double locked = calculateProgressLocked(tasks);
+
+        DecimalFormat decimalFormat = new DecimalFormat("#000");
+        return decimalFormat.format(closed) + decimalFormat.format(inProcessing) + decimalFormat.format(open)
+                + decimalFormat.format(locked);
+    }
+
+    /**
+     * Get progress for closed tasks.
+     *
+     * @param tasksBean
+     *            list of Task bean objects
+     * @param tasksDTO
+     *            list of TaskDTO objects
+     * @return progress for closed steps
+     */
+    public double getProgressClosed(List<Task> tasksBean, List<TaskDTO> tasksDTO) {
+        Map<String, Integer> tasks = getCalculationForProgress(tasksBean, tasksDTO);
+
+        return calculateProgressClosed(tasks);
+    }
+
+    /**
+     * Get progress for processed tasks.
+     *
+     * @param tasksBean
+     *            list of Task bean objects
+     * @param tasksDTO
+     *            list of TaskDTO objects
+     * @return progress for processed tasks
+     */
+    public double getProgressInProcessing(List<Task> tasksBean, List<TaskDTO> tasksDTO) {
+        Map<String, Integer> tasks = getCalculationForProgress(tasksBean, tasksDTO);
+
+        return calculateProgressInProcessing(tasks);
+    }
+
+    /**
+     * Get progress for open tasks.
+     *
+     * @param tasksBean
+     *            list of Task bean objects
+     * @param tasksDTO
+     *            list of TaskDTO objects
+     * @return return progress for open tasks
+     */
+    public double getProgressOpen(List<Task> tasksBean, List<TaskDTO> tasksDTO) {
+        Map<String, Integer> tasks = getCalculationForProgress(tasksBean, tasksDTO);
+        return calculateProgressOpen(tasks);
+    }
+
+    /**
+     * Get progress for open tasks.
+     *
+     * @param tasksBean
+     *            list of Task bean objects
+     * @param tasksDTO
+     *            list of TaskDTO objects
+     * @return return progress for open tasks
+     */
+    public double getProgressLocked(List<Task> tasksBean, List<TaskDTO> tasksDTO) {
+        Map<String, Integer> tasks = getCalculationForProgress(tasksBean, tasksDTO);
+        return calculateProgressLocked(tasks);
+    }
+
+    private double calculateProgressClosed(Map<String, Integer> tasks) {
+        return (double) (tasks.get(CLOSED) * 100)
+                / (double) (tasks.get(CLOSED) + tasks.get(IN_PROCESSING) + tasks.get(OPEN) + tasks.get(LOCKED));
+    }
+
+    private double calculateProgressInProcessing(Map<String, Integer> tasks) {
+        return (double) (tasks.get(IN_PROCESSING) * 100)
+                / (double) (tasks.get(CLOSED) + tasks.get(IN_PROCESSING) + tasks.get(OPEN) + tasks.get(LOCKED));
+    }
+
+    private double calculateProgressOpen(Map<String, Integer> tasks) {
+        return (double) (tasks.get(OPEN) * 100)
+                / (double) (tasks.get(CLOSED) + tasks.get(IN_PROCESSING) + tasks.get(OPEN) + tasks.get(LOCKED));
+    }
+
+    private double calculateProgressLocked(Map<String, Integer> tasks) {
+        return (double) (tasks.get(LOCKED) * 100)
+                / (double) (tasks.get(CLOSED) + tasks.get(IN_PROCESSING) + tasks.get(OPEN) + tasks.get(LOCKED));
+    }
+
+    private Map<String, Integer> getCalculationForProgress(List<Task> tasksBean, List<TaskDTO> tasksDTO) {
+        List<TaskStatus> taskStatuses = new ArrayList<>();
+
+        if (Objects.nonNull(tasksBean)) {
+            for (Task task : tasksBean) {
+                taskStatuses.add(task.getProcessingStatus());
+            }
+        } else {
+            for (TaskDTO task : tasksDTO) {
+                taskStatuses.add(task.getProcessingStatus());
+            }
+        }
+        return calculationForProgress(taskStatuses);
+    }
+
+    private Map<String, Integer> calculationForProgress(List<TaskStatus> taskStatuses) {
+        Map<String, Integer> results = new HashMap<>();
+        int open = 0;
+        int inProcessing = 0;
+        int closed = 0;
+        int locked = 0;
+
+        for (TaskStatus taskStatus : taskStatuses) {
+            if (taskStatus.equals(TaskStatus.DONE)) {
+                closed++;
+            } else if (taskStatus.equals(TaskStatus.OPEN)) {
+                open++;
+            } else if (taskStatus.equals(TaskStatus.LOCKED)) {
+                locked++;
+            } else {
+                inProcessing++;
+            }
+        }
+
+        results.put(CLOSED, closed);
+        results.put(IN_PROCESSING, inProcessing);
+        results.put(OPEN, open);
+        results.put(LOCKED, locked);
+
+        if (open + inProcessing + closed + locked == 0) {
+            results.put(LOCKED, 1);
+        }
+
+        return results;
     }
 
     /**
@@ -2153,8 +2362,8 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
      * @return property value if process has property with name 'propertyName',
      *         empty String otherwise
      */
-    public static String getPropertyValue(ProcessDTO process, String propertyName) {
-        for (PropertyDTO property : process.getProperties()) {
+    public static String getPropertyValue(Process process, String propertyName) {
+        for (Property property : process.getProperties()) {
             if (property.getTitle().equals(propertyName)) {
                 return property.getValue();
             }
@@ -2169,10 +2378,9 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
      *            ProcessDTO object for which duration/age is calculated
      * @return process age of given process
      */
-    public static String getProcessDuration(ProcessDTO process) {
-        String creationDateTimeString = process.getCreationDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime createLocalDate = LocalDateTime.parse(creationDateTimeString, formatter);
+    public static String getProcessDuration(Process process) {
+        Date creationDate = process.getCreationDate();
+        LocalDateTime createLocalDate = creationDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         Duration duration = Duration.between(createLocalDate, LocalDateTime.now());
         return String.format("%sd; %sh", duration.toDays(),
             duration.toHours() - TimeUnit.DAYS.toHours(duration.toDays()));
@@ -2466,7 +2674,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     /**
      * Retrieve comments for the given process.
      *
-     * @param processDTO
+     * @param process
      *          process for which the tooltip is created
      * @return List containing comments of given process
      *
@@ -2475,6 +2683,81 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     public List<Comment> getComments(ProcessDTO processDTO) throws DAOException {
         Process process = ServiceManager.getProcessService().getById(processDTO.getId());
         return ServiceManager.getCommentService().getAllCommentsByProcess(process);
+    }
+
+    public String createCorrectionMessagesTooltip(Process process) throws DAOException {
+        List<Comment> correctionComments = ServiceManager.getCommentService().getAllCommentsByProcess(process)
+                .stream().filter(c -> CommentType.ERROR.equals(c.getType())).collect(Collectors.toList());
+        return createCommentTooltip(correctionComments);
+    }
+
+    private String createCommentTooltip(List<Comment> comments) {
+        return comments.stream()
+                .map(c -> " - [" + c.getCreationDate() + "] " + c.getAuthor().getFullName() + ": " + c.getMessage()
+                        + " (" + Helper.getTranslation("fixed") + ": " + c.isCorrected() + ")")
+                .collect(Collectors.joining(NEW_LINE_ENTITY));
+    }
+
+    private Task getLastProcessedTask(Process process) {
+        List<Task> tasks = getTasksInWork(process);
+        if (tasks.isEmpty()) {
+            tasks = getCompletedTasks(process);
+        }
+        tasks = tasks.stream().filter(t -> Objects.nonNull(t.getProcessingUser())).collect(Collectors.toList());
+        if (tasks.isEmpty()) {
+            return null;
+        } else {
+            tasks.sort(Comparator.comparing(Task::getProcessingBegin));
+            return tasks.get(0);
+        }
+    }
+
+    /**
+     * Return UserName of user that handled the last task of the given process (either the newest task INWORK or the
+     * newest DONE task, if no task is INWORK). Return an empty String if no task is INWORK or DONE.
+     *
+     * @param process Process
+     * @return name of processing user
+     */
+    public String getUserHandlingLastTask(Process process) {
+        Task lastTask = getLastProcessedTask(process);
+        if (Objects.isNull(lastTask)) {
+            return "";
+        } else {
+            return lastTask.getProcessingUser().getFullName();
+        }
+    }
+
+    /**
+     * Return processing begin of last processed task of given process.
+     *
+     * @param process Process
+     * @return processing begin of last processed task
+     */
+    public String getLastProcessingStart(Process process) {
+        Task lastTask = getLastProcessedTask(process);
+        if (Objects.isNull(lastTask)) {
+            return "";
+        } else {
+            // FIXME: this should be probably converted!
+            return lastTask.getProcessingBegin().toString();
+        }
+    }
+
+    /**
+     * Return processing end of last processed task of given process.
+     *
+     * @param process Process
+     * @return processing end of last processed task
+     */
+    public String getLastProcessingEnd(Process process) {
+        Task lastTask = getLastProcessedTask(process);
+        if (Objects.isNull(lastTask) || TaskStatus.INWORK.equals(lastTask.getProcessingStatus())) {
+            return "";
+        } else {
+            // FIXME: this should be probably converted!
+            return lastTask.getProcessingEnd().toString();
+        }
     }
 
     /**
@@ -2655,17 +2938,17 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     /**
      * Get all tasks of given process which should be visible to the user.
-     * @param processDTO process as DTO object
+     * @param process process as DTO object
      * @param user user to filter the tasks for
      * @return List of filtered tasks as DTO objects
      */
-    public List<TaskDTO> getCurrentTasksForUser(ProcessDTO processDTO, User user) {
+    public List<Task> getCurrentTasksForUser(Process process, User user) {
         Set<Integer> userRoles = user.getRoles().stream()
                 .map(Role::getId)
                 .collect(Collectors.toSet());
-        return processDTO.getTasks().stream()
+        return process.getTasks().stream()
                 .filter(task -> TaskStatus.OPEN.equals(task.getProcessingStatus()) || TaskStatus.INWORK.equals(task.getProcessingStatus()))
-                .filter(task -> !task.getRoleIds().stream()
+                .filter(task -> !task.getRoles().stream().map(Role::getId)
                         .filter(userRoles::contains)
                         .collect(Collectors.toSet()).isEmpty())
                 .collect(Collectors.toList());
@@ -2705,6 +2988,17 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
         }
         templateProcesses.sort(Comparator.comparing(Process::getTitle));
         return templateProcesses;
+    }
+
+    /**
+     * find processes by inChoiceListShown attribute.
+     * @return a list of found processes
+     */
+    public List<ProcessDTO> findByInChoiceListShown() throws DataException {
+        BoolQueryBuilder inChoiceListShownQuery = new BoolQueryBuilder();
+        MatchQueryBuilder matchQuery = matchQuery(ProcessTypeField.IN_CHOICE_LIST_SHOWN.getKey(), true);
+        inChoiceListShownQuery.must(matchQuery);
+        return ServiceManager.getProcessService().findByQuery(matchQuery, true);
     }
 
     /**

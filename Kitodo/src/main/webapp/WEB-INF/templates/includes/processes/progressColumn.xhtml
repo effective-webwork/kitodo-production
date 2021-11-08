@@ -15,7 +15,7 @@
 <ui:composition
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <!--@elvariable id="process" type="org.kitodo.production.dto.ProcessDTO"-->
+    <!--@elvariable id="process" type="org.kitodo.data.database.beans.Process"-->
     <h:panelGroup
             class="process-progress"
             title="#{ProcessForm.getCurrentTaskTitles(process)}"
@@ -24,11 +24,11 @@
                 background-image: linear-gradient(
                     to right,
                     var(--green),
-                    var(--green) #{process.progressClosed}%,
-                    var(--light-green) #{process.progressClosed}%,
-                    var(--light-green) #{process.progressInProcessing + process.progressClosed}%,
-                    var(--light-orange) #{process.progressInProcessing + process.progressClosed}%,
-                    var(--light-orange) #{process.progressOpen + process.progressClosed + process.progressInProcessing}%,
-                    var(--orange) #{process.progressOpen + process.progressClosed + process.progressInProcessing}%);"
+                    var(--green) #{ProcessForm.getProgressClosed(process)}%,
+                    var(--light-green) #{ProcessForm.getProgressClosed(process)}%,
+                    var(--light-green) #{ProcessForm.getProgressInProcessing(process) + ProcessForm.getProgressClosed(process)}%,
+                    var(--light-orange) #{ProcessForm.getProgressInProcessing(process) + ProcessForm.getProgressClosed(process)}%,
+                    var(--light-orange) #{ProcessForm.getProgressOpen(process) + ProcessForm.getProgressClosed(process) + ProcessForm.getProgressInProcessing(process)}%,
+                    var(--orange) #{ProcessForm.getProgressOpen(process) + ProcessForm.getProgressClosed(process) + ProcessForm.getProgressInProcessing(process)}%);"
     />
 </ui:composition>
