@@ -11,12 +11,16 @@
 
 package org.kitodo.data.database.beans;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,13 +36,24 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
-
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.kitodo.api.Metadata;
+import org.kitodo.api.MetadataEntry;
+import org.kitodo.api.MetadataGroup;
+import org.kitodo.api.dataformat.Workpiece;
+import org.kitodo.api.dataformat.mets.MetsXmlElementAccessInterface;
+import org.kitodo.config.KitodoConfig;
 import org.kitodo.data.database.persistence.ProcessDAO;
+import org.kitodo.data.elasticsearch.bridges.MetadataBinder;
+import org.kitodo.serviceloader.KitodoServiceLoader;
 
 @Entity
 @Indexed(index = "kitodo-process")
@@ -116,25 +131,24 @@ public class Process extends BaseTemplateBean {
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "process_x_property", joinColumns = {
-        @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_process_x_property_process_id")) }, inverseJoinColumns = {
-            @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_process_x_property_property_id")) })
+            @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_process_x_property_process_id"))}, inverseJoinColumns = {
+            @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_process_x_property_property_id"))})
     private List<Property> properties;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "template_x_property", joinColumns = {
-        @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_template_x_property_process_id")) }, inverseJoinColumns = {
-            @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_template_x_property_property_id")) })
+            @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_template_x_property_process_id"))}, inverseJoinColumns = {
+            @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_template_x_property_property_id"))})
     private List<Property> templates;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @IndexedEmbedded(includePaths = {"id", "title", "value"})
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @JoinTable(name = "workpiece_x_property", joinColumns = {
-        @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_workpiece_x_property_process_id")) },
-            inverseJoinColumns = {
-                @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_workpiece_x_property_property_id")) })
+            @JoinColumn(name = "process_id", foreignKey = @ForeignKey(name = "FK_workpiece_x_property_process_id"))}, inverseJoinColumns = {
+            @JoinColumn(name = "property_id", foreignKey = @ForeignKey(name = "FK_workpiece_x_property_property_id"))})
     private List<Property> workpieces;
 
     @ManyToMany(mappedBy = "processes")
@@ -153,7 +167,13 @@ public class Process extends BaseTemplateBean {
     private User blockedUser;
 
     @Transient
-    private List<Map<String, Object>> metadata;
+    @IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "processBaseUri")))
+    Workpiece workpiece;
+
+    @Transient
+    @IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "workpiece")))
+    @PropertyBinding(binder = @PropertyBinderRef(type = MetadataBinder.class))
+    private List<Metadata> metadata;
 
     @Transient
     private int numberOfMetadata;
@@ -179,6 +199,7 @@ public class Process extends BaseTemplateBean {
         this.tasks = new ArrayList<>();
         this.inChoiceListShown = false;
         this.creationDate = new Date();
+        this.metadata = new ArrayList<>();
     }
 
     /**
@@ -273,8 +294,7 @@ public class Process extends BaseTemplateBean {
     /**
      * Sets the process base URI.
      *
-     * @param processBaseUri
-     *            the given process base URI
+     * @param processBaseUri the given process base URI
      */
     public void setProcessBaseUri(URI processBaseUri) {
         this.processBaseUri = Objects.isNull(processBaseUri) ? null : processBaseUri.toString();
@@ -414,8 +434,7 @@ public class Process extends BaseTemplateBean {
     /**
      * Set list of templates.
      *
-     * @param templates
-     *            as list of Property objects
+     * @param templates as list of Property objects
      */
     public void setTemplates(List<Property> templates) {
         this.templates = templates;
@@ -437,8 +456,7 @@ public class Process extends BaseTemplateBean {
     /**
      * Set list of workpieces.
      *
-     * @param workpieces
-     *            as list of Property objects
+     * @param workpieces as list of Property objects
      */
     public void setWorkpieces(List<Property> workpieces) {
         this.workpieces = workpieces;
@@ -460,8 +478,7 @@ public class Process extends BaseTemplateBean {
     /**
      * Set batches, if list is empty just set, if not first clear and next set.
      *
-     * @param batches
-     *            list
+     * @param batches list
      */
     public void setBatches(List<Batch> batches) {
         if (this.batches == null) {
@@ -534,7 +551,10 @@ public class Process extends BaseTemplateBean {
      *
      * @return value of metadata
      */
-    public List<Map<String, Object>> getMetadata() {
+    public List<Metadata> getMetadata() {
+        metadata.clear();
+        metadata.addAll(getLogicalDivisionsMetadata());
+        metadata.addAll(getPhysicalDivisionsMetadata());
         return metadata;
     }
 
@@ -543,8 +563,31 @@ public class Process extends BaseTemplateBean {
      *
      * @param metadata as Map
      */
-    public void setMetadata(List<Map<String, Object>> metadata) {
+    public void setMetadata(List<Metadata> metadata) {
         this.metadata = metadata;
+    }
+
+    /**
+     * Get workpiece.
+     *
+     * @return value of workpiece
+     */
+    public Workpiece getWorkpiece() {
+        try (InputStream inputStream = mapUriToKitodoDataDirectoryUri(getMetadataFileUri()).toURL().openStream()) {
+            return createMetsXmlElementAccess().read(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Workpiece();
+    }
+
+    /**
+     * Set workpiece.
+     *
+     * @param workpiece as Workpiece
+     */
+    public void setWorkpiece(Workpiece workpiece) {
+        this.workpiece = workpiece;
     }
 
     /**
@@ -559,8 +602,7 @@ public class Process extends BaseTemplateBean {
     /**
      * Set blocked user.
      *
-     * @param blockedUser
-     *            User object
+     * @param blockedUser User object
      */
     public void setBlockedUser(User blockedUser) {
         this.blockedUser = blockedUser;
@@ -607,10 +649,9 @@ public class Process extends BaseTemplateBean {
      * {@code Process} are equal if the values of their {@code Id}, {@code Title},
      * {@code OutputName} and {@code CreationDate} member fields are the same.
      *
-     * @param object
-     *            An object to be compared with this {@code Process}.
+     * @param object An object to be compared with this {@code Process}.
      * @return {@code true} if the object to be compared is an instance of
-     *         {@code Process} and has the same values; {@code false} otherwise.
+     * {@code Process} and has the same values; {@code false} otherwise.
      */
     @Override
     public boolean equals(Object object) {
@@ -683,5 +724,60 @@ public class Process extends BaseTemplateBean {
      */
     public void setNumberOfStructures(int numberOfStructures) {
         this.numberOfStructures = numberOfStructures;
+    }
+
+    private static MetsXmlElementAccessInterface createMetsXmlElementAccess() {
+        return new KitodoServiceLoader<MetsXmlElementAccessInterface>(MetsXmlElementAccessInterface.class).loadModule();
+    }
+
+    private URI mapUriToKitodoDataDirectoryUri(URI uri) {
+        String kitodoDataDirectory = KitodoConfig.getKitodoDataDirectory();
+        if (uri == null) {
+            return Paths.get(KitodoConfig.getKitodoDataDirectory()).toUri();
+        } else {
+            if (!uri.isAbsolute() && !uri.getRawPath().contains(kitodoDataDirectory)) {
+                return Paths.get(KitodoConfig.getKitodoDataDirectory(), uri.getRawPath()).toUri();
+            }
+        }
+        return uri;
+    }
+
+    private URI getMetadataFileUri() {
+        URI workPathUri = getProcessBaseUri();
+
+        String workDirectoryPath = workPathUri.getPath();
+        try {
+            return new URI(workPathUri.getScheme(), workPathUri.getUserInfo(), workPathUri.getHost(),
+                    workPathUri.getPort(),
+                    workDirectoryPath.endsWith("/") ? workDirectoryPath.concat("meta.xml")
+                            : workDirectoryPath + '/' + "meta.xml",
+                    workPathUri.getQuery(), null);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    private List<Metadata> getLogicalDivisionsMetadata() {
+        return getWorkpiece().getAllLogicalDivisions()
+                .stream()
+                .flatMap(logicalDivision -> logicalDivision.getMetadata().parallelStream())
+                .filter(metadata -> !(metadata instanceof MetadataEntry)
+                        || Objects.nonNull(((MetadataEntry) metadata).getValue())
+                        && !((MetadataEntry) metadata).getValue().isEmpty())
+                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getGroup())
+                        && !((MetadataGroup) metadata).getGroup().isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    private List<Metadata> getPhysicalDivisionsMetadata() {
+        return getWorkpiece().getAllPhysicalDivisions()
+                .stream()
+                .flatMap(physicalDivision -> physicalDivision.getMetadata().parallelStream())
+                .filter(metadata -> !(metadata instanceof MetadataEntry)
+                        || Objects.nonNull(((MetadataEntry) metadata).getValue())
+                        && !((MetadataEntry) metadata).getValue().isEmpty())
+                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getGroup())
+                        && !((MetadataGroup) metadata).getGroup().isEmpty())
+                .collect(Collectors.toList());
     }
 }

@@ -327,8 +327,8 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
      */
     private boolean openMetsFile() throws IOException, InvalidImagesException, MediaNotFoundException {
         mainFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
-        workpiece = ServiceManager.getMetsService().loadWorkpiece(mainFileUri);
-        workpieceOriginalState = ServiceManager.getMetsService().loadWorkpiece(mainFileUri);
+        workpiece = process.getWorkpiece();
+        workpieceOriginalState = process.getWorkpiece();
         if (Objects.isNull(workpiece.getId())) {
             logger.warn("Workpiece has no ID. Cannot verify workpiece ID. Setting workpiece ID.");
             workpiece.setId(process.getId().toString());
@@ -492,6 +492,7 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
             ServiceManager.getFileService().createBackupFile(process);
             try (OutputStream out = ServiceManager.getFileService().write(mainFileUri)) {
                 ServiceManager.getMetsService().save(workpiece, out);
+                process.setWorkpiece(workpiece);
                 ServiceManager.getProcessService().saveToIndex(process,false);
                 unsavedUploadedMedia.clear();
                 deleteUnsavedDeletedMedia();

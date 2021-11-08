@@ -279,7 +279,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     @Override
     public void save(Process process, boolean updateRelatedObjectsInIndex) throws DataException {
         WorkflowControllerService.updateProcessSortHelperStatus(process);
-        
+
         // save parent processes if they are new and do not have an id yet
         List<Process> parents = findParentProcesses(process);
         for (Process parent: parents) {
@@ -287,7 +287,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
                 super.save(parent, updateRelatedObjectsInIndex);
             }
         }
-        
+
         super.save(process, updateRelatedObjectsInIndex);
 
         // save parent processes in order to refresh ElasticSearch index
@@ -299,15 +299,16 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     @Override
     public void saveToIndex(Process process, boolean forceRefresh)
             throws CustomResponseException, DataException, IOException {
-
+        // TODO: probably remove (as index is now managed by hibernate search!)
         enrichProcessData(process, false);
-
+        //process.setMetadata(getMetadataForIndex(process));
+        process.setBaseType(getBaseType(process));
         super.saveToIndex(process, forceRefresh);
     }
 
     /**
      * Find all parent processes for a process ordered such that the root parent comes first.
-     * 
+     *
      * @param process the process whose parents are to be found
      * @return the list of parent processes (direct parents and grand parents, and more)
      */
@@ -338,7 +339,10 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     @Override
     public void addAllObjectsToIndex(List<Process> processes) throws CustomResponseException, DAOException, IOException {
         for (Process process : processes) {
+            // TODO: probably remove (as index is now managed by hibernate search!)
             enrichProcessData(process, true);
+            //process.setMetadata(getMetadataForIndex(process, true));
+            process.setBaseType(getBaseType(process));
         }
         super.addAllObjectsToIndex(processes);
     }
@@ -954,7 +958,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     /**
      * Parses last processing dates from the jsonObject and adds them to the processDTO bean.
-     * 
+     *
      * @param jsonObject the json object retrieved from elastic search
      * @param processDTO the processDTO bean that will receive the processing dates
      */
@@ -967,7 +971,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     /**
      * Parses task progress properties from the jsonObject and adds them to the processDTO bean.
-     * 
+     *
      * @param jsonObject the json object retrieved from elastic search
      * @param processDTO the processDTO bean that will receive the progress information
      */
@@ -2421,10 +2425,10 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
         }
     }
 
-    /** 
-     * Upload from home for list of processes for current user. 
+    /**
+     * Upload from home for list of processes for current user.
      * Deletes symlinks in home directory of current user.
-     * 
+     *
      * @param processes the list of processes
      */
     public static void uploadFromHome(List<Process> processes) {
