@@ -13,6 +13,7 @@ package org.kitodo.production.services.data;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -198,7 +199,7 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
             throws DataException {
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
-            return searchSession.search(Task.class).where(f -> f.matchAll()).fetch(pageSize).hits();
+            return new ArrayList<>(searchSession.search(Task.class).where(f -> f.matchAll()).fetchHits(pageSize));
         }
         /*return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
                 Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));*/

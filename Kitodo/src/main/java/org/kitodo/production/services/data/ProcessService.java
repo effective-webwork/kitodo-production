@@ -387,7 +387,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             org.primefaces.model.SortOrder sortOrder, Map filters) throws DataException {
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
-            return searchSession.search(Process.class).where(f -> f.matchAll()).fetch(pageSize).hits();
+            return new ArrayList<>(searchSession.search(Process.class).where(f -> f.matchAll()).fetchHits(pageSize));
         }
         //return loadData(first, pageSize, sortField, sortOrder, filters, false, false);
     }

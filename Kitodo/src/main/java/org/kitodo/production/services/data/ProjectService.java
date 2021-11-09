@@ -163,7 +163,7 @@ public class ProjectService extends ClientSearchService<Project, ProjectDTO, Pro
             throws DataException {
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
-            return searchSession.search(Project.class).where(f -> f.matchAll()).fetch(pageSize).hits();
+            return new ArrayList<>(searchSession.search(Project.class).where(f -> f.matchAll()).fetchHits(pageSize));
         }
         //return findByQuery(getProjectsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
             //false);

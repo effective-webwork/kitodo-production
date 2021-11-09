@@ -45,7 +45,6 @@
                 </p:panel>
                 <p:panel styleClass="grid-item"
                          rendered="#{SecurityAccessController.hasAuthorityToViewProcessList()}">
-                    <!--
                     <div class="content-header">
                         <div class="ui-panel-content ui-widget-content">
                             <h3>#{msgs.processes}</h3>
@@ -66,11 +65,9 @@
                     <div class="content-body">
                         <ui:include src="/WEB-INF/templates/includes/desktop/processesWidget.xhtml"/>
                     </div>
-                    -->
                 </p:panel>
                 <p:panel styleClass="grid-item"
                          rendered="#{SecurityAccessController.hasAuthorityToViewProjectList()}">
-                    <!--
                     <div class="content-header">
                         <div class="ui-panel-content ui-widget-content">
                             <h3>#{msgs.projects}</h3>
@@ -89,9 +86,7 @@
                     <div class="content-body">
                         <ui:include src="/WEB-INF/templates/includes/desktop/projectsWidget.xhtml"/>
                     </div>
-                    -->
                 </p:panel>
-                <!--
                 <p:panel styleClass="grid-item" rendered="#{SecurityAccessController.hasAuthorityToViewDatabaseStatistics()}">
                     <div class="content-header">
                         <div class="ui-panel-content ui-widget-content">
@@ -109,7 +104,6 @@
                         <ui:include src="/WEB-INF/templates/includes/desktop/statisticWidget.xhtml"/>
                     </div>
                 </p:panel>
-                -->
                 <p:ajaxStatus onstart="$('#loadingScreen').show()" oncomplete="$('#loadingScreen').hide(); #{DesktopForm.emptyCache()}"/>
             </div>
         </ui:fragment>
