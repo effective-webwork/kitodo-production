@@ -11,16 +11,11 @@
 
 package org.kitodo.data.database.beans;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,14 +43,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.kitodo.api.Metadata;
-import org.kitodo.api.MetadataEntry;
-import org.kitodo.api.MetadataGroup;
 import org.kitodo.api.dataformat.Workpiece;
-import org.kitodo.api.dataformat.mets.MetsXmlElementAccessInterface;
-import org.kitodo.config.KitodoConfig;
 import org.kitodo.data.database.persistence.ProcessDAO;
 import org.kitodo.data.elasticsearch.bridges.MetadataBinder;
-import org.kitodo.serviceloader.KitodoServiceLoader;
+import org.kitodo.data.helper.WorkpieceHelper;
 
 @Entity
 @Indexed(index = "kitodo-process")
@@ -561,9 +552,7 @@ public class Process extends BaseTemplateBean {
      * @return value of metadata
      */
     public List<Metadata> getMetadata() {
-        metadata.clear();
-        metadata.addAll(getLogicalDivisionsMetadata());
-        metadata.addAll(getPhysicalDivisionsMetadata());
+        metadata =  WorkpieceHelper.getAllProcessMetadata(getWorkpiece());
         return metadata;
     }
 
@@ -582,12 +571,10 @@ public class Process extends BaseTemplateBean {
      * @return value of workpiece
      */
     public Workpiece getWorkpiece() {
-        try (InputStream inputStream = mapUriToKitodoDataDirectoryUri(getMetadataFileUri()).toURL().openStream()) {
-            return createMetsXmlElementAccess().read(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (Objects.isNull(workpiece) || !Objects.equals(workpiece, WorkpieceHelper.loadWorkpiece(getProcessBaseUri()))) {
+            setWorkpiece(WorkpieceHelper.loadWorkpiece(getProcessBaseUri()));
         }
-        return new Workpiece();
+        return WorkpieceHelper.loadWorkpiece(getProcessBaseUri());
     }
 
     /**
