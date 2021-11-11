@@ -66,18 +66,24 @@ public class MetadataBinder implements PropertyBinder {
 
         @Override
         public void write(DocumentElement documentElement, List metadataElements, PropertyBridgeWriteContext context) {
-            List<Metadata> metadataList = (List<Metadata>) metadataElements;
-            for (Metadata metadata : metadataList) {
-                DocumentElement metadataElement = documentElement.addObject(this.metadata);
+            for (Object listElement : metadataElements) {
+                if (listElement instanceof Metadata) {
+                    evaluateMetadataElement(documentElement, (Metadata) listElement);
+                }
+            }
+        }
+
+        private void evaluateMetadataElement(DocumentElement containerElement, Metadata metadata) {
+            DocumentElement metadataElement = containerElement.addObject(this.metadata);
+            if (metadata instanceof MetadataEntry) {
                 metadataElement.addValue(key, metadata.getKey());
-                if (metadata instanceof MetadataEntry) {
-                    metadataElement.addValue(value, ((MetadataEntry) metadata).getValue());
-                } else if (metadata instanceof MetadataGroup) {
-                    for (Metadata meta : ((MetadataGroup) metadata).getGroup()) {
-                        DocumentElement groupElement = metadataElement.addObject(group);
-                        groupElement.addValue(groupKey, meta.getKey());
-                        groupElement.addValue(groupValue, ((MetadataEntry) meta).getValue());
-                    }
+                metadataElement.addValue(value, ((MetadataEntry) metadata).getValue());
+            } else if (metadata instanceof MetadataGroup) {
+                for (Metadata meta : ((MetadataGroup) metadata).getGroup()) {
+                    DocumentElement groupElement = metadataElement.addObject(group);
+                    groupElement.addValue(groupKey, metadata.getKey());
+                    // FIXME: recursion does not work!!
+                    evaluateMetadataElement(groupElement, meta);
                 }
             }
         }
