@@ -16,6 +16,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 @MappedSuperclass
 public abstract class BaseTemplateBean extends BaseIndexedBean {
 
-    @GenericField
+    @GenericField(sortable = Sortable.YES)
     @Column(name = "title")
     protected String title;
 

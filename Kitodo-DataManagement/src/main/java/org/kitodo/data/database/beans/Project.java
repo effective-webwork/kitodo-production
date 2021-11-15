@@ -28,12 +28,14 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.kitodo.data.database.persistence.ProjectDAO;
 
 @Entity
@@ -41,7 +43,7 @@ import org.kitodo.data.database.persistence.ProjectDAO;
 @Table(name = "project")
 public class Project extends BaseIndexedBean implements Comparable<Project> {
 
-    @GenericField
+    @KeywordField(sortable = Sortable.YES)
     @Column(name = "title", nullable = false, unique = true)
     private String title;
 
@@ -53,7 +55,7 @@ public class Project extends BaseIndexedBean implements Comparable<Project> {
     @Column(name = "metsRightsOwner")
     private String metsRightsOwner = "";
 
-    @FullTextField
+    @GenericField(sortable = Sortable.YES)
     @Column(name = "metsRightsOwnerLogo")
     private String metsRightsOwnerLogo = "";
 
@@ -102,7 +104,7 @@ public class Project extends BaseIndexedBean implements Comparable<Project> {
     private Integer numberOfVolumes;
 
     @Column(name = "active")
-    @GenericField
+    @GenericField(sortable = Sortable.YES)
     private Boolean active = true;
 
     @ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST)
