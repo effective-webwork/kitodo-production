@@ -16,7 +16,7 @@
         xmlns:f="http://xmlns.jcp.org/jsf/core"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:p="http://primefaces.org/ui">
-    <!--@elvariable id="item" type="org.kitodo.production.dto.ProjectDTO"-->
+    <!--@elvariable id="item" type="org.kitodo.data.database.beans.Project"-->
     <p:dataTable var="item"
                  value="#{ProjectForm.lazyDTOModel}"
                  first="#{ProjectForm.firstRow}"
@@ -26,7 +26,7 @@
                  paginator="true"
                  resizableColumns="true"
                  liveResize="true"
-                 sortBy="#{item.title.keyword}"
+                 sortBy="#{item.title}"
                  rows="#{LoginForm.loggedUser.tableSize}"
                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
                  currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
@@ -44,7 +44,7 @@
         </p:column>
 
         <p:column headerText="#{msgs.title}"
-                  sortBy="#{item.title.keyword}"
+                  sortBy="#{item.title}"
                   rendered="#{ProjectForm.showColumn('project.title')}">
             <h:outputText value="#{item.title}"
                           title="#{item.title}"/>
@@ -150,12 +150,12 @@
                 </h:link>
 
                 <h:panelGroup styleClass="action"
-                              title="#{item.hasProcesses() ? msgs.cannotDeleteProject : msgs.delete}">
+                              title="#{empty item.getProcesses() ? msgs.delete : msgs.cannotDeleteProject}">
                     <p:commandLink id="deleteProject"
                                    action="#{ProjectForm.delete(item.id)}"
                                    update="projectsTable"
                                    rendered="#{SecurityAccessController.hasAuthorityToDeleteProject()}"
-                                   disabled="#{item.hasProcesses()}">
+                                   disabled="#{not empty item.getProcesses()}">
                         <h:outputText><i class="fa fa-trash-o"/></h:outputText>
                         <p:confirm header="#{msgs.confirmDelete}"
                                    message="#{ProjectForm.formatString('confirmDeleteProject', item.title)}"

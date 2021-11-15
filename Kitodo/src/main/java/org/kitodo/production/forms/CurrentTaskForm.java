@@ -743,8 +743,8 @@ public class CurrentTaskForm extends BaseForm {
 
     /**
      * Retrieve and return process property value of property with given name 'propertyName' from process of given
-     * TaskDTO 'task'.
-     * @param task the TaskDTO object from which the property value is retrieved
+     * Task 'task'.
+     * @param task the Task object from which the property value is retrieved
      * @param propertyName name of the property for the property value is retrieved
      * @return property value if process has property with name 'propertyName', empty String otherwise
      */
@@ -765,7 +765,7 @@ public class CurrentTaskForm extends BaseForm {
     /**
      * Calculate and return age of given tasks process as a String.
      *
-     * @param task TaskDTO object whose process is used
+     * @param task Task object whose process is used
      * @return process age of given tasks process
      */
     public String getProcessDuration(Task task) {
@@ -800,12 +800,12 @@ public class CurrentTaskForm extends BaseForm {
      * Check and return whether the process of the given task has any correction comments or not.
      *
      * @param task
-     *          TaskDTO to check
+     *          Task to check
      * @return 0, if process of given task has no correction comment
      *         1, if process of given task has correction comments that are all corrected
      *         2, if process of given task has at least one open correction comment
      */
-    public int hasCorrectionComment(TaskDTO task) {
+    public int hasCorrectionComment(Task task) {
         try {
             return ProcessService.hasCorrectionComment(task.getProcess().getId()).getValue();
         } catch (DAOException e) {

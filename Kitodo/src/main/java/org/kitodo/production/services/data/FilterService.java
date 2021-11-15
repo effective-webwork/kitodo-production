@@ -68,7 +68,7 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
 
     private static final Logger logger = LogManager.getLogger(FilterService.class);
     private static volatile FilterService instance = null;
-    
+
     private static final Pattern CONDITION_PATTERN = Pattern.compile("\\(([^\\)]+)\\)|([^\\(\\)\\|]+)");
     public static final String FILTER_STRING = "filterString";
 
@@ -151,16 +151,16 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
      * depending on which data structures are used for applying filtering
      * restrictions conjunctions are formed and collect the restrictions and
      * then will be applied on the corresponding criteria. A criteria is only
-     * added if needed for the presence of filters applying to it. 
-     * 
-     * <p>Filters are enclosed in double quotes and separated via a space. 
-     * Each filter can be a disjunction of conditions separated by a "|". 
+     * added if needed for the presence of filters applying to it.
+     *
+     * <p>Filters are enclosed in double quotes and separated via a space.
+     * Each filter can be a disjunction of conditions separated by a "|".
      * Conditions can be negated by adding the prefix "-".</p>
-     * 
-     * <p>Some examples are: the default filter "word", which filters task or 
-     * processes by their title; a filter "stepinwork:Scanning", which filters 
-     * processes or tasks by the task state "Scanning" which are also currently in 
-     * progress. The negation thereof would be "-stepinwork:Scanning". A disjunction 
+     *
+     * <p>Some examples are: the default filter "word", which filters task or
+     * processes by their title; a filter "stepinwork:Scanning", which filters
+     * processes or tasks by the task state "Scanning" which are also currently in
+     * progress. The negation thereof would be "-stepinwork:Scanning". A disjunction
      * of conditions would be "stepinwork:Scanning | stepinwork:QC".</p>
      *
      * @param filters
@@ -203,7 +203,7 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
 
     /**
      * Splits a filter into multiple alternative conditions.
-     * 
+     *
      * @param filter the filter string (that was enclosed in double quotes)
      * @return a list of conditions after splitting the filter at the "|" character
      */
@@ -218,7 +218,7 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
 
     /**
      * Builds a ElasticSearch query from a single condition.
-     * 
+     *
      * @param condition the condition (e.g. a single word, or a pair of "property:value")
      * @param objectType the object type that is being filtered (either task or process)
      * @return a elastic search query builder object representing the condition
@@ -1139,8 +1139,19 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
             return ServiceManager.getUserService().getAllActiveUsersSortedByNameAndSurname();
         } catch (RuntimeException e) {
             logger.warn("RuntimeException caught. List of users could be empty!");
-            Helper.setErrorMessage("errorLoadingMany", new Object[] {Helper.getTranslation("activeUsers") }, logger, e);
+            Helper.setErrorMessage("errorLoadingMany", new Object[]{Helper.getTranslation("activeUsers")}, logger, e);
         }
         return new ArrayList<>();
+    }
+
+    public Map<String, String> getFilterMap(String filterString) {
+        Map<String, String> filterMap = new HashMap<>();
+        for (String filter : prepareFilters(filterString)) {
+            if (StringUtils.countMatches(filter, ":") == 1) {
+                String[] filterComponents = filter.split(":");
+                filterMap.put(filterComponents[0].trim(), filterComponents[1].trim());
+            }
+        }
+        return filterMap;
     }
 }

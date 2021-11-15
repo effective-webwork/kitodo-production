@@ -387,7 +387,17 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             org.primefaces.model.SortOrder sortOrder, Map filters) throws DataException {
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
-            return new ArrayList<>(searchSession.search(Process.class).where(f -> f.matchAll()).fetchHits(pageSize));
+            if (sortOrder.equals(org.primefaces.model.SortOrder.ASCENDING)) {
+                return new ArrayList<>(searchSession.search(Process.class)
+                        .where(SearchPredicateFactory::matchAll)
+                        .sort(f -> f.field(sortField).asc())
+                        .fetchHits(first, pageSize));
+            } else {
+                return new ArrayList<>(searchSession.search(Process.class)
+                        .where(SearchPredicateFactory::matchAll)
+                        .sort(f -> f.field(sortField).desc())
+                        .fetchHits(first, pageSize));
+            }
         }
         //return loadData(first, pageSize, sortField, sortOrder, filters, false, false);
     }
@@ -404,12 +414,16 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
      * @return List of loaded processes
      * @throws DataException if processes cannot be loaded from search index
      */
-    public List<ProcessDTO> loadData(int first, int pageSize, String sortField,
+    public List<Process> loadData(int first, int pageSize, String sortField,
                                      org.primefaces.model.SortOrder sortOrder, Map filters,
                                      boolean showClosedProcesses, boolean showInactiveProjects) throws DataException {
+        /*
         String filter = ServiceManager.getFilterService().parseFilterString(filters);
         return findByQuery(getQueryForFilter(showClosedProcesses, showInactiveProjects, filter),
                 getSortBuilder(sortField, sortOrder), first, pageSize, false);
+         */
+        // FIXME: include "showClosedProcesses", "showInactiveProjects"!
+        return loadData(first, pageSize, sortField, sortOrder, filters);
     }
 
     /**
@@ -2693,6 +2707,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     private String createCommentTooltip(List<Comment> comments) {
         return comments.stream()
+                .filter(c -> Objects.nonNull(c.getAuthor()))
                 .map(c -> " - [" + c.getCreationDate() + "] " + c.getAuthor().getFullName() + ": " + c.getMessage()
                         + " (" + Helper.getTranslation("fixed") + ": " + c.isCorrected() + ")")
                 .collect(Collectors.joining(NEW_LINE_ENTITY));
@@ -2761,20 +2776,20 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     }
 
     /**
-     * Check and return if child process for given ProcessDTO processDTO can be created via calendar or not.
+     * Check and return if child process for given Process process can be created via calendar or not.
      *
-     * @param processDTO ProcessDTO for which child processes may be created via calendar
+     * @param process Process for which child processes may be created via calendar
      * @return whether child processes for the given ProcessDTO can be created via the calendar or not
      * @throws DAOException if process could not be loaded from database
      * @throws IOException if ruleset file could not be read
      */
-    public static boolean canCreateProcessWithCalendar(ProcessDTO processDTO)
+    public static boolean canCreateProcessWithCalendar(Process process)
             throws DAOException, IOException {
         Collection<String> functionalDivisions;
-        if (Objects.isNull(processDTO.getRuleset())) {
+        if (Objects.isNull(process.getRuleset())) {
             return false;
         }
-        Integer rulesetId = processDTO.getRuleset().getId();
+        Integer rulesetId = process.getRuleset().getId();
         if (RULESET_CACHE_FOR_CREATE_FROM_CALENDAR.containsKey(rulesetId)) {
             functionalDivisions = RULESET_CACHE_FOR_CREATE_FROM_CALENDAR.get(rulesetId);
         } else {
@@ -2783,24 +2798,24 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
                     .getFunctionalDivisions(FunctionalDivision.CREATE_CHILDREN_WITH_CALENDAR);
             RULESET_CACHE_FOR_CREATE_FROM_CALENDAR.put(rulesetId, functionalDivisions);
         }
-        return functionalDivisions.contains(processDTO.getBaseType());
+        return functionalDivisions.contains(process.getBaseType());
     }
 
     /**
-     * Check and return if child process for given ProcessDTO processDTO can be created or not.
+     * Check and return if child process for given Process process can be created or not.
      *
-     * @param processDTO ProcessDTO for which child processes may be created
+     * @param process ProcessDTO for which child processes may be created
      * @return whether child processes for the given ProcessDTO can be created via the calendar or not
      * @throws DAOException if process could not be loaded from database
      * @throws IOException if ruleset file could not be read
      */
-    public static boolean canCreateChildProcess(ProcessDTO processDTO) throws DAOException,
+    public static boolean canCreateChildProcess(Process process) throws DAOException,
             IOException {
         Collection<String> functionalDivisions;
-        if (Objects.isNull(processDTO.getRuleset())) {
+        if (Objects.isNull(process.getRuleset())) {
             return false;
         }
-        Integer rulesetId = processDTO.getRuleset().getId();
+        Integer rulesetId = process.getRuleset().getId();
         if (RULESET_CACHE_FOR_CREATE_CHILD_FROM_PARENT.containsKey(rulesetId)) {
             functionalDivisions = RULESET_CACHE_FOR_CREATE_CHILD_FROM_PARENT.get(rulesetId);
         } else {
@@ -2809,7 +2824,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
                     .getFunctionalDivisions(FunctionalDivision.CREATE_CHILDREN_FROM_PARENT);
             RULESET_CACHE_FOR_CREATE_CHILD_FROM_PARENT.put(rulesetId, functionalDivisions);
         }
-        return functionalDivisions.contains(processDTO.getBaseType());
+        return functionalDivisions.contains(process.getBaseType());
     }
 
     /**

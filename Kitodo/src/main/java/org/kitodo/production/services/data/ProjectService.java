@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.hibernate.Session;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.config.enums.KitodoConfigFile;
@@ -144,7 +145,14 @@ public class ProjectService extends ClientSearchService<Project, ProjectDTO, Pro
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countDocuments(getProjectsForCurrentUserQuery());
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            // TODO: apply given filter map!
+            // TODO 2: restrict to projects of current user (see "getProjectsForCurrentUserQuery")
+            return searchSession.search(Project.class).where(SearchPredicateFactory::matchAll).fetchTotalHitCount();
+        }
+
+        //return countDocuments(getProjectsForCurrentUserQuery());
     }
 
     @Override
@@ -163,7 +171,20 @@ public class ProjectService extends ClientSearchService<Project, ProjectDTO, Pro
             throws DataException {
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
-            return new ArrayList<>(searchSession.search(Project.class).where(f -> f.matchAll()).fetchHits(pageSize));
+            // TODO: restrict to projects of current user! (e.g. use something like "getProjectsForCurrentUserQuery"!)
+            // TODO 2: map filters
+            // TODO 3: improve mapping of sortOrder
+            if (sortOrder.equals(SortOrder.ASCENDING)) {
+                return new ArrayList<>(searchSession.search(Project.class)
+                        .where(SearchPredicateFactory::matchAll)
+                        .sort(f -> f.field(sortField).asc())
+                        .fetchHits(first, pageSize));
+            } else {
+                return new ArrayList<>(searchSession.search(Project.class)
+                        .where(SearchPredicateFactory::matchAll)
+                        .sort(f -> f.field(sortField).desc())
+                        .fetchHits(first, pageSize));
+            }
         }
         //return findByQuery(getProjectsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
             //false);

@@ -32,7 +32,6 @@ import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.export.ExportDms;
-import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.enums.ChartMode;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
@@ -432,13 +431,13 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * If processes are generated with calendar.
      *
-     * @param processDTO
+     * @param process
      *            the process dto to check.
      * @return true if processes are created with calendar, false otherwise
      */
-    public boolean createProcessesWithCalendar(ProcessDTO processDTO) {
+    public boolean createProcessesWithCalendar(Process process) {
         try {
-            return ProcessService.canCreateProcessWithCalendar(processDTO);
+            return ProcessService.canCreateProcessWithCalendar(process);
         } catch (IOException | DAOException e) {
             Helper.setErrorMessage(ERROR_READING, new Object[] {ObjectType.PROCESS.getTranslationSingular() }, logger,
                     e);
@@ -449,13 +448,13 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * If a process can be created as child.
      *
-     * @param processDTO
+     * @param process
      *            the process dto to check.
      * @return true if processes can be created as child, false otherwise
      */
-    public boolean createProcessAsChildPossible(ProcessDTO processDTO) {
+    public boolean createProcessAsChildPossible(Process process) {
         try {
-            return ProcessService.canCreateChildProcess(processDTO);
+            return ProcessService.canCreateChildProcess(process);
         } catch (IOException | DAOException e) {
             Helper.setErrorMessage(ERROR_READING, new Object[] {ObjectType.PROCESS.getTranslationSingular() }, logger,
                     e);
@@ -479,9 +478,9 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * Starts generation of xml logfile for current process.
      */
-    public void createXML(ProcessDTO processDTO) {
+    public void createXML(Process process) {
         try {
-            ProcessService.createXML(ServiceManager.getProcessService().getById(processDTO.getId()), getUser());
+            ProcessService.createXML(ServiceManager.getProcessService().getById(process.getId()), getUser());
         } catch (IOException | DAOException e) {
             Helper.setErrorMessage("Error creating log file in home directory", logger, e);
         }
@@ -529,41 +528,35 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * Upload from home for single process.
      */
-    public void uploadFromHome(ProcessDTO processDTO) {
+    public void uploadFromHome(Process process) {
         try {
             WebDav myDav = new WebDav();
-            myDav.uploadFromHome(ServiceManager.getProcessService().getById(processDTO.getId()));
-            Helper.setMessage("directoryRemoved", processDTO.getTitle());
+            myDav.uploadFromHome(ServiceManager.getProcessService().getById(process.getId()));
+            Helper.setMessage("directoryRemoved", process.getTitle());
         } catch (DAOException e) {
             Helper.setErrorMessage(ERROR_LOADING_ONE,
-                    new Object[] {ObjectType.PROCESS.getTranslationSingular(), processDTO.getId() }, logger, e);
+                    new Object[] {ObjectType.PROCESS.getTranslationSingular(), process.getId() }, logger, e);
         }
     }
 
     /**
      * Delete Process.
      *
-     * @param processDTO
+     * @param process
      *            process to delete.
      */
-    public void delete(ProcessDTO processDTO) {
-        try {
-            Process process = ServiceManager.getProcessService().getById(processDTO.getId());
-            if (process.getChildren().isEmpty()) {
-                try {
-                    ProcessService.deleteProcess(process);
-                } catch (DataException | IOException e) {
-                    Helper.setErrorMessage(ERROR_DELETING, new Object[] {ObjectType.PROCESS.getTranslationSingular() },
-                            logger, e);
-                }
-            } else {
-                this.deleteProcessDialog = new DeleteProcessDialog();
-                this.deleteProcessDialog.setProcess(process);
-                PrimeFaces.current().executeScript("PF('deleteChildrenDialog').show();");
+    public void delete(Process process) {
+        if (process.getChildren().isEmpty()) {
+            try {
+                ProcessService.deleteProcess(process);
+            } catch (DataException | IOException e) {
+                Helper.setErrorMessage(ERROR_DELETING, new Object[] {ObjectType.PROCESS.getTranslationSingular() },
+                        logger, e);
             }
-        } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_DELETING, new Object[] {ObjectType.PROCESS.getTranslationSingular() }, logger,
-                    e);
+        } else {
+            this.deleteProcessDialog = new DeleteProcessDialog();
+            this.deleteProcessDialog.setProcess(process);
+            PrimeFaces.current().executeScript("PF('deleteChildrenDialog').show();");
         }
     }
 

@@ -29,17 +29,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.hibernate.Session;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.api.command.CommandResult;
 import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Project;
-import org.kitodo.data.database.beans.Role;
 import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.Template;
 import org.kitodo.data.database.beans.User;
@@ -63,9 +63,7 @@ import org.kitodo.production.dto.ProjectDTO;
 import org.kitodo.production.dto.TaskDTO;
 import org.kitodo.production.dto.UserDTO;
 import org.kitodo.production.enums.GenerationMode;
-import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
-import org.kitodo.production.helper.SearchResultGeneration;
 import org.kitodo.production.helper.VariableReplacer;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyMetsModsDigitalDocumentHelper;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyPrefsHelper;
@@ -123,9 +121,56 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
      *
      * @return query to retrieve tasks for which the user eligible.
      */
-    private BoolQueryBuilder createUserTaskQuery(String filter, boolean onlyOwnTasks, boolean hideCorrectionTasks,
-                                                 boolean showAutomaticTasks, List<TaskStatus> taskStatusRestrictions) {
+    private SearchQuery<Task> createUserTaskQuery(SearchSession searchSession, String filter, boolean onlyOwnTasks,
+                                                  boolean hideCorrectionTasks, boolean showAutomaticTasks,
+                                                  List<TaskStatus> taskStatusRestrictions,
+                                                  String sortField, SortOrder sortOrder) {
         User user = ServiceManager.getUserService().getAuthenticatedUser();
+
+        return searchSession.search(Task.class)
+            .where(f -> f.bool( b -> {
+                b.must(b
+                        .filter(f.match().field("typeAutomatic").matching(showAutomaticTasks))
+                        .filter(f.match().field("correction").matching(!hideCorrectionTasks))
+                );
+                if (onlyOwnTasks && Objects.nonNull(user)) {
+                    b.must(b.filter(f.match().field("processingUser").matching(user)));
+                }
+                // FIXME: this does not result in a "must be one of the taskStatus allowed"!
+                for (TaskStatus allowedStatus : taskStatusRestrictions) {
+                    b.should(f.match().field("processingStatus").matching(allowedStatus));
+                }
+                for (Map.Entry<String, String> filterEntry : ServiceManager.getFilterService().getFilterMap(filter).entrySet()) {
+                    b.must(b.filter(f.match().field(filterEntry.getKey()).matching(filterEntry.getValue())));
+                }
+            }))
+                .sort(f -> SortOrder.ASCENDING.equals(sortOrder) ? f.field(sortField).asc() : f.field(sortField).desc())
+                .toQuery();
+
+/*
+
+            if (sortOrder.equals(SortOrder.ASCENDING)) {
+                return new ArrayList<>(searchSession.search(Task.class)
+                        .where(f -> f.bool()
+                                .must( f.exists().field("process"))
+                                .must(f.bool()
+                                        .should(f.match().field("processingStatus").matching("INWORK", ValueConvert.NO))
+                                        .should(f.match().field("processingStatus").matching("OPEN", ValueConvert.NO))))
+                        .sort(f -> f.field(sortField).asc())
+                        .fetchHits(first, pageSize));
+            } else {
+                return new ArrayList<>(searchSession.search(Task.class)
+                        .where(f -> f.bool()
+                                .must( f.exists().field("process"))
+                                .must(f.bool()
+                                        .should(f.match().field("processingStatus").matching("INWORK", ValueConvert.NO))
+                                        .should(f.match().field("processingStatus").matching("OPEN", ValueConvert.NO))))
+                        .sort(f -> f.field(sortField).desc())
+                        .fetchHits(first, pageSize));
+            }
+        }
+
+
 
         BoolQueryBuilder query = new BoolQueryBuilder();
         query.must(getQueryForTemplate(0));
@@ -158,6 +203,7 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
         }
 
         return query;
+        */
     }
 
     @Override
@@ -173,14 +219,25 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countResults(new HashMap<String, String>(filters), false, false, false, null);
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            // TODO: map "filters", "onlyOwnTasks", "hideCorrectionTasks", "showAutomaticTasks", "taskStatus"
+            return searchSession.search(Task.class).where(SearchPredicateFactory::matchAll).fetchTotalHitCount();
+        }
+        //return countResults(new HashMap<String, String>(filters), false, false, false, null);
     }
 
     public Long countResults(HashMap<String, String> filters, boolean onlyOwnTasks, boolean hideCorrectionTasks,
                              boolean showAutomaticTasks, List<TaskStatus> taskStatus)
             throws DataException {
-        return countDocuments(createUserTaskQuery(ServiceManager.getFilterService().parseFilterString(filters),
-                onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks, taskStatus));
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            SearchQuery<Task> searchTasksQuery = createUserTaskQuery(searchSession, ServiceManager.getFilterService().parseFilterString(filters),
+                    onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks, taskStatus, "id", SortOrder.ASCENDING);
+            return searchTasksQuery.fetchTotalHitCount();
+        }
+        /*return countDocuments(createUserTaskQuery(ServiceManager.getFilterService().parseFilterString(filters),
+                onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks, taskStatus));*/
     }
 
     @Override
@@ -197,12 +254,8 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
     @Override
     public List<Task> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        try (Session session = HibernateUtil.getSession()) {
-            SearchSession searchSession = Search.session(session);
-            return new ArrayList<>(searchSession.search(Task.class).where(f -> f.matchAll()).fetchHits(pageSize));
-        }
-        /*return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
-                Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));*/
+        return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
+                Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));
     }
 
     /**
@@ -219,16 +272,29 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
      * @return List of loaded tasks
      * @throws DataException if tasks cannot be loaded from search index
      */
-    public List<TaskDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters,
+    public List<Task> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters,
                                   boolean onlyOwnTasks, boolean hideCorrectionTasks, boolean showAutomaticTasks,
                                   List<TaskStatus> taskStatus)
             throws DataException {
+
+        /*
         if ("process.creationDate".equals(sortField)) {
             sortField = "processForTask.creationDate";
         }
+        */
         String filter = ServiceManager.getFilterService().parseFilterString(filters);
-        return findByQuery(createUserTaskQuery(filter, onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks,
-                taskStatus), getSortBuilder(sortField, sortOrder), first, pageSize, false);
+
+        // FIXME: incorporate "related = false" (see out-commented return statement below!)
+
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            SearchQuery<Task> searchTasksQuery = createUserTaskQuery(searchSession, filter, onlyOwnTasks,
+                    hideCorrectionTasks, showAutomaticTasks, taskStatus, sortField, sortOrder);
+
+            return new ArrayList<>(searchTasksQuery.fetchHits(first, pageSize));
+        }
+        /*return findByQuery(createUserTaskQuery(filter, onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks,
+                taskStatus), getSortBuilder(sortField, sortOrder), first, pageSize, false);*/
     }
 
     /**

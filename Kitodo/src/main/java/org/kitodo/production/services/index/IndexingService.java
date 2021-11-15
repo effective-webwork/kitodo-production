@@ -35,10 +35,15 @@ import javax.json.JsonReader;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.ConfigMain;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.elasticsearch.KitodoRestClient;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.elasticsearch.index.IndexRestClient;
@@ -211,7 +216,12 @@ public class IndexingService {
      * @return number of indexed objects
      */
     public long getNumberOfIndexedObjects(ObjectType objectType) throws DataException {
-        return searchServices.get(objectType).count();
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            Class<?> clazz = objectType.getaClass();
+            return searchSession.search(clazz).where(SearchPredicateFactory::matchAll).fetchTotalHitCount();
+        }
+        //return searchServices.get(objectType).count();
     }
 
     /**

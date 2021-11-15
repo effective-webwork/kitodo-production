@@ -25,8 +25,7 @@
               headerText="#{msgs.actions}">
         <h:panelGroup layout="block"
                       styleClass="actionsBlock">
-            <!--@elvariable id="process" type="org.kitodo.production.dto.ProcessDTO"-->
-
+            <!--@elvariable id="process" type="org.kitodo.data.database.beans.Process"-->
             <h:panelGroup styleClass="action"
                           title="#{ProcessListView.createProcessAsChildPossible(process)? msgs.createProcessAsChild : msgs.createProcessAsChildNotConfigured}">
                 <h:link id="createChildren"
@@ -137,12 +136,12 @@
                 <h:outputText><i class="fa fa-file-archive-o fa-lg"/></h:outputText>
             </h:commandLink>
             <h:panelGroup styleClass="action"
-                          title="#{process.hasChildren() ? msgs.processNotDeletableWithChildren : msgs.delete}">
+                          title="#{empty process.children ? msgs.delete : msgs.processNotDeletableWithChildren}">
                 <p:commandLink id="deleteProcess"
                                action="#{ProcessListView.delete(process)}"
                                title="#{msgs.delete}"
                                rendered="#{SecurityAccessController.hasAuthorityToDeleteProcess()}"
-                               disabled="#{process.hasChildren()}"
+                               disabled="#{not empty process.children}"
                                update="@form">
                     <h:outputText><i class="fa fa-trash-o"/></h:outputText>
                     <p:confirm header="#{msgs.confirmDelete}"
