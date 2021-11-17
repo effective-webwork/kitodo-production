@@ -545,7 +545,7 @@ public class Process extends BaseTemplateBean {
      * @return value of metadata
      */
     public List<Metadata> getMetadata() {
-        metadata =  WorkpieceHelper.getAllProcessMetadata(getWorkpiece());
+        setMetadata(WorkpieceHelper.getAllProcessMetadata(getWorkpiece()));
         return metadata;
     }
 
@@ -577,6 +577,7 @@ public class Process extends BaseTemplateBean {
      */
     public void setWorkpiece(Workpiece workpiece) {
         this.workpiece = workpiece;
+        getMetadata();
     }
 
     /**

@@ -14,10 +14,8 @@ package org.kitodo.data.elasticsearch.bridges;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -33,56 +31,37 @@ public class MetadataBinder implements PropertyBinder {
         context.dependencies().use("key");
 
         IndexSchemaObjectField metadataField = context.indexSchemaElement().objectField("metadata");
-        IndexSchemaObjectField group = metadataField.objectField("group");
-        IndexFieldType<String> stringIndexFieldType = context.typeFactory().asString().toIndexFieldType();
+        metadataField.objectFieldTemplate("metadataGroup").matchingPathGlob("*group").multiValued();
+        metadataField.fieldTemplate("metadataTemplate_key", f -> f.asString()).matchingPathGlob("*key");
+        metadataField.fieldTemplate("metadataTemplate_value", f -> f.asString()).matchingPathGlob("*value");
 
-        context.bridge(List.class, new MetadataBridge(
-                metadataField.multiValued().toReference(),
-                metadataField.field("key", stringIndexFieldType).toReference(),
-                metadataField.field("value", stringIndexFieldType).toReference(),
-                group.multiValued().toReference(),
-                group.field("key", stringIndexFieldType).toReference(),
-                group.field("value", stringIndexFieldType).toReference()));
+        context.bridge(List.class, new MetadataBridge(metadataField.multiValued().toReference()));
     }
 
     private static class MetadataBridge implements PropertyBridge<List> {
-        private final IndexObjectFieldReference metadata;
-        private final IndexFieldReference<String> key;
-        private final IndexFieldReference<String> value;
-        private final IndexObjectFieldReference group;
-        private final IndexFieldReference<String> groupKey;
-        private final IndexFieldReference<String> groupValue;
+        private final IndexObjectFieldReference metadataObject;
 
-        public MetadataBridge(IndexObjectFieldReference metadata, IndexFieldReference<String> key,
-                              IndexFieldReference<String> value, IndexObjectFieldReference group,
-                              IndexFieldReference<String> groupKey, IndexFieldReference<String> groupValue) {
-            this.metadata = metadata;
-            this.key = key;
-            this.value = value;
-            this.group = group;
-            this.groupKey = groupKey;
-            this.groupValue = groupValue;
+        public MetadataBridge(IndexObjectFieldReference metadata) {
+            this.metadataObject = metadata;
         }
 
         @Override
         public void write(DocumentElement documentElement, List metadataElements, PropertyBridgeWriteContext context) {
             for (Object listElement : metadataElements) {
                 if (listElement instanceof Metadata) {
-                    evaluateMetadataElement(documentElement, (Metadata) listElement);
+                    DocumentElement rootElement = documentElement.addObject(metadataObject);
+                    evaluateMetadataElement(rootElement, (Metadata) listElement);
                 }
             }
         }
 
         private void evaluateMetadataElement(DocumentElement containerElement, Metadata metadata) {
-            DocumentElement metadataElement = containerElement.addObject(this.metadata);
+            containerElement.addValue("key", metadata.getKey());
             if (metadata instanceof MetadataEntry) {
-                metadataElement.addValue(key, metadata.getKey());
-                metadataElement.addValue(value, ((MetadataEntry) metadata).getValue());
+                containerElement.addValue("value", ((MetadataEntry) metadata).getValue());
             } else if (metadata instanceof MetadataGroup) {
                 for (Metadata meta : ((MetadataGroup) metadata).getGroup()) {
-                    DocumentElement groupElement = metadataElement.addObject(group);
-                    groupElement.addValue(groupKey, metadata.getKey());
-                    // FIXME: recursion does not work!!
+                    DocumentElement groupElement = containerElement.addObject("group");
                     evaluateMetadataElement(groupElement, meta);
                 }
             }
