@@ -16,8 +16,8 @@ import org.w3c.dom.Element;
 public class EadResponseHandler extends XmlResponseHandler {
 
     private static final String EAD_TITLE_PATH
-            = "//c[@level='file' and @id]/did/unittitle[@type='Einheitstitel']/text()";
-    private static final String EAD_ID_PATH = "//c[@level='file' and @id]/@id";
+            = "*[local-name()='did']/*[local-name()='unittitle' and @type='Einheitstitel']/text()";
+    private static final String EAD_ID_PATH = "@id";
 
     @Override
     String getRecordTitle(Element record) {

@@ -18,7 +18,8 @@ public enum SearchInterfaceType {
     OAI("oai", "http://www.openarchives.org/OAI/2.0/", "record", null, null,
             null, null, null, ".//*[local-name()='error']/text()"),
     FTP("ftp", null, null, null, null,null, null, null,
-            null);
+            null),
+    CUSTOM("custom", "http://www.w3.org/1999/xhtml", ".//*[local-name()='c' and @level='file']", null, null, null, null, null, "/error/text()");
 
     private final String typeString;
     private final String namespace;
