@@ -307,8 +307,8 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             throws CustomResponseException, DataException, IOException {
         // TODO: probably remove (as index is now managed by hibernate search!)
         enrichProcessData(process, false);
-        //process.setMetadata(getMetadataForIndex(process));
-        process.setBaseType(getBaseType(process));
+        /*process.setMetadata(getMetadataForIndex(process));
+        process.setBaseType(getBaseType(process));*/
         super.saveToIndex(process, forceRefresh);
     }
 
@@ -348,7 +348,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             // TODO: probably remove (as index is now managed by hibernate search!)
             enrichProcessData(process, true);
             //process.setMetadata(getMetadataForIndex(process, true));
-            process.setBaseType(getBaseType(process));
+            //process.setBaseType(getBaseType(process));
         }
         super.addAllObjectsToIndex(processes);
     }

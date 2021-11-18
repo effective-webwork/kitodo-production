@@ -280,7 +280,7 @@ public class SchemaService {
         VariableReplacer variableReplacer = new VariableReplacer(workpiece, process, null);
         String linkUri = variableReplacer.replace(uriWithVariables);
         link.setUri(URI.create(linkUri));
-        structure.setType(ServiceManager.getProcessService().getBaseType(process));
+        structure.setType(process.getBaseType());
     }
 
     private void copyLabelAndOrderlabel(Process source, LogicalDivision destination) throws IOException {

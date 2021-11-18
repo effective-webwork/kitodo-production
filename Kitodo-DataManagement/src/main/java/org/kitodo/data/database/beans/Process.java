@@ -178,6 +178,8 @@ public class Process extends BaseTemplateBean {
     private int numberOfStructures;
 
     @Transient
+    @IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "workpiece")))
+    @GenericField
     private String baseType;
 
     /**
@@ -545,7 +547,7 @@ public class Process extends BaseTemplateBean {
      * @return value of metadata
      */
     public List<Metadata> getMetadata() {
-        setMetadata(WorkpieceHelper.getAllProcessMetadata(getWorkpiece()));
+        getWorkpiece();
         return metadata;
     }
 
@@ -567,7 +569,7 @@ public class Process extends BaseTemplateBean {
         if (Objects.isNull(workpiece) || !Objects.equals(workpiece, WorkpieceHelper.loadWorkpiece(getProcessBaseUri()))) {
             setWorkpiece(WorkpieceHelper.loadWorkpiece(getProcessBaseUri()));
         }
-        return WorkpieceHelper.loadWorkpiece(getProcessBaseUri());
+        return workpiece;
     }
 
     /**
@@ -576,8 +578,13 @@ public class Process extends BaseTemplateBean {
      * @param workpiece as Workpiece
      */
     public void setWorkpiece(Workpiece workpiece) {
-        this.workpiece = workpiece;
-        getMetadata();
+        if (Objects.nonNull(workpiece) && !Objects.equals(this.workpiece, workpiece)) {
+            this.workpiece = workpiece;
+        } else {
+            this.workpiece = WorkpieceHelper.loadWorkpiece(getProcessBaseUri());
+        }
+        setMetadata(WorkpieceHelper.getAllProcessMetadata(this.workpiece));
+        setBaseType(this.workpiece.getLogicalStructure().getType());
     }
 
     /**
@@ -604,6 +611,9 @@ public class Process extends BaseTemplateBean {
      * @return value of baseType
      */
     public String getBaseType() {
+        if (Objects.isNull(baseType) || baseType.isEmpty() || !Objects.equals(baseType, getWorkpiece().getLogicalStructure().getType())) {
+            setBaseType(getWorkpiece().getLogicalStructure().getType());
+        }
         return baseType;
     }
 
