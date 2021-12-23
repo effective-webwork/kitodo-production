@@ -36,6 +36,9 @@ public class OPACConfig {
     private static XMLConfiguration config;
     private static final String TRUE = "true";
     private static final String DEFAULT = "[@default]";
+    private static final String LABEL = "[@label]";
+    private static final String VALUE = "[@value]";
+    private static final String SEARCH_FIELD = "searchField";
     private static final int DEFAULT_IMPORT_DEPTH = 2;
 
     /**
@@ -119,9 +122,9 @@ public class OPACConfig {
      * @return String name of catalogs default "searchField" if it exists; empty String otherwise
      */
     public static String getDefaultSearchField(String catalogName) {
-        for (HierarchicalConfiguration searchField : getSearchFields(catalogName).configurationsAt("searchField")) {
+        for (HierarchicalConfiguration searchField : getSearchFields(catalogName).configurationsAt(SEARCH_FIELD)) {
             if (TRUE.equals(searchField.getString(DEFAULT))) {
-                String defaultSearchField = searchField.getString("[@label]");
+                String defaultSearchField = searchField.getString(LABEL);
                 if (StringUtils.isNotBlank(defaultSearchField)) {
                     return defaultSearchField;
                 }
@@ -197,9 +200,9 @@ public class OPACConfig {
      * @return HierarchicalConfiguration for catalog's "parentElement"
      */
     public static String getParentIDElement(String catalogName) {
-        for (HierarchicalConfiguration field : getSearchFields(catalogName).configurationsAt("searchField")) {
+        for (HierarchicalConfiguration field : getSearchFields(catalogName).configurationsAt(SEARCH_FIELD)) {
             if (TRUE.equals(field.getString("[@parentElement]"))) {
-                String parentIDElement = field.getString("[@label]");
+                String parentIDElement = field.getString(LABEL);
                 if (StringUtils.isNotBlank(parentIDElement)) {
                     return parentIDElement;
                 }
@@ -225,7 +228,7 @@ public class OPACConfig {
      * @return HierarchicalConfiguration for catalog's "identifierParameter"
      */
     public static String getIdentifierParameter(String catalogName) {
-        return getCatalog(catalogName).getString("identifierParameter[@value]");
+        return getCatalog(catalogName).getString("identifierParameter" + VALUE);
     }
 
     /**
@@ -245,7 +248,7 @@ public class OPACConfig {
      * @return HierarchicalConfiguration for catalog's "identifierMetadata"
      */
     public static String getIdentifierMetadata(String catalogName) {
-        return getCatalog(catalogName).getString("identifierMetadata[@value]");
+        return getCatalog(catalogName).getString("identifierMetadata" + VALUE);
     }
 
     /**
@@ -391,5 +394,17 @@ public class OPACConfig {
         config.setListDelimiter('&');
         config.setReloadingStrategy(new FileChangedReloadingStrategy());
         return config;
+    }
+
+    /**
+     * Check and return whether configuration of catalog 'catalogName' is restricted to queries for individual
+     * records and therefore does not support queries returning hit lists containing multiple records.
+     *
+     * @param catalogName catalog name
+     * @return whether catalog support only single record queries or not
+     */
+    public static boolean isHitlistSupported(String catalogName) {
+        return !getCatalog(catalogName).containsKey("hitlistSupport")
+                || getCatalog(catalogName).getBoolean("hitlistSupport");
     }
 }

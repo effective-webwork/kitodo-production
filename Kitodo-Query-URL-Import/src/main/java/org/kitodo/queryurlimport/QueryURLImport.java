@@ -43,6 +43,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -249,7 +251,7 @@ public class QueryURLImport implements ExternalDataImportInterface {
             throw new CatalogException("Unknown host: " + e.getMessage());
         } catch (ClientProtocolException e) {
             throw new CatalogException("ClientProtocolException: " + e.getMessage());
-        } catch (IOException e) {
+        } catch (IOException | XPathExpressionException e) {
             throw new CatalogException(e.getLocalizedMessage());
         }
     }
@@ -308,16 +310,22 @@ public class QueryURLImport implements ExternalDataImportInterface {
             this.reinitializeHttpClient();
             logger.debug("Requesting: {}", fullUrl);
             HttpResponse response = httpClient.execute(new HttpGet(fullUrl));
-            if (Objects.equals(response.getStatusLine().getStatusCode(), SC_OK)) {
-                if (Objects.isNull(response.getEntity())) {
+            int responseStatusCode = response.getStatusLine().getStatusCode();
+            if (Objects.equals(responseStatusCode, SC_OK)) {
+                HttpEntity httpEntity = response.getEntity();
+                if (Objects.isNull(httpEntity)) {
                     throw new NoRecordFoundException("No record with ID '" + identifier + "' found!");
                 }
-                return createRecordFromXMLElement(IOUtils.toString(response.getEntity().getContent(),
-                        Charset.defaultCharset()));
+                String xmlContent = IOUtils.toString(httpEntity.getContent(), Charset.defaultCharset());
+                XmlResponseHandler.checkResponseDocumentForError(stringToDocument(xmlContent), interfaceType);
+                return createRecordFromXMLElement(xmlContent);
             }
-            throw new ConfigException("Search Query Request Failed");
+            throw new CatalogException(response.getStatusLine().getReasonPhrase() + " (Http status code "
+                    + responseStatusCode + ")");
         } catch (IOException e) {
             throw new ConfigException(e.getLocalizedMessage());
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new CatalogException(e.getMessage());
         }
     }
 

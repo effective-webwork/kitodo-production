@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -61,7 +62,7 @@ abstract class XmlResponseHandler {
      * @param response HttpResponse for which a SearchResult is created
      * @return SearchResult created from given HttpResponse
      */
-    SearchResult getSearchResult(HttpResponse response, SearchInterfaceType interfaceType) {
+    SearchResult getSearchResult(HttpResponse response, SearchInterfaceType interfaceType) throws XPathExpressionException {
         SearchResult searchResult = new SearchResult();
         Document resultDocument = transformResponseToDocument(response);
         if (Objects.nonNull(resultDocument)) {
@@ -71,16 +72,30 @@ abstract class XmlResponseHandler {
             } else {
                 searchResult.setNumberOfHits(searchResult.getHits().size());
             }
-            if (searchResult.getNumberOfHits() < 1 && Objects.nonNull(interfaceType.getErrorMessageXpath())) {
-                String errorMessage = getTextContent(resultDocument.getDocumentElement(),
-                        interfaceType.getErrorMessageXpath());
-                if (StringUtils.isNotBlank(errorMessage)) {
-                    errorMessage = interfaceType.getTypeString().toUpperCase() + " error: '" + errorMessage + "'";
-                    throw new CatalogException(errorMessage);
-                }
+            if (searchResult.getNumberOfHits() < 1) {
+                checkResponseDocumentForError(resultDocument, interfaceType);
             }
         }
         return searchResult;
+    }
+
+    /**
+     * Check if given XML document contains an error message as defined in the given SearchInterfaceTypes error message
+     * XPath. If the document contains an error, a CatalogException is thrown with the corresponding error message.
+     * @param document XML Document to check for error message
+     * @param interfaceType SearchInterfaceType defining XPath where to check for error message in document
+     */
+    public static void checkResponseDocumentForError(Document document, SearchInterfaceType interfaceType) {
+        if (Objects.nonNull(document)
+                && Objects.nonNull(interfaceType)
+                && Objects.nonNull(interfaceType.getErrorMessageXpath())) {
+            String errorMessage = getTextContent(document.getDocumentElement(),
+                    interfaceType.getErrorMessageXpath());
+            if (StringUtils.isNotBlank(errorMessage)) {
+                errorMessage = interfaceType.getTypeString().toUpperCase() + " interface error: '" + errorMessage + "'";
+                throw new CatalogException(errorMessage);
+            }
+        }
     }
 
     /**
@@ -109,9 +124,9 @@ abstract class XmlResponseHandler {
         }
     }
 
-    private LinkedList<SingleHit> extractHits(Document document, SearchInterfaceType type) {
+    private LinkedList<SingleHit> extractHits(Document document, SearchInterfaceType type) throws XPathExpressionException {
         LinkedList<SingleHit> hits = new LinkedList<>();
-        NodeList records = document.getElementsByTagNameNS(type.getNamespace(), type.getRecordString());
+        NodeList records = (NodeList) xPath.evaluate(type.getRecordString(), document, XPathConstants.NODESET);
         for (int i = 0; i < records.getLength(); i++) {
             Element recordElement = (Element) records.item(i);
             hits.add(new SingleHit(getRecordTitle(recordElement), getRecordID(recordElement)));

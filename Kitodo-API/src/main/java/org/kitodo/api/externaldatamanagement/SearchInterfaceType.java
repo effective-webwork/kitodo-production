@@ -12,10 +12,10 @@
 package org.kitodo.api.externaldatamanagement;
 
 public enum SearchInterfaceType {
-    SRU("sru", "http://www.loc.gov/zing/srw/", "record", "startRecord", "1",
+    SRU("sru", "http://www.loc.gov/zing/srw/", ".//*[local-name()='records']/*[local-name()='record']", "startRecord", "1",
             "maximumRecords", "query", "numberOfRecords",
             ".//*[local-name()='diagnostic']/*[local-name()='message']/text()"),
-    OAI("oai", "http://www.openarchives.org/OAI/2.0/", "record", null, null,
+    OAI("oai", "http://www.openarchives.org/OAI/2.0/", ".//*[name()='record']", null, null,
             null, null, null, ".//*[local-name()='error']/text()"),
     FTP("ftp", null, null, null, null,null, null, null,
             null),

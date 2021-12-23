@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.externaldatamanagement.SingleHit;
 import org.kitodo.api.schemaconverter.ExemplarRecord;
+import org.kitodo.config.OPACConfig;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.CatalogException;
 import org.kitodo.exceptions.ConfigException;
@@ -102,22 +103,23 @@ public class CatalogImportDialog  extends MetadataImportDialog implements Serial
     public void search() {
         List<?> hits;
         try {
-            hits = hitModel.load(0, 10, null, SortOrder.ASCENDING, Collections.EMPTY_MAP);
+            if (OPACConfig.isHitlistSupported(hitModel.getSelectedCatalog())) {
+                hits = hitModel.load(0, 10, null, SortOrder.ASCENDING, Collections.EMPTY_MAP);
+                if (hits.size() == 1) {
+                    getRecordById(((SingleHit) hits.get(0)).getIdentifier());
+                } else {
+                    ((DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(HITSTABLE_NAME)).reset();
+                    PrimeFaces.current().executeScript("PF('hitlistDialog').show()");
+                }
+            } else {
+                getRecordById(hitModel.getSearchTerm());
+            }
         } catch (CatalogException e) {
             this.opacErrorMessage = e.getMessage();
             PrimeFaces.current().ajax().update("opacErrorDialog");
             PrimeFaces.current().executeScript("PF('opacErrorDialog').show();");
-            return;
-        }
-        if (hits.size() == 1) {
-            getRecordById(((SingleHit) hits.get(0)).getIdentifier());
-        } else {
-            try {
-                ((DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent(HITSTABLE_NAME)).reset();
-                PrimeFaces.current().executeScript("PF('hitlistDialog').show()");
-            } catch (IllegalArgumentException e) {
-                Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
-            }
+        } catch (IllegalArgumentException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
         }
     }
 
