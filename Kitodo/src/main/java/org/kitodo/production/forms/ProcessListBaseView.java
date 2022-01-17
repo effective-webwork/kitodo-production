@@ -32,6 +32,7 @@ import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.export.ExportDms;
+import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.enums.ChartMode;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
@@ -58,7 +59,7 @@ public class ProcessListBaseView extends BaseForm {
     private int numberOfGlobalImages;
     private int numberOfGlobalStructuralElements;
     private int numberOfGlobalMetadata;
-    List<? extends Object> selectedProcessesOrProcessDTOs = new ArrayList<>();
+    List<Process> selectedProcessesOrProcessDTOs = new ArrayList<>();
     private final String doneDirectoryName = ConfigCore.getParameterOrDefaultValue(ParameterCore.DONE_DIRECTORY_NAME);
     DeleteProcessDialog deleteProcessDialog = new DeleteProcessDialog();
 
@@ -118,35 +119,22 @@ public class ProcessListBaseView extends BaseForm {
      *
      * @return value of selectedProcesses
      */
-    @SuppressWarnings("unchecked")
     public List<Process> getSelectedProcesses() {
-        List<Process> selectedProcesses = new ArrayList<>();
         ProcessService processService = ServiceManager.getProcessService();
         if (allSelected) {
             try {
-                this.selectedProcessesOrProcessDTOs = processService.findByQuery(processService.getQueryForFilter(
+                this.selectedProcessesOrProcessDTOs = new ArrayList<>();
+                List<ProcessDTO> processDTOS = processService.findByQuery(processService.getQueryForFilter(
                                 this.isShowClosedProcesses(), isShowInactiveProjects(), getFilter())
                         .mustNot(processService.createSetQueryForIds(new ArrayList<>(excludedProcessIds))), false);
-            } catch (DataException e) {
+                for (ProcessDTO processDTO : processDTOS) {
+                    selectedProcessesOrProcessDTOs.add(ServiceManager.getProcessService().getById(processDTO.getId()));
+                }
+            } catch (DataException | DAOException e) {
                 logger.error(e.getMessage());
             }
         }
-        if (selectedProcessesOrProcessDTOs.size() > 0) {
-            if (selectedProcessesOrProcessDTOs.get(0) instanceof ProcessDTO) {
-                // list contains ProcessDTO instances
-                try {
-                    selectedProcesses = ServiceManager.getProcessService()
-                            .convertDtosToBeans((List<ProcessDTO>) selectedProcessesOrProcessDTOs);
-                } catch (DAOException e) {
-                    Helper.setErrorMessage(ERROR_LOADING_MANY,
-                            new Object[]{ObjectType.PROCESS.getTranslationPlural()}, logger, e);
-                }
-            } else if (selectedProcessesOrProcessDTOs.get(0) instanceof Process) {
-                // list contains Process instances
-                selectedProcesses = (List<Process>) selectedProcessesOrProcessDTOs;
-            }
-        }
-        return selectedProcesses;
+        return selectedProcessesOrProcessDTOs;
     }
 
     /**
@@ -588,17 +576,17 @@ public class ProcessListBaseView extends BaseForm {
     }
 
     /**
-     * Returns the list of currently selected processes. This list is used both when displaying search results 
-     * and when displaying the process list, which is why it may contain either instances of Process or 
+     * Returns the list of currently selected processes. This list is used both when displaying search results
+     * and when displaying the process list, which is why it may contain either instances of Process or
      * instances of ProcessDTO.
-     * 
+     *
      * @return list of instances of Process or ProcessDTO
      */
-    public List<? extends Object> getSelectedProcessesOrProcessDTOs() {
+    public List<Process> getSelectedProcessesOrProcessDTOs() {
         return selectedProcessesOrProcessDTOs;
     }
 
-    public void setSelectedProcessesOrProcessDTOs(List<? extends Object> selectedProcessesOrProcessDTOs) {
+    public void setSelectedProcessesOrProcessDTOs(List<Process> selectedProcessesOrProcessDTOs) {
         this.selectedProcessesOrProcessDTOs = selectedProcessesOrProcessDTOs;
     }
 
@@ -618,7 +606,7 @@ public class ProcessListBaseView extends BaseForm {
 
     /**
      * Returns the number of global images of the process list base view.
-     * 
+     *
      * @return the number of global images
      */
     public int getNumberOfGlobalImages() {
@@ -628,7 +616,7 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * Returns the number of global structural elements of the process list base
      * view.
-     * 
+     *
      * @return the number of global structural elements
      */
     public int getNumberOfGlobalStructuralElements() {
@@ -637,7 +625,7 @@ public class ProcessListBaseView extends BaseForm {
 
     /**
      * Returns the number of global metadata of the process list base view.
-     * 
+     *
      * @return the number of global metadata
      */
     public int getNumberOfGlobalMetadata() {
@@ -647,7 +635,7 @@ public class ProcessListBaseView extends BaseForm {
     /**
      * Returns the number of global process metadata statistics of the process
      * list base view.
-     * 
+     *
      * @return the number of global process metadata statistics
      */
     public int getNumberOfGlobalProcessMetadataStatistics() {
