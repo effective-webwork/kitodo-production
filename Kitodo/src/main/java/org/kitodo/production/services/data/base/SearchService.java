@@ -11,14 +11,9 @@
 
 package org.kitodo.production.services.data.base;
 
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
-
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.BucketOrder;
@@ -42,11 +38,17 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
+import org.hibernate.Session;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.BaseIndexedBean;
 import org.kitodo.data.database.enums.IndexAction;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.BaseDAO;
+import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.elasticsearch.index.Indexer;
 import org.kitodo.data.elasticsearch.index.type.BaseType;
@@ -55,6 +57,7 @@ import org.kitodo.data.elasticsearch.search.enums.SearchCondition;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.production.dto.BaseDTO;
 import org.kitodo.production.helper.Helper;
+import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.ProjectService;
 import org.primefaces.model.SortOrder;
 
@@ -407,7 +410,7 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      * @return list of all documents
      */
     public List<Map<String, Object>> findAllDocuments() throws DataException {
-        QueryBuilder queryBuilder = matchAllQuery();
+        QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
         try {
             return searcher.findDocuments(queryBuilder, null, null, Math.toIntExact(count()));
         } catch (CustomResponseException e) {
@@ -421,7 +424,7 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      * @return list of all documents from that range
      */
     public List<Map<String, Object>> findAllDocuments(Integer offset, Integer size) throws DataException {
-        QueryBuilder queryBuilder = matchAllQuery();
+        QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
         try {
             return searcher.findDocuments(queryBuilder, null, offset, size);
         } catch (CustomResponseException e) {
@@ -573,8 +576,8 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      * @param ids as a List of Integer
      * @return query as QueryBuilder
      */
-    public QueryBuilder createSetQueryForIds(List<Integer> ids) {
-        return termsQuery("_id", ids);
+    private QueryBuilder createSetQueryForIds(List<Integer> ids) {
+        return QueryBuilders.termsQuery("_id", ids);
     }
 
     /**
@@ -617,12 +620,12 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      */
     protected QueryBuilder createSetQuery(String key, Set<?> values, boolean contains) {
         if (contains && !values.isEmpty()) {
-            return termsQuery(key, values);
+            return QueryBuilders.termsQuery(key, values);
         } else if (!contains && Objects.nonNull(values)) {
             BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-            return boolQuery.mustNot(termsQuery(key, values));
+            return boolQuery.mustNot(QueryBuilders.termsQuery(key, values));
         } else {
-            return matchQuery(key, 0);
+            return QueryBuilders.matchQuery(key, 0);
         }
     }
 
@@ -660,12 +663,12 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      */
     protected QueryBuilder createSimpleQuery(String key, Integer id, boolean contains) {
         if (contains && Objects.nonNull(id)) {
-            return matchQuery(key, id);
+            return QueryBuilders.matchQuery(key, id);
         } else if (!contains && Objects.nonNull(id)) {
             BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-            return boolQuery.mustNot(matchQuery(key, id));
+            return boolQuery.mustNot(QueryBuilders.matchQuery(key, id));
         } else {
-            return matchQuery(key, 0);
+            return QueryBuilders.matchQuery(key, 0);
         }
     }
 
@@ -685,12 +688,12 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      */
     protected QueryBuilder createSimpleQuery(String key, Boolean condition, boolean contains) {
         if (contains && Objects.nonNull(condition)) {
-            return matchQuery(key, condition);
+            return QueryBuilders.matchQuery(key, condition);
         } else if (!contains && Objects.nonNull(condition)) {
             BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-            return boolQuery.mustNot(matchQuery(key, condition));
+            return boolQuery.mustNot(QueryBuilders.matchQuery(key, condition));
         } else {
-            return matchQuery(key, false);
+            return QueryBuilders.matchQuery(key, false);
         }
     }
 
@@ -709,10 +712,10 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      */
     protected QueryBuilder createSimpleQuery(String key, String value, boolean contains) {
         if (contains) {
-            return matchQuery(key, value);
+            return QueryBuilders.matchQuery(key, value);
         } else {
             BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-            return boolQuery.mustNot(matchQuery(key, value));
+            return boolQuery.mustNot(QueryBuilders.matchQuery(key, value));
         }
     }
 
@@ -738,10 +741,10 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
         }
 
         if (contains) {
-            return matchQuery(key, value).operator(operator);
+            return QueryBuilders.matchQuery(key, value).operator(operator);
         } else {
             BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-            return boolQuery.mustNot(matchQuery(key, value).operator(operator));
+            return boolQuery.mustNot(QueryBuilders.matchQuery(key, value).operator(operator));
         }
     }
 
@@ -760,19 +763,19 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
         QueryBuilder query = null;
         switch (searchCondition) {
             case EQUAL:
-                query = matchQuery(key, Helper.getDateAsFormattedString(date));
+                query = QueryBuilders.matchQuery(key, Helper.getDateAsFormattedString(date));
                 break;
             case EQUAL_OR_BIGGER:
-                query = rangeQuery(key).gte(Helper.getDateAsFormattedString(date));
+                query = QueryBuilders.rangeQuery(key).gte(Helper.getDateAsFormattedString(date));
                 break;
             case EQUAL_OR_SMALLER:
-                query = rangeQuery(key).lte(Helper.getDateAsFormattedString(date));
+                query = QueryBuilders.rangeQuery(key).lte(Helper.getDateAsFormattedString(date));
                 break;
             case BIGGER:
-                query = rangeQuery(key).gt(Helper.getDateAsFormattedString(date));
+                query = QueryBuilders.rangeQuery(key).gt(Helper.getDateAsFormattedString(date));
                 break;
             case SMALLER:
-                query = rangeQuery(key).lt(Helper.getDateAsFormattedString(date));
+                query = QueryBuilders.rangeQuery(key).lt(Helper.getDateAsFormattedString(date));
                 break;
             default:
                 assert false : searchCondition;
@@ -795,19 +798,19 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
         QueryBuilder query = null;
         switch (searchCondition) {
             case EQUAL:
-                query = matchQuery(key, value);
+                query = QueryBuilders.matchQuery(key, value);
                 break;
             case EQUAL_OR_BIGGER:
-                query = rangeQuery(key).gte(value);
+                query = QueryBuilders.rangeQuery(key).gte(value);
                 break;
             case EQUAL_OR_SMALLER:
-                query = rangeQuery(key).lte(value);
+                query = QueryBuilders.rangeQuery(key).lte(value);
                 break;
             case BIGGER:
-                query = rangeQuery(key).gt(value);
+                query = QueryBuilders.rangeQuery(key).gt(value);
                 break;
             case SMALLER:
-                query = rangeQuery(key).lt(value);
+                query = QueryBuilders.rangeQuery(key).lt(value);
                 break;
             default:
                 assert false : searchCondition;
@@ -816,7 +819,7 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
     }
 
     protected QueryBuilder createSimpleWildcardQuery(String key, String value) {
-        return queryStringQuery(key + ".keyword: *" + value + "*");
+        return QueryBuilders.queryStringQuery(key + ".keyword: *" + value + "*");
     }
 
     protected Long findCountAggregation(QueryBuilder query, String field) throws DataException {
@@ -939,6 +942,48 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
             } catch (DAOException e) {
                 removeFromIndex(baseIndexedBeanId,true);
             }
+        }
+    }
+
+    protected List<BaseBean> loadData(Class<T> clazz, SortOrder sortOrder, String sortField, int first, int pageSize,
+                                      Map<String, String> filter) {
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            SearchMapping mapping = Search.mapping(searchSession.toOrmSession().getSessionFactory());
+            final Map<String, Object> filterMap = Objects.nonNull(filter) ? ServiceManager.getFilterService()
+                    .parseFilterMap(filter, mapping.indexedEntity(clazz)) : Collections.emptyMap();
+            // TODO: restrict to instances of current user! (e.g. use something like "getProjectsForCurrentUserQuery"!)
+            return new ArrayList<>(searchSession.search(clazz)
+                    .select(SearchProjectionFactory::entity)
+                    .where( f -> f.bool( b -> {
+                        b.must(f.matchAll());
+                        for (Map.Entry<String, Object> filterEntry : filterMap.entrySet()) {
+                            b.must(f.match().field(filterEntry.getKey())
+                                    .matching(filterEntry.getValue()));
+                        }
+                    }))
+                    .sort(f -> sortOrder.equals(SortOrder.ASCENDING) ? f.field(sortField).asc() : f.field(sortField)
+                            .desc())
+                    .fetchHits(first, pageSize));
+        }
+    }
+
+    protected Long countResults(Class<T> clazz, Map<String, String> filter) {
+        try (Session session = HibernateUtil.getSession()) {
+            SearchSession searchSession = Search.session(session);
+            SearchMapping mapping = Search.mapping(searchSession.toOrmSession().getSessionFactory());
+            final Map<String, Object> filterMap = Objects.nonNull(filter) ? ServiceManager.getFilterService()
+                    .parseFilterMap(filter, mapping.indexedEntity(clazz)) : Collections.emptyMap();
+            // TODO 2: restrict to projects of current user (see "getProjectsForCurrentUserQuery")
+            return searchSession.search(clazz)
+                    .where( f -> f.bool( b -> {
+                        b.must(f.matchAll());
+                        for (Map.Entry<String, Object> filterEntry : filterMap.entrySet()) {
+                            b.must(f.match().field(filterEntry.getKey())
+                                    .matching(filterEntry.getValue()));
+                        }
+                    }))
+                    .fetchTotalHitCount();
         }
     }
 }

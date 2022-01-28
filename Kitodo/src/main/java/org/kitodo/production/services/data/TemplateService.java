@@ -22,12 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.kitodo.config.ConfigCore;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.Template;
@@ -95,7 +97,9 @@ public class TemplateService extends ClientSearchService<Template, TemplateDTO, 
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countDocuments(createUserTemplatesQuery(filters));
+        // TODO: restrict to templates of current user!
+        return countResults(Template.class, filters);
+        //return countDocuments(createUserTemplatesQuery(filters));
     }
 
     @Override
@@ -109,10 +113,13 @@ public class TemplateService extends ClientSearchService<Template, TemplateDTO, 
     }
 
     @Override
-    public List<TemplateDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public List<Template> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return findByQuery(createUserTemplatesQuery(filters), getSortBuilder(sortField, sortOrder), first, pageSize,
-            false);
+        // TODO: restrict to templates of current user!
+        List<BaseBean> baseBeans = loadData(Template.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(template -> template instanceof Template).map(template -> (Template)template).collect(Collectors.toList());
+        //return findByQuery(createUserTemplatesQuery(filters), getSortBuilder(sortField, sortOrder), first, pageSize,
+            //false);
 
     }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,7 @@ import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalDivision;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Ruleset;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.RulesetDAO;
@@ -92,14 +94,19 @@ public class RulesetService extends ClientSearchService<Ruleset, RulesetDTO, Rul
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countDocuments(getRulesetsForCurrentUserQuery());
+        // TODO: restrict to rulesets of current user!
+        return countResults(Ruleset.class, filters);
+        //return countDocuments(getRulesetsForCurrentUserQuery());
     }
 
     @Override
-    public List<RulesetDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public List<Ruleset> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return findByQuery(getRulesetsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
-            false);
+        // TODO: restrict to rulesets of current user!
+        List<BaseBean> baseBeans = loadData(Ruleset.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(b -> b instanceof Ruleset).map(bb -> (Ruleset)bb).collect(Collectors.toList());
+        //return findByQuery(getRulesetsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
+            //false);
     }
 
     @Override
@@ -247,7 +254,7 @@ public class RulesetService extends ClientSearchService<Ruleset, RulesetDTO, Rul
 
     /**
      * Returns the names of those divisions that fulfill a given function.
-     * 
+     *
      * @param rulesetId
      *            ruleset database number
      * @param function

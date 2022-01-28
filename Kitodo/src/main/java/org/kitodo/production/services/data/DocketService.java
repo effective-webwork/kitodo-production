@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Docket;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.DocketDAO;
@@ -76,14 +78,19 @@ public class DocketService extends ClientSearchService<Docket, DocketDTO, Docket
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countDocuments(getDocketsForCurrentUserQuery());
+        // TODO: restrict to dockets of current user!
+        return countResults(Docket.class, filters);
+        //return countDocuments(getDocketsForCurrentUserQuery());
     }
 
     @Override
-    public List<DocketDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public List<Docket> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return findByQuery(getDocketsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
-            false);
+        // TODO: restrict to dockets of current user!
+        List<BaseBean> baseBeans = loadData(Docket.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(b -> b instanceof Docket).map(bb -> (Docket)bb).collect(Collectors.toList());
+        //return findByQuery(getDocketsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
+            //false);
     }
 
     @Override
@@ -114,7 +121,7 @@ public class DocketService extends ClientSearchService<Docket, DocketDTO, Docket
 
     /**
      * Get list of dockets for given title.
-     * 
+     *
      * @param title
      *            for get from database
      * @return list of dockets
@@ -149,7 +156,7 @@ public class DocketService extends ClientSearchService<Docket, DocketDTO, Docket
 
     /**
      * Find docket with exact title and file name.
-     * 
+     *
      * @param title
      *            of the searched docket
      * @param file

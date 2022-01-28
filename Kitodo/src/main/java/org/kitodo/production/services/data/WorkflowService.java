@@ -15,9 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Workflow;
 import org.kitodo.data.database.enums.WorkflowStatus;
 import org.kitodo.data.database.exceptions.DAOException;
@@ -76,14 +78,17 @@ public class WorkflowService extends ClientSearchService<Workflow, WorkflowDTO, 
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        return countDocuments(getWorkflowsForCurrentUserQuery());
+        return countResults(Workflow.class, filters);
+        //return countDocuments(getWorkflowsForCurrentUserQuery());
     }
 
     @Override
-    public List<WorkflowDTO> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
+    public List<Workflow> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return findByQuery(getWorkflowsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
-            false);
+        List<BaseBean> baseBeans = loadData(Workflow.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(w -> w instanceof Workflow).map(ww -> (Workflow)ww).collect(Collectors.toList());
+        //return findByQuery(getWorkflowsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
+            //false);
     }
 
     @Override

@@ -26,11 +26,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.kitodo.data.database.enums.WorkflowStatus;
 import org.kitodo.data.database.persistence.WorkflowDAO;
 
@@ -39,11 +41,11 @@ import org.kitodo.data.database.persistence.WorkflowDAO;
 @Table(name = "workflow")
 public class Workflow extends BaseIndexedBean {
 
-    @GenericField
+    @KeywordField(sortable = Sortable.YES)
     @Column(name = "title")
     private String title;
 
-    @GenericField
+    @KeywordField(sortable = Sortable.YES)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private WorkflowStatus status = WorkflowStatus.DRAFT;

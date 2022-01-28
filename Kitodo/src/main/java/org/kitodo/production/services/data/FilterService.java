@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
@@ -34,6 +35,9 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Filter;
@@ -1147,11 +1151,29 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
     public Map<String, String> getFilterMap(String filterString) {
         Map<String, String> filterMap = new HashMap<>();
         for (String filter : prepareFilters(filterString)) {
-            if (StringUtils.countMatches(filter, ":") == 1) {
-                String[] filterComponents = filter.split(":");
-                filterMap.put(filterComponents[0].trim(), filterComponents[1].trim());
+            List<String> filterComponents = Arrays.stream(filter.split(":")).map(String::trim)
+                    .collect(Collectors.toList());
+            if (filterComponents.size() == 2) {
+                filterMap.put(filterComponents.get(0), filterComponents.get(1));
             }
         }
         return filterMap;
+    }
+
+    public Map<String, Object> parseFilterMap(Map<String, String> filter, SearchIndexedEntity<?> searchIndexedEntity) {
+        IndexDescriptor indexDescriptor = searchIndexedEntity.indexManager().descriptor();
+        Map<String, Object> typedFilterMap = new HashMap<>();
+        for (Map.Entry<String, String> filterMapEntry : getFilterMap(parseFilterString(filter)).entrySet()) {
+            Optional<IndexFieldDescriptor> optionalFieldDescriptor = indexDescriptor.field( filterMapEntry.getKey() );
+            if (optionalFieldDescriptor.isPresent()) {
+                Class<?> fieldType = optionalFieldDescriptor.get().toValueField().type().dslArgumentClass();
+                if (fieldType.equals(Integer.class)) {
+                    typedFilterMap.put(filterMapEntry.getKey(), Integer.parseInt(filterMapEntry.getValue()));
+                } else if (fieldType.equals(String.class)) {
+                    typedFilterMap.put(filterMapEntry.getKey(), filterMapEntry.getValue());
+                }
+            }
+        }
+        return typedFilterMap;
     }
 }

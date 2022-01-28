@@ -92,10 +92,6 @@ import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.hibernate.Session;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
@@ -110,6 +106,7 @@ import org.kitodo.api.filemanagement.filters.FileNameBeginsAndEndsWithFilter;
 import org.kitodo.api.filemanagement.filters.FileNameEndsAndDoesNotBeginWithFilter;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Batch;
 import org.kitodo.data.database.beans.Comment;
 import org.kitodo.data.database.beans.Folder;
@@ -263,7 +260,9 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     public Long countResults(Map filters, boolean showClosedProcesses, boolean showInactiveProjects)
             throws DataException {
-        return countDocuments(createUserProcessesQuery(filters, showClosedProcesses, showInactiveProjects));
+        // TODO: restrict to processes of current user!
+        return countResults(Process.class, filters);
+        //return countDocuments(createUserProcessesQuery(filters, showClosedProcesses, showInactiveProjects));
     }
 
     @Override
@@ -384,21 +383,11 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
 
     @Override
     public List<Process> loadData(int first, int pageSize, String sortField,
-            org.primefaces.model.SortOrder sortOrder, Map filters) throws DataException {
-        try (Session session = HibernateUtil.getSession()) {
-            SearchSession searchSession = Search.session(session);
-            if (sortOrder.equals(org.primefaces.model.SortOrder.ASCENDING)) {
-                return new ArrayList<>(searchSession.search(Process.class)
-                        .where(SearchPredicateFactory::matchAll)
-                        .sort(f -> f.field(sortField).asc())
-                        .fetchHits(first, pageSize));
-            } else {
-                return new ArrayList<>(searchSession.search(Process.class)
-                        .where(SearchPredicateFactory::matchAll)
-                        .sort(f -> f.field(sortField).desc())
-                        .fetchHits(first, pageSize));
-            }
-        }
+            org.primefaces.model.SortOrder sortOrder, Map<String, String> filters) throws DataException {
+        // TODO: restrict to processes of current user!
+        List<BaseBean> baseBeans = loadData(Process.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(process -> process instanceof Process)
+                .map(process -> (Process)process).collect(Collectors.toList());
         //return loadData(first, pageSize, sortField, sortOrder, filters, false, false);
     }
 
@@ -417,13 +406,8 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     public List<Process> loadData(int first, int pageSize, String sortField,
                                      org.primefaces.model.SortOrder sortOrder, Map filters,
                                      boolean showClosedProcesses, boolean showInactiveProjects) throws DataException {
-        /*
-        String filter = ServiceManager.getFilterService().parseFilterString(filters);
-        return findByQuery(getQueryForFilter(showClosedProcesses, showInactiveProjects, filter),
-                getSortBuilder(sortField, sortOrder), first, pageSize, false);
-         */
-        // FIXME: include "showClosedProcesses", "showInactiveProjects"!
-        return loadData(first, pageSize, sortField, sortOrder, filters);
+        // TODO: include "showClosedProcesses", "showInactiveProjects"!
+        return loadData(Process.class, sortOrder, sortField, first, pageSize, filters);
     }
 
     /**

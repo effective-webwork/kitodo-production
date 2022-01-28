@@ -24,11 +24,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.hibernate.Session;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.config.enums.KitodoConfigFile;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
@@ -37,7 +34,6 @@ import org.kitodo.data.database.beans.Template;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.enums.IndexAction;
 import org.kitodo.data.database.exceptions.DAOException;
-import org.kitodo.data.database.persistence.HibernateUtil;
 import org.kitodo.data.database.persistence.ProjectDAO;
 import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
 import org.kitodo.data.elasticsearch.index.Indexer;
@@ -145,13 +141,8 @@ public class ProjectService extends ClientSearchService<Project, ProjectDTO, Pro
 
     @Override
     public Long countResults(Map filters) throws DataException {
-        try (Session session = HibernateUtil.getSession()) {
-            SearchSession searchSession = Search.session(session);
-            // TODO: apply given filter map!
-            // TODO 2: restrict to projects of current user (see "getProjectsForCurrentUserQuery")
-            return searchSession.search(Project.class).where(SearchPredicateFactory::matchAll).fetchTotalHitCount();
-        }
-
+        // TODO: restrict to projects of current user!
+        return countResults(Project.class, filters);
         //return countDocuments(getProjectsForCurrentUserQuery());
     }
 
@@ -169,23 +160,9 @@ public class ProjectService extends ClientSearchService<Project, ProjectDTO, Pro
     @Override
     public List<Project> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        try (Session session = HibernateUtil.getSession()) {
-            SearchSession searchSession = Search.session(session);
-            // TODO: restrict to projects of current user! (e.g. use something like "getProjectsForCurrentUserQuery"!)
-            // TODO 2: map filters
-            // TODO 3: improve mapping of sortOrder
-            if (sortOrder.equals(SortOrder.ASCENDING)) {
-                return new ArrayList<>(searchSession.search(Project.class)
-                        .where(SearchPredicateFactory::matchAll)
-                        .sort(f -> f.field(sortField).asc())
-                        .fetchHits(first, pageSize));
-            } else {
-                return new ArrayList<>(searchSession.search(Project.class)
-                        .where(SearchPredicateFactory::matchAll)
-                        .sort(f -> f.field(sortField).desc())
-                        .fetchHits(first, pageSize));
-            }
-        }
+        // TODO: restrict to projects of current user!
+        List<BaseBean> baseBeans = loadData(Project.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(b -> b instanceof Project).map(bb -> (Project)bb).collect(Collectors.toList());
         //return findByQuery(getProjectsForCurrentUserQuery(), getSortBuilder(sortField, sortOrder), first, pageSize,
             //false);
     }

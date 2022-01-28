@@ -135,7 +135,7 @@ public class Task extends BaseIndexedBean {
     private WorkflowCondition workflowCondition;
 
     /**
-     * This field contains information about user, which works on this task.
+     * This field contains information about the user who works on this task.
      */
     @ManyToOne
     @IndexedEmbedded(includePaths = {"surname", "name", "id", "login"})

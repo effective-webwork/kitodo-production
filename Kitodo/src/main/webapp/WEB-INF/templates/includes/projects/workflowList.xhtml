@@ -26,7 +26,7 @@
                  paginator="true"
                  resizableColumns="true"
                  liveResize="true"
-                 sortBy="#{item.title.keyword}"
+                 sortBy="#{item.title}"
                  rows="#{LoginForm.loggedUser.tableSize}"
                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
                  currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
@@ -36,7 +36,7 @@
                 listener="#{WorkflowForm.onPageChange}"/>
 
         <p:column headerText="#{msgs.title}"
-                  sortBy="#{item.title.keyword}"
+                  sortBy="#{item.title}"
                   rendered="#{ProjectForm.showColumn('workflow.title')}">
             <h:outputText value="#{item.title}"
                           title="#{item.title}"/>

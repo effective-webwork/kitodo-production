@@ -13,7 +13,6 @@ package org.kitodo.production.services.data;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +36,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.kitodo.api.command.CommandResult;
+import org.kitodo.data.database.beans.BaseBean;
 import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Project;
@@ -230,12 +230,17 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
     public Long countResults(HashMap<String, String> filters, boolean onlyOwnTasks, boolean hideCorrectionTasks,
                              boolean showAutomaticTasks, List<TaskStatus> taskStatus)
             throws DataException {
+        // TODO: restrict to given TaskStatus, showAutomaticTasks, hideCorrectionTasks, onlyOwnTasks, user/roles!
+        return countResults(Task.class, filters);
+        /*
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
             SearchQuery<Task> searchTasksQuery = createUserTaskQuery(searchSession, ServiceManager.getFilterService().parseFilterString(filters),
                     onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks, taskStatus, "id", SortOrder.ASCENDING);
-            return searchTasksQuery.fetchTotalHitCount();
+            Long totalHitCount = searchTasksQuery.fetchTotalHitCount();
+            return totalHitCount;
         }
+         */
         /*return countDocuments(createUserTaskQuery(ServiceManager.getFilterService().parseFilterString(filters),
                 onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks, taskStatus));*/
     }
@@ -254,8 +259,12 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
     @Override
     public List<Task> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters)
             throws DataException {
-        return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
-                Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));
+        // TODO: restrict tasks to given TaskStatus!
+        List<BaseBean> baseBeans = loadData(Task.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(task -> task instanceof Task)
+                .map(task -> (Task)task).collect(Collectors.toList());
+        //return loadData(first, pageSize, sortField, sortOrder, filters, false, false, false,
+                //Arrays.asList(TaskStatus.OPEN, TaskStatus.INWORK));
     }
 
     /**
@@ -284,15 +293,21 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
         */
         String filter = ServiceManager.getFilterService().parseFilterString(filters);
 
-        // FIXME: incorporate "related = false" (see out-commented return statement below!)
+        // FIXME: incorporate "onlyOwnTasks", "hideCorrectionTasks", "showAutomaticTasks", "taskStatus", "related = false" (see out-commented return statement below!)
 
+        /*
         try (Session session = HibernateUtil.getSession()) {
             SearchSession searchSession = Search.session(session);
             SearchQuery<Task> searchTasksQuery = createUserTaskQuery(searchSession, filter, onlyOwnTasks,
                     hideCorrectionTasks, showAutomaticTasks, taskStatus, sortField, sortOrder);
 
-            return new ArrayList<>(searchTasksQuery.fetchHits(first, pageSize));
+            //return new ArrayList<>(searchTasksQuery.fetchHits(first, pageSize));
         }
+         */
+
+        List<BaseBean> baseBeans = loadData(Task.class, sortOrder, sortField, first, pageSize, filters);
+        return baseBeans.stream().filter(task -> task instanceof Task).map(task -> (Task)task).collect(Collectors.toList());
+
         /*return findByQuery(createUserTaskQuery(filter, onlyOwnTasks, hideCorrectionTasks, showAutomaticTasks,
                 taskStatus), getSortBuilder(sortField, sortOrder), first, pageSize, false);*/
     }

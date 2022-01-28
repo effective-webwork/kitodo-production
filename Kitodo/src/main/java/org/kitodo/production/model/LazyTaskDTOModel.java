@@ -91,7 +91,7 @@ public class LazyTaskDTOModel extends LazyDTOModel {
             } catch (DataException | ElasticsearchStatusException | QueryShardException e) {
                 setRowCount(0);
                 logger.error(e.getMessage(), e);
-            } catch (FilterException e) {
+            } catch (FilterException | NumberFormatException e) {
                 setRowCount(0);
                 PrimeFaces.current().executeScript("PF('sticky-notifications').renderMessage("
                         + "{'summary':'Filter error','detail':'" + e.getMessage() + "','severity':'error'});");

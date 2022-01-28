@@ -20,22 +20,24 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
 @Indexed(index = "kitodo-ruleset")
 @Table(name = "ruleset")
 public class Ruleset extends BaseIndexedBean {
 
-    @GenericField
+    @KeywordField(sortable = Sortable.YES)
     @Column(name = "title")
     private String title;
 
-    @GenericField
+    @KeywordField(sortable = Sortable.YES)
     @Column(name = "file")
     private String file;
 
