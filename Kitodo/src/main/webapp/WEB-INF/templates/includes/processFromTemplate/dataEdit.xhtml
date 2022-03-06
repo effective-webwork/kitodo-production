@@ -129,11 +129,22 @@
                     </p:commandButton>
                 </h:panelGroup>
             </p:row>
+            <p:row>
+                <p:outputLabel for="discard"
+                               value="#{msgs['newProcess.discardUnknownMetadata']}"/>
+                <p:selectBooleanCheckbox styleClass="switch input"
+                                         id="discard"
+                                         value="#{CreateProcessForm.discardUnknownMetadata}">
+                        <p:ajax event="change"
+                                update="editForm:processFromTemplateTabView:metadataTable"/>
+                </p:selectBooleanCheckbox>
+            </p:row>
         </p:panelGrid>
 
         <ui:include src="/WEB-INF/templates/includes/metadataTreeTable.xhtml">
             <ui:param name="root" value="#{CreateProcessForm.processMetadata.logicalMetadataTree}"/>
             <ui:param name="readOnly" value="#{false}"/>
+            <ui:param name="discardUnknownMetadata" value="#{CreateProcessForm.discardUnknownMetadata}"/>
             <ui:param name="Form" value="#{CreateProcessForm}"/>
         </ui:include>
         <p:remoteCommand name="preserveMetadata"

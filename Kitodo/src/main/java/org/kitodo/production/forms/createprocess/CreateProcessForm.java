@@ -85,6 +85,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
     private final String processListPath = MessageFormat.format(REDIRECT_PATH, "processes");
     private String referringView = "";
     private int progress;
+    private Boolean discardUnknownMetadata = true;
 
     static final int TITLE_RECORD_LINK_TAB_INDEX = 1;
 
@@ -650,5 +651,23 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
      */
     public void prepareAddableMetadataForGroup(TreeNode treeNode) {
         addMetadataDialog.prepareAddableMetadataForGroup(getMainProcess().getRuleset(), treeNode);
+    }
+
+    /**
+     * Get discardUnknownMetadata.
+     *
+     * @return value of discardUnknownMetadata
+     */
+    public Boolean getDiscardUnknownMetadata() {
+        return discardUnknownMetadata;
+    }
+
+    /**
+     * Set discardUnknownMetadata.
+     *
+     * @param discardUnknownMetadata as java.lang.Boolean
+     */
+    public void setDiscardUnknownMetadata(Boolean discardUnknownMetadata) {
+        this.discardUnknownMetadata = discardUnknownMetadata;
     }
 }

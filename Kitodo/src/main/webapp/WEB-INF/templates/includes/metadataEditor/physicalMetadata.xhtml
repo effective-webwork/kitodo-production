@@ -27,6 +27,7 @@
             <ui:include src="/WEB-INF/templates/includes/metadataTreeTable.xhtml">
                 <ui:param name="root" value="#{DataEditorForm.metadataPanel.physicalMetadataRows}" />
                 <ui:param name="readOnly" value="#{readOnly}" />
+                <ui:param name="discardUnknownMetadata" value="#{false}"/>
                 <ui:param name="Form" value="#{DataEditorForm}"/>
             </ui:include>
 

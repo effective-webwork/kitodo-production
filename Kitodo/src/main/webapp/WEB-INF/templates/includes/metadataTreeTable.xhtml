@@ -27,6 +27,7 @@
     <!--@elvariable id="root" type="org.primefaces.model.TreeNode"-->
     <!--@elvariable id="Form" type="DataEditorForm" or "CreateProcessForm"-->
     <!--@elvariable id="node" type="org.primefaces.model.TreeNode"-->
+    <!--@elvariable id="discardUnknownMetadata" type="java.lang.Boolean"-->
     <p:treeTable value="#{root}"
                  var="item"
                  nodeVar="node"
@@ -34,7 +35,8 @@
                  widgetVar="metadataTable"
                  id="metadataTable">
         <p:column>
-            <span class="input-wrapper">
+            <h:panelGroup rendered="#{not item.undefined or not discardUnknownMetadata}"
+                          class="input-wrapper">
                 <!-- field label -->
                 <p:outputLabel value="#{item.label}:" rendered="#{not item.undefined}"/>
                 <p:outputLabel value="#{item.label}: ⚠️" style="background-color: gold;"
@@ -187,7 +189,7 @@
                                      rendered="#{not readOnly}"
                     />
                 </h:panelGroup>
-            </span>
+            </h:panelGroup>
         </p:column>
     </p:treeTable>
     <p:remoteCommand  name="updateTitleMetadata" update="@(.ui-tree, .stripe.selected)"  />
