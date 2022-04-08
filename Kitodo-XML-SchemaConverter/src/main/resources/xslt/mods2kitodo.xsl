@@ -229,7 +229,7 @@
                         <xsl:value-of select="$last_name"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="substring-before($display_name, ', ')"/>
+                        <xsl:value-of select="$display_name"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </kitodo:metadata>
@@ -238,9 +238,6 @@
                     <xsl:when test="$first_name != ''">
                         <xsl:value-of select="$first_name"/>
                     </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="substring-after($display_name, ', ')"/>
-                    </xsl:otherwise>
                 </xsl:choose>
             </kitodo:metadata>
             <kitodo:metadata name="DateOfDeath">

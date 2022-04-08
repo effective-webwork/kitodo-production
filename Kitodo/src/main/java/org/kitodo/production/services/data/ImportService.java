@@ -14,6 +14,7 @@ package org.kitodo.production.services.data;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +33,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -96,6 +102,7 @@ import org.kitodo.production.process.ProcessGenerator;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.workflow.KitodoNamespaceContext;
 import org.kitodo.serviceloader.KitodoServiceLoader;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -111,6 +118,8 @@ public class ImportService {
     private static ExternalDataImportInterface importModule;
     private static final String KITODO_NAMESPACE = "http://meta.kitodo.org/v1/";
     private static final String KITODO_STRING = "kitodo";
+    private static final String MODS_NAMESPACE = "http://www.loc.gov/mods/v3";
+    private static final String MODS_TAG = "mods";
 
     private ProcessGenerator processGenerator;
     private static final String REPLACE_ME = "REPLACE_ME";
@@ -675,6 +684,9 @@ public class ImportService {
         if (Objects.nonNull(debugFolder)) {
             FileUtils.writeStringToFile(new File(debugFolder, "catalogRecord.xml"),
                     (String) dataRecord.getOriginalData(), StandardCharsets.UTF_8);
+        }
+        if (dataRecord.getMetadataFormat() == MetadataFormat.MODS) {
+            checkModsFormat(dataRecord);
         }
         DataRecord internalRecord = converter.convert(dataRecord, MetadataFormat.KITODO, FileFormat.XML, mappingFiles);
         if (Objects.nonNull(debugFolder)) {
@@ -1303,5 +1315,66 @@ public class ImportService {
      */
     public static Collection<String> getHigherLevelIdentifierMetadata(Ruleset ruleset) throws IOException {
         return getFunctionalMetadata(ruleset, FunctionalMetadata.HIGHERLEVEL_IDENTIFIER);
+    }
+
+    private String toString(Document doc) {
+        try {
+            StringWriter sw = new StringWriter();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+            return sw.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("Error converting to String", ex);
+        }
+    }
+
+    private void checkModsFormat(DataRecord dataRecord) {
+        if (dataRecord.getOriginalData() instanceof String) {
+            String orig = (String) dataRecord.getOriginalData();
+            if (!orig.contains(MODS_TAG + ":" + MODS_TAG)) {
+                Document document = null;
+                try {
+                    document = XMLUtils.parseXMLString(orig);
+                } catch (IOException | ParserConfigurationException | SAXException e) {
+                    logger.error(e);
+                }
+                if (document != null && document.getDocumentElement().getElementsByTagName(MODS_TAG).getLength() >= 1 ) {
+                    Element modsElement = (Element) document.getDocumentElement().getElementsByTagName(MODS_TAG).item(0);
+                    modsElement.getParentNode().replaceChild(buildModsElementNSRecursively(modsElement), modsElement);
+                    dataRecord.setOriginalData(toString(document));
+                }
+            }
+        }
+    }
+
+    private Element buildModsElementNSRecursively(Element element) {
+        Element newElementNS = copyElement(element);
+        NodeList list = element.getChildNodes();
+        for (int j = 0; j < list.getLength(); j++) {
+            if (list.item(j) instanceof Element) {
+                newElementNS.appendChild(buildModsElementNSRecursively((Element) list.item(j)));
+            }
+        }
+        return newElementNS;
+    }
+
+    private Element copyElement(Element el) {
+        Element newElement = el.getOwnerDocument().createElementNS(MODS_NAMESPACE, el.getTagName());
+        newElement.setPrefix(MODS_TAG);
+        newElement.setTextContent(el.getTextContent());
+        for (int i = 0; i < el.getAttributes().getLength(); i++) {
+            Node attr = el.getAttributes().item(i);
+            try {
+                newElement.setAttributeNS(attr.getNamespaceURI(), attr.getLocalName(), attr.getNodeValue());
+            } catch (DOMException e) {
+                newElement.setAttribute(attr.getLocalName(), attr.getNodeValue());
+            }
+        }
+        return newElement;
     }
 }
