@@ -15,20 +15,21 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kitodo.MockDatabase;
 import org.kitodo.data.database.beans.Process;
+import org.kitodo.production.helper.Helper;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.selenium.testframework.BaseTestSelenium;
 import org.kitodo.selenium.testframework.Browser;
 import org.kitodo.selenium.testframework.Pages;
+import org.kitodo.selenium.testframework.pages.ImportConfigurationEditPage;
 import org.kitodo.selenium.testframework.pages.ProcessesPage;
 import org.kitodo.selenium.testframework.pages.ProjectEditPage;
 import org.kitodo.selenium.testframework.pages.ProjectsPage;
@@ -47,6 +48,8 @@ public class EditingST extends BaseTestSelenium {
         processesPage = Pages.getProcessesPage();
         projectsPage = Pages.getProjectsPage();
         usersPage = Pages.getUsersPage();
+        MockDatabase.insertMappingFiles();
+        MockDatabase.insertImportConfigurations();
     }
 
     @Before
@@ -184,5 +187,17 @@ public class EditingST extends BaseTestSelenium {
         usersPage.editClient();
         assertEquals("Header for edit client is incorrect", "Mandant bearbeiten",
             Pages.getClientEditPage().getHeaderText());
+    }
+
+    @Test
+    public void editImportConfigurationTest() throws Exception {
+        ImportConfigurationEditPage editPage = projectsPage.editImportConfiguration();
+        editPage.togglePrestructuredImport();
+        Thread.sleep(2000);
+        editPage.save();
+        String expectedMessage = Helper.getTranslation("importConfig.validation.error.prestructuredImport",
+                "MODS to Kitodo mapping");
+        assertEquals("Prestructured import exception should have been thrown", expectedMessage,
+                editPage.getErrorMessage());
     }
 }

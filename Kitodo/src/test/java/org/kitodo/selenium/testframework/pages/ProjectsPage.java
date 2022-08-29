@@ -108,6 +108,10 @@ public class ProjectsPage extends Page<ProjectsPage> {
     private WebElement editRulesetLink;
 
     @SuppressWarnings("unused")
+    @FindBy(xpath = "//a[@href='/kitodo/pages/importConfigurationEdit.jsf?id=1']")
+    private WebElement editImportConfigurationLink;
+
+    @SuppressWarnings("unused")
     @FindBy(id = TEMPLATE_TABLE + ":0:templateActionForm:action22")
     private WebElement createProcess;
 
@@ -394,6 +398,15 @@ public class ProjectsPage extends Page<ProjectsPage> {
 
         clickButtonAndWaitForRedirect(editRulesetLink, Pages.getRulesetEditPage().getUrl());
         return Pages.getRulesetEditPage();
+    }
+
+    /**
+     * Go to edit import configuration page.
+     */
+    public ImportConfigurationEditPage editImportConfiguration() throws Exception {
+        switchToTabByIndex(TabIndex.IMPORT_CONFIGURATIONS.getIndex());
+        clickButtonAndWaitForRedirect(editImportConfigurationLink, Pages.getImportConfigurationEditPage().getUrl());
+        return Pages.getImportConfigurationEditPage();
     }
 
     /**
