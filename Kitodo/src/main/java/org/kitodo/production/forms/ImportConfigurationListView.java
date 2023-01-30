@@ -14,6 +14,7 @@ package org.kitodo.production.forms;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -37,6 +38,7 @@ public class ImportConfigurationListView extends BaseForm {
 
     private static final Logger logger = LogManager.getLogger(ImportConfigurationListView.class);
     private final String importConfigurationEditPath = MessageFormat.format(REDIRECT_PATH, "importConfigurationEdit");
+    private Boolean catalogConfigurationsFound;
 
     /**
      * Empty default constructor that also sets the LazyDTOModel instance of this bean.
@@ -97,5 +99,16 @@ public class ImportConfigurationListView extends BaseForm {
         } catch (ConfigurationException e) {
             Helper.setErrorMessage(e.getMessage() + ": " + e.getCause().getMessage());
         }
+    }
+
+    /**
+     * Check and return whether catalog configurations were found in the 'kitodo_opac.xml' file.
+     * @return value of catalogConfigurationsFound
+     */
+    public boolean catalogConfigurationsFound() {
+        if (Objects.isNull(catalogConfigurationsFound)) {
+            catalogConfigurationsFound = !OPACConfig.getCatalogs().isEmpty();
+        }
+        return catalogConfigurationsFound;
     }
 }

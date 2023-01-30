@@ -35,11 +35,14 @@
         <h:panelGroup id="convertButtonWrapper">
             <h:form id="convertMenu"
                     rendered="#{ProjectForm.activeTabIndex eq 5}">
-                <p:commandButton value="#{msgs['importConfig.migration.importCatalogConfigurations']}"
-                                 id="convertCatalogConfigurations"
-                                 styleClass="secondary"
-                                 action="#{ImportConfigurationListView.startCatalogConfigurationImport()}"
-                                 immediate="true"/>
+                <h:panelGroup title="#{ImportConfigurationListView.catalogConfigurationsFound() ? 'Convert catalog configurations' : 'No catalog configurations found in kitodo_opac.xml'}">
+                    <p:commandButton value="#{msgs['importConfig.migration.importCatalogConfigurations']}"
+                                     id="convertCatalogConfigurations"
+                                     styleClass="secondary"
+                                     action="#{ImportConfigurationListView.startCatalogConfigurationImport()}"
+                                     disabled="#{not ImportConfigurationListView.catalogConfigurationsFound()}"
+                                     immediate="true"/>
+                </h:panelGroup>
             </h:form>
         </h:panelGroup>
         <h:form id="configureColumnsForm" rendered="#{SecurityAccessController.hasAuthorityToConfigureColumns()}">
