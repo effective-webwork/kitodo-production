@@ -146,4 +146,15 @@ public class ImportConfigurationService extends SearchDatabaseService<ImportConf
                 .sorted(Comparator.comparing(ImportConfiguration::getTitle))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Get all import configurations sorted by title.
+     * @return list of import configurations sorted by title.
+     * @throws DAOException when import configuration could not be loaded
+     */
+    @Override
+    public List<ImportConfiguration> getAll() throws DAOException {
+        return dao.getAll().stream().sorted(Comparator.comparing(ImportConfiguration::getTitle))
+                .collect(Collectors.toList());
+    }
 }
