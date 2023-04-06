@@ -144,8 +144,6 @@
                 <h:panelGroup layout="block"
                               styleClass="dialogButtonWrapper">
                     <p:commandButton action="#{ProjectForm.saveFolder()}"
-                                     update="editForm"
-                                     oncomplete="PF('editFolderDialog').hide();"
                                      value="#{msgs.apply}"
                                      styleClass="primary right">
                         <p:ajax event="click" oncomplete="toggleSave()"/>

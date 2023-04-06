@@ -80,6 +80,7 @@ public class BaseForm implements Serializable {
     protected List<ListColumn> selectedColumns;
 
     protected int firstRow;
+    protected ErrorDialog errorDialog;
 
     /**
      * Get first row to show in datatable.
@@ -429,4 +430,23 @@ public class BaseForm implements Serializable {
                     getUser().getId());
         }
     }
+
+    /**
+     * Get errorDialog.
+     *
+     * @return value of errorDialog
+     */
+    public ErrorDialog getErrorDialog() {
+        return errorDialog;
+    }
+
+    /**
+     * Set errorDialog.
+     *
+     * @param errorDialog as org.kitodo.production.forms.ErrorDialog
+     */
+    public void setErrorDialog(ErrorDialog errorDialog) {
+        this.errorDialog = errorDialog;
+    }
+
 }

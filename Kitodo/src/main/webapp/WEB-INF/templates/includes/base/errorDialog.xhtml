@@ -1,0 +1,51 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+   <p:dialog id="errorDialog"
+             widgetVar="errorDialog"
+             showHeader="false"
+             modal="true"
+             width="500px"
+             appendTo="@(body)"
+             resizable="false"
+             closable="false">
+      <!--@elvariable id="beanObject" type="org.kitodo.production.forms.ProjectForm"-->
+      <h:panelGroup id="messageWrapper">
+         <h3>
+            <h:outputFormat value="#{beanObject.errorDialog.errorMessage}"/>
+         </h3>
+         <div class="select-note ui-messages-error">
+            #{beanObject.errorDialog.errorDescription}
+         </div>
+      </h:panelGroup>
+
+      <p:panelGrid>
+         <p:row>
+            <h:form>
+               <p:commandButton id="closeButton"
+                                icon="fa fa-close fa-lg"
+                                iconPos="right"
+                                value="#{msgs.close}"
+                                onclick='PF("errorDialog").hide();'
+                                style="margin-right: var(--default-double-size);"
+                                styleClass="secondary right"/>
+            </h:form>
+         </p:row>
+      </p:panelGrid>
+   </p:dialog>
+</ui:composition>

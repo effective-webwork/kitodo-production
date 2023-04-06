@@ -105,6 +105,9 @@
     <ui:define name="dialog">
         <ui:include src="/WEB-INF/templates/includes/projectEdit/projectEditMetsPopup.xhtml"/>
         <ui:include src="/WEB-INF/templates/includes/projectEdit/templateAddPopup.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/base/errorDialog.xhtml">
+            <ui:param name="beanObject" value="#{ProjectForm}"/>
+        </ui:include>
     </ui:define>
 
 </ui:composition>

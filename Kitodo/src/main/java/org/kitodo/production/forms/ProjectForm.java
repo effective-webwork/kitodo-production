@@ -55,6 +55,7 @@ import org.kitodo.production.helper.Helper;
 import org.kitodo.production.model.LazyDTOModel;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.ProjectService;
+import org.primefaces.PrimeFaces;
 
 @Named("ProjectForm")
 @SessionScoped
@@ -331,21 +332,32 @@ public class ProjectForm extends BaseForm {
      * Save folder.
      */
     public void saveFolder() {
-        if (!this.project.getFolders().contains(this.myFolder)) {
+        if (this.project.getFolders().contains(this.myFolder)) {
+            List<Folder> folders = this.project.getFolders();
+            String duplicateFileGroup = null;
+            for (Folder folder : folders) {
+                if (this.myFolder.getFileGroup().equals(folder.getFileGroup()) && folder != myFolder) {
+                    duplicateFileGroup = folder.getFileGroup();
+                    break;
+                }
+            }
+            if (Objects.nonNull(duplicateFileGroup)) {
+                String errorDescription = Helper.getTranslation("errorDuplicateFilegroup", duplicateFileGroup);
+                String errorTitle = Helper.getTranslation("anErrorOccurred");
+                errorDialog = new ErrorDialog(errorTitle, errorDescription);
+                PrimeFaces.current().ajax().update("errorDialog");
+                PrimeFaces.current().executeScript("PF('errorDialog').show();");
+            } else {
+                PrimeFaces.current().executeScript("PF('editFolderDialog').hide();");
+                PrimeFaces.current().ajax().update("editForm");
+            }
+        } else {
             this.project.getFolders().add(this.myFolder);
             try {
                 ServiceManager.getProjectService().saveToDatabase(this.project);
             } catch (DAOException e) {
                 Helper.setErrorMessage(ERROR_SAVING, new Object[] {ObjectType.PROJECT.getTranslationSingular() },
                         logger, e);
-            }
-        } else {
-            List<Folder> folders = this.project.getFolders();
-            for (Folder folder : folders) {
-                if (this.myFolder.getFileGroup().equals(folder.getFileGroup()) && folder != myFolder) {
-                    Helper.setErrorMessage("errorDuplicateFilegroup",
-                        new Object[] {ObjectType.FOLDER.getTranslationPlural() });
-                }
             }
         }
     }
@@ -558,7 +570,12 @@ public class ProjectForm extends BaseForm {
     }
 
     private Map<String, Folder> getFolderMap() {
-        return getFolderList().parallelStream().collect(Collectors.toMap(Folder::getFileGroup, Function.identity()));
+        try {
+            return getFolderList().parallelStream().collect(Collectors.toMap(Folder::getFileGroup, Function.identity()));
+        } catch (IllegalStateException e) {
+            Helper.setErrorMessage(e);
+            return Collections.emptyMap();
+        }
     }
 
     /**
