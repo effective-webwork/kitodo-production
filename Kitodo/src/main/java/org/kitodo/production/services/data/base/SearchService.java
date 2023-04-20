@@ -576,7 +576,7 @@ public abstract class SearchService<T extends BaseIndexedBean, S extends BaseDTO
      * @param ids as a List of Integer
      * @return query as QueryBuilder
      */
-    private QueryBuilder createSetQueryForIds(List<Integer> ids) {
+    public QueryBuilder createSetQueryForIds(List<Integer> ids) {
         return QueryBuilders.termsQuery("_id", ids);
     }
 

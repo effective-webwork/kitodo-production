@@ -60,7 +60,7 @@ public class MetadataBinder implements PropertyBinder {
             if (metadata instanceof MetadataEntry) {
                 containerElement.addValue("value", ((MetadataEntry) metadata).getValue());
             } else if (metadata instanceof MetadataGroup) {
-                for (Metadata meta : ((MetadataGroup) metadata).getGroup()) {
+                for (Metadata meta : ((MetadataGroup) metadata).getMetadata()) {
                     DocumentElement groupElement = containerElement.addObject("group");
                     evaluateMetadataElement(groupElement, meta);
                 }

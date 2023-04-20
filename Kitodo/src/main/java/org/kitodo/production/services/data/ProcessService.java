@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -72,6 +73,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.join.ScoreMode;
@@ -180,6 +182,10 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     private static final String DIRECTORY_PREFIX = ConfigCore.getParameter(ParameterCore.DIRECTORY_PREFIX, "orig");
     private static final String DIRECTORY_SUFFIX = ConfigCore.getParameter(ParameterCore.DIRECTORY_SUFFIX, "tif");
     private static final String SUFFIX = ConfigCore.getParameter(ParameterCore.METS_EDITOR_DEFAULT_SUFFIX, "");
+    private static final String CLOSED = "closed";
+    private static final String IN_PROCESSING = "inProcessing";
+    private static final String LOCKED = "locked";
+    private static final String OPEN = "open";
     private static final String PROCESS_TITLE = "(processtitle)";
     private static final String METADATA_SEARCH_KEY = ProcessTypeField.METADATA + ".mdWrap.xmlData.kitodo.metadata";
     private static final String METADATA_GROUP_SEARCH_KEY = ProcessTypeField.METADATA + ".mdWrap.xmlData.kitodo.metadataGroup.metadata";
@@ -305,7 +311,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     public void saveToIndex(Process process, boolean forceRefresh)
             throws CustomResponseException, DataException, IOException {
         // TODO: probably remove (as index is now managed by hibernate search!)
-        enrichProcessData(process, false);
+        //enrichProcessData(process, false);
         /*process.setMetadata(getMetadataForIndex(process));
         process.setBaseType(getBaseType(process));*/
         super.saveToIndex(process, forceRefresh);
@@ -345,13 +351,15 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     public void addAllObjectsToIndex(List<Process> processes) throws CustomResponseException, DAOException, IOException {
         for (Process process : processes) {
             // TODO: probably remove (as index is now managed by hibernate search!)
-            enrichProcessData(process, true);
+            //enrichProcessData(process, true);
             //process.setMetadata(getMetadataForIndex(process, true));
             //process.setBaseType(getBaseType(process));
         }
         super.addAllObjectsToIndex(processes);
     }
 
+    // FIXME: can this be removed?
+    /*
     private void enrichProcessData(Process process, boolean forIndexingAll) throws IOException {
         process.setMetadata(getMetadataForIndex(process, forIndexingAll));
         URI metadataFilePath = fileService.getMetadataFilePath(process, false, forIndexingAll);
@@ -365,6 +373,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
             process.setBaseType(getBaseType(workpiece));
         }
     }
+     */
 
     /**
      * MetadataType aus Preferences eines Prozesses ermitteln.
@@ -2672,7 +2681,7 @@ public class ProcessService extends ProjectSearchService<Process, ProcessDTO, Pr
     /**
      * Retrieve comments for the given process.
      *
-     * @param process
+     * @param processDTO
      *          process for which the tooltip is created
      * @return List containing comments of given process
      *

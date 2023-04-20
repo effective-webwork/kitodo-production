@@ -1150,7 +1150,7 @@ public class FilterService extends SearchService<Filter, FilterDTO, FilterDAO> {
 
     public Map<String, String> getFilterMap(String filterString) {
         Map<String, String> filterMap = new HashMap<>();
-        for (String filter : prepareFilters(filterString)) {
+        for (String filter : splitFilters(filterString)) {
             List<String> filterComponents = Arrays.stream(filter.split(":")).map(String::trim)
                     .collect(Collectors.toList());
             if (filterComponents.size() == 2) {

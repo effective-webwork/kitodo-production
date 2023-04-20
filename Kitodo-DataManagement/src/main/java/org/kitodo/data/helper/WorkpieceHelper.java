@@ -85,8 +85,8 @@ public class WorkpieceHelper {
                 .filter(metadata -> !(metadata instanceof MetadataEntry)
                         || Objects.nonNull(((MetadataEntry) metadata).getValue())
                         && !((MetadataEntry) metadata).getValue().isEmpty())
-                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getGroup())
-                        && !((MetadataGroup) metadata).getGroup().isEmpty())
+                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getMetadata())
+                        && !((MetadataGroup) metadata).getMetadata().isEmpty())
                 .collect(Collectors.toList());
     }
 
@@ -97,8 +97,8 @@ public class WorkpieceHelper {
                 .filter(metadata -> !(metadata instanceof MetadataEntry)
                         || Objects.nonNull(((MetadataEntry) metadata).getValue())
                         && !((MetadataEntry) metadata).getValue().isEmpty())
-                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getGroup())
-                        && !((MetadataGroup) metadata).getGroup().isEmpty())
+                .filter(metadata -> !(metadata instanceof MetadataGroup) || Objects.nonNull(((MetadataGroup) metadata).getMetadata())
+                        && !((MetadataGroup) metadata).getMetadata().isEmpty())
                 .collect(Collectors.toList());
     }
 

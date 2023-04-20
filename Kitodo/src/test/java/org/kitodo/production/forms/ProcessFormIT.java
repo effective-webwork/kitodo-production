@@ -28,6 +28,7 @@ import org.kitodo.SecurityTestUtils;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Template;
+import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.services.ServiceManager;
 
 public class ProcessFormIT {
@@ -104,7 +105,11 @@ public class ProcessFormIT {
         Assert.assertEquals(new ArrayList<>(Arrays.asList(1, 2, 5)), selectedIds);
 
         processForm.setAllSelected(false);
-        processForm.selectedProcessesOrProcessDTOs = ServiceManager.getProcessService().findByAnything("SelectionTest");
+        List<ProcessDTO> processDTOS = ServiceManager.getProcessService().findByAnything("SelectionTest");
+        processForm.selectedProcessesOrProcessDTOs = new ArrayList<>();
+        for (ProcessDTO processDTO : processDTOS) {
+            processForm.selectedProcessesOrProcessDTOs.add(ServiceManager.getProcessService().getById(processDTO.getId()));
+        }
         selectedIds = processForm.getSelectedProcesses()
                 .stream().map(Process::getId).sorted().collect(Collectors.toList());
         Assert.assertEquals(new ArrayList<>(Arrays.asList(4, 5)), selectedIds);
