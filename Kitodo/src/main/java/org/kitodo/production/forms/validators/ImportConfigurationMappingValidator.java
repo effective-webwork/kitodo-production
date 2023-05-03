@@ -22,6 +22,7 @@ import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.MappingFile;
 import org.kitodo.production.helper.Helper;
@@ -55,29 +56,31 @@ public class ImportConfigurationMappingValidator implements Validator<DualListMo
         Boolean prestructuredImport = (Boolean) prestructuredImportInput.getValue();
 
         // if no mapping files are configured, the imported metadata must already be in KITODO internal format
-        if (!Objects.equals(metadataFormat, MetadataFormat.KITODO.name())
-                && mappingFiles.isEmpty()) {
-            throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, Helper.getTranslation(
-                    "importConfig.validation.error.missingMappingFiles", metadataFormat), null));
-        } else {
-            for (MappingFile mappingFile : mappingFiles) {
-                int index = mappingFiles.indexOf(mappingFile);
-                // first mapping file must map import configuration metadata format to some other format
-                if (index == 0 && !Objects.equals(metadataFormat, mappingFile.getInputMetadataFormat())) {
-                    throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            Helper.getTranslation("importConfig.validation.error.firstMappingFormat",
-                                    mappingFile.getTitle(), metadataFormat, mappingFile.getInputMetadataFormat()), null));
-                }
-                if (index == mappingFiles.size() - 1) {
-                    validateLastMappingFile(mappingFile, prestructuredImport);
-                }
-                // intermediate mapping files output metadata format must match next files input metadata format
-                if (mappingFiles.size() > index + 1 && !Objects.equals(mappingFile.getOutputMetadataFormat(),
-                        mappingFiles.get(index + 1).getInputMetadataFormat())) {
-                    throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, Helper.getTranslation(
-                            "importConfig.validation.error.intermediateMappingFormat",
-                            mappingFile.getTitle(), mappingFiles.get(index + 1).getInputMetadataFormat(),
-                            mappingFile.getOutputMetadataFormat()), null));
+        if (StringUtils.isNotBlank(metadataFormat)) {
+            if (!Objects.equals(metadataFormat, MetadataFormat.KITODO.name())
+                    && mappingFiles.isEmpty()) {
+                throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, Helper.getTranslation(
+                        "importConfig.validation.error.missingMappingFiles", metadataFormat), null));
+            } else {
+                for (MappingFile mappingFile : mappingFiles) {
+                    int index = mappingFiles.indexOf(mappingFile);
+                    // first mapping file must map import configuration metadata format to some other format
+                    if (index == 0 && !Objects.equals(metadataFormat, mappingFile.getInputMetadataFormat())) {
+                        throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                Helper.getTranslation("importConfig.validation.error.firstMappingFormat",
+                                        mappingFile.getTitle(), metadataFormat, mappingFile.getInputMetadataFormat()), null));
+                    }
+                    if (index == mappingFiles.size() - 1) {
+                        validateLastMappingFile(mappingFile, prestructuredImport);
+                    }
+                    // intermediate mapping files output metadata format must match next files input metadata format
+                    if (mappingFiles.size() > index + 1 && !Objects.equals(mappingFile.getOutputMetadataFormat(),
+                            mappingFiles.get(index + 1).getInputMetadataFormat())) {
+                        throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, Helper.getTranslation(
+                                "importConfig.validation.error.intermediateMappingFormat",
+                                mappingFile.getTitle(), mappingFiles.get(index + 1).getInputMetadataFormat(),
+                                mappingFile.getOutputMetadataFormat()), null));
+                    }
                 }
             }
         }
