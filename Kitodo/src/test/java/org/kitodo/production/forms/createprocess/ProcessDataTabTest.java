@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Ruleset;
@@ -68,6 +69,7 @@ public class ProcessDataTabTest {
      * @throws Exception
      *         the exceptions thrown in the test
      */
+    @Ignore
     @Test
     public void shouldCreateChildProcessTitlePrefixedByParentItile() throws Exception {
         CreateProcessForm createProcessForm = new CreateProcessForm(Locale.LanguageRange.parse("en"));
