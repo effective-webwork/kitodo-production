@@ -11,11 +11,15 @@
 
 package org.kitodo.production.services.file;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
@@ -33,6 +37,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -97,6 +102,7 @@ public class FileService {
     private static final String TEMP_EXTENSION = ".tmp";
 
     private static final String SLASH = "/";
+    private static final String RENAMING = ".renaming";
 
 
     /**
@@ -1512,7 +1518,58 @@ public class FileService {
                 filenameMapping.put(renamingEntry.getKey(), fileManagementModule.rename(tempFilename, newFilepath));
             }
         }
+        createRenamingFile(filenameMapping, processDataUri);
         return numberOfRenamedMedia;
+    }
+
+    private void createRenamingFile(BidiMap<URI, URI> filenameMapping, URI processDir) throws IOException {
+        URI renamingFileUri = processDir.resolve(RENAMING);
+        try (OutputStream outputStream = write(renamingFileUri);
+             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+            String mappingContent = filenameMapping.entrySet().stream()
+                    .map(entry -> entry.getKey() + StringUtils.SPACE + entry.getValue())
+                    .collect(Collectors.joining(System.lineSeparator()));
+            bufferedWriter.write(mappingContent);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    private DualHashBidiMap<URI, URI> readRenamingFile(Process process) {
+        DualHashBidiMap<URI, URI> renamingMapping = new DualHashBidiMap<>();
+        URI processDataUri = ServiceManager.getProcessService().getProcessDataDirectory(process);
+        URI renamingFileUri = processDataUri.resolve(RENAMING);
+        try (InputStream inputStream = read(renamingFileUri);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            for (String line : bufferedReader.lines().collect(Collectors.toList())) {
+                String[] lineFragments = line.split(StringUtils.SPACE);
+                if (lineFragments.length > 2) {
+                    // TODO: should parsing stop with an error dialog?
+                    logger.error(String.format("Unable to parse line '%s' for filename mapping", line));
+                    continue;
+                }
+                try {
+                    renamingMapping.put(new URI(lineFragments[0]), new URI(lineFragments[1]));
+                } catch (URISyntaxException e) {
+                    // TODO: should parsing stop with an error dialog?
+                    logger.error(e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            logger.info(e.getMessage());
+        }
+        return renamingMapping;
+    }
+
+    public void removeRenamingFile(Process process) throws IOException {
+        URI processDataUri = ServiceManager.getProcessService().getProcessDataDirectory(process);
+
+        if (!processDataUri.toString().endsWith(SLASH)) {
+            processDataUri = URI.create(processDataUri + SLASH);
+        }
+        URI renamingFileUri = processDataUri.resolve(RENAMING);
+        delete(renamingFileUri);
     }
 
     /**
@@ -1522,14 +1579,17 @@ public class FileService {
      *
      * @param filenameMappings Bidirectional map containing original filenames as keys and new filenames as values.
      * @param workpiece Workpiece of current process
+     * @param process Process current process
      */
-    public void revertRenaming(BidiMap<URI, URI> filenameMappings, Workpiece workpiece) {
+    public void revertRenaming(BidiMap<URI, URI> filenameMappings, Workpiece workpiece, Process process) {
         // revert media variant URIs for all media files in workpiece to previous, original values
         for (PhysicalDivision physicalDivision : workpiece
                 .getAllPhysicalDivisionChildrenFilteredByTypes(PhysicalDivision.TYPES)) {
             for (Entry<MediaVariant, URI> mediaVariantURIEntry : physicalDivision.getMediaFiles().entrySet()) {
-                physicalDivision.getMediaFiles().put(mediaVariantURIEntry.getKey(),
-                        filenameMappings.get(mediaVariantURIEntry.getValue()));
+                if (filenameMappings.containsKey(mediaVariantURIEntry.getValue())) {
+                    physicalDivision.getMediaFiles().put(mediaVariantURIEntry.getKey(),
+                            filenameMappings.get(mediaVariantURIEntry.getValue()));
+                }
             }
         }
         // revert filenames of media files to previous, original values
@@ -1542,6 +1602,7 @@ public class FileService {
             for (URI tempUri : tempUris) {
                 fileManagementModule.rename(tempUri, StringUtils.removeEnd(tempUri.toString(), TEMP_EXTENSION));
             }
+            removeRenamingFile(process);
         } catch (IOException e) {
             logger.error(e);
         }
@@ -1563,5 +1624,21 @@ public class FileService {
             }
         }
         return updatedMap;
+    }
+
+    /**
+     * Reads potential '.renaming' file from process directory and reverts all filename changes logged in this file.
+     * @param workpiece the workpiece of the process
+     * @param process the process in question
+     * @return whether any file renaming information could be retrieved from a '.renaming' file of this process or not.
+     */
+    public boolean revertUnsavedRenamings(Workpiece workpiece, Process process) {
+        BidiMap<URI, URI> filenameMappings = readRenamingFile(process);
+        if (!filenameMappings.isEmpty()) {
+            revertRenaming(filenameMappings, workpiece, process);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

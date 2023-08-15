@@ -1,0 +1,46 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="revertRenamingDialog"
+              widgetVar="revertRenamingDialog"
+              width="500px"
+              showHeader="false"
+              appendTo="@(body)"
+              resizable="false"
+              closable="false"
+              modal="true">
+        <h:form id="confirmForm">
+            <h:panelGroup id="messageWrapper">
+                <h3>#{msgs['dataEditor.revertUnsavedRenamingTitle']}</h3>
+                <h:panelGroup layout="block"
+                              styleClass="select-note ui-messages-error">
+                    <h:outputText value="#{msgs['dataEditor.revertUnsavedRenamingText']}"/>
+                </h:panelGroup>
+            </h:panelGroup>
+            <h:panelGroup layout="block"
+                          styleClass="dialogButtonWrapper">
+                <p:commandButton value="#{msgs['ok']}"
+                                 id="okButton"
+                                 onclick="PF('revertRenamingDialog').hide();"
+                                 styleClass="primary right"
+                                 icon="fa fa-close"
+                                 iconPos="right"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>

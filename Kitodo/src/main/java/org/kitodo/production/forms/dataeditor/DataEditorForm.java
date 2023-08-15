@@ -294,6 +294,9 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
             } else {
                 PrimeFaces.current().executeScript("PF('metadataLockedDialog').show();");
             }
+            if (ServiceManager.getFileService().revertUnsavedRenamings(workpiece, process)) {
+                PrimeFaces.current().executeScript("PF('revertRenamingDialog').show();");
+            }
         } catch (IOException | DAOException | InvalidImagesException | NoSuchElementException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
         }
@@ -390,7 +393,7 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
     public void close() {
         deleteNotSavedUploadedMedia();
         unsavedDeletedMedia.clear();
-        ServiceManager.getFileService().revertRenaming(filenameMapping.inverseBidiMap(), workpiece);
+        ServiceManager.getFileService().revertRenaming(filenameMapping.inverseBidiMap(), workpiece, process);
         metadataPanel.clear();
         structurePanel.clear();
         workpiece = null;
@@ -503,6 +506,7 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
             filenameMapping = new DualHashBidiMap<>();
             ServiceManager.getProcessService().updateChildrenFromLogicalStructure(process, workpiece.getLogicalStructure());
             ServiceManager.getFileService().createBackupFile(process);
+            ServiceManager.getFileService().removeRenamingFile(process);
             try (OutputStream out = ServiceManager.getFileService().write(mainFileUri)) {
                 ServiceManager.getMetsService().save(workpiece, out);
                 ServiceManager.getProcessService().saveToIndex(process,false);
