@@ -1562,6 +1562,11 @@ public class FileService {
         return renamingMapping;
     }
 
+    /**
+     * Removes a potential '.renaming' file of the provided Process 'process'.
+     * @param process Process whose '.renaming' file is removed
+     * @throws IOException when removing the '.renaming' file fails
+     */
     public void removeRenamingFile(Process process) throws IOException {
         URI processDataUri = ServiceManager.getProcessService().getProcessDataDirectory(process);
 
