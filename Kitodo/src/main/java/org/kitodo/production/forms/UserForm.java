@@ -371,7 +371,7 @@ public class UserForm extends BaseForm {
     }
 
     /**
-     * Remove all processes from User 'userObject' that are associated with the client identified by ID
+     * Remove all projects from User 'userObject' that are associated with the client identified by ID
      * 'removeClientId'.
      */
     public void removeUserFromClientProjects() {
