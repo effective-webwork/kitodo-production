@@ -19,11 +19,14 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,10 +55,13 @@ import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
+import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Ruleset;
+import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.CommandException;
+import org.kitodo.exceptions.ConfigException;
 import org.kitodo.exceptions.InvalidImagesException;
 import org.kitodo.exceptions.MediaNotFoundException;
 import org.kitodo.production.dto.ProcessDTO;
@@ -97,6 +103,9 @@ public class FileService {
     private static final String TEMP_EXTENSION = ".tmp";
 
     private static final String SLASH = "/";
+    private static final String GENERATOR_SOURCE_ERROR_MESSAGE =
+            "Unable to determine number of scanned images for task %s:";
+    private static final String MEDIA_NUMBER_ERROR_MESSAGE = "Unable to determine number of scanned media for task %s:";
 
 
     /**
@@ -1563,5 +1572,66 @@ public class FileService {
             }
         }
         return updatedMap;
+    }
+
+    /**
+     * This method determines the number of source media files added to a specific process during the current run of
+     * given 'task'. Source media files are files contained in the process subfolder configured as 'generator source' in
+     * the corresponding project settings.
+     * The method only takes those files into account that have a 'modified' timestamp between processing start of task
+     * and now.
+     * @param task Task for which the number of source media files is determined
+     * @return number of source media files
+     */
+    public static int getNumberOfSourceMediaFilesCreated(Task task) {
+        Process process = task.getProcess();
+        Folder generatorSourceFolder = getGeneratorSource(task);
+        URI processSourceFolder = process.getProcessBaseUri().resolve(generatorSourceFolder.getRelativePath());
+        Path sourceFolderPath = Paths.get(ConfigCore.getKitodoDataDirectory() + processSourceFolder);
+        String errorMessage = String.format(MEDIA_NUMBER_ERROR_MESSAGE, task.getId());
+        if (Files.exists(sourceFolderPath) && Files.isDirectory(sourceFolderPath)) {
+            File[] sourceFiles = sourceFolderPath.toFile().listFiles();
+            if (Objects.nonNull(sourceFiles)) {
+                return filterSourceFiles(sourceFiles, new Subfolder(process, generatorSourceFolder), task);
+            }
+            throw new ConfigException(errorMessage + " source files are null");
+        }
+        throw new ConfigException(errorMessage + " generator source folder does not exist or is not a directory!");
+    }
+
+    /**
+     * Retrieve generator source subfolder of project to which the given task belongs.
+     * @param task Task for which corresponding generator source subfolder is determined and returned
+     * @return subfolder configured as generator source in project to which given task belongs
+     */
+    public static Folder getGeneratorSource(Task task) {
+        Process process = task.getProcess();
+        int taskId = task.getId();
+        String errorMessage = String.format(GENERATOR_SOURCE_ERROR_MESSAGE, taskId);
+        if (Objects.isNull(process)) {
+            throw new ConfigException(errorMessage + " process is null");
+        }
+        Project project = process.getProject();
+        if (Objects.isNull(project)) {
+            throw new ConfigException(errorMessage + " project is null");
+        }
+        Folder generatorSourceFolder = project.getGeneratorSource();
+        if (Objects.isNull(generatorSourceFolder)) {
+            throw new ConfigException(errorMessage+ " no generator source defined for project " + project.getId());
+        }
+        return generatorSourceFolder;
+    }
+
+    private static int filterSourceFiles(File[] sourceFiles, Subfolder generatorSourceSubfolder, Task task) {
+        Date currentTime = new Date();
+        return Math.toIntExact(Arrays.stream(sourceFiles)
+                .map(File::getAbsoluteFile)
+                .filter(f -> generatorSourceSubfolder.getFileFormat().getExtension(false)
+                        .equals(FilenameUtils.getExtension(f.getName())))
+                .filter(File::isFile)
+                .map(File::lastModified)
+                .filter(ts -> ts > Math.max(task.getProcessingTime().getTime(), task.getProcessingBegin().getTime()))
+                .filter(ts -> ts < currentTime.getTime())
+                .count());
     }
 }
