@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,17 +35,16 @@ import org.kitodo.api.validation.State;
 import org.kitodo.api.validation.ValidationResult;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
-import org.kitodo.data.database.beans.Comment;
+import org.kitodo.constants.StringConstants;
+import org.kitodo.data.database.beans.*;
 import org.kitodo.data.database.beans.Process;
-import org.kitodo.data.database.beans.Task;
-import org.kitodo.data.database.beans.User;
-import org.kitodo.data.database.beans.WorkflowCondition;
 import org.kitodo.data.database.enums.TaskEditType;
 import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.enums.WorkflowConditionType;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.elasticsearch.index.converter.ProcessConverter;
 import org.kitodo.data.exceptions.DataException;
+import org.kitodo.exceptions.ConfigException;
 import org.kitodo.production.enums.ProcessState;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.VariableReplacer;
@@ -52,8 +54,10 @@ import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyMet
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyPrefsHelper;
 import org.kitodo.production.helper.tasks.TaskManager;
 import org.kitodo.production.metadata.MetadataLock;
+import org.kitodo.production.model.Subfolder;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.TaskService;
+import org.kitodo.production.services.file.FileService;
 import org.kitodo.production.thread.TaskScriptThread;
 
 public class WorkflowControllerService {
@@ -64,6 +68,11 @@ public class WorkflowControllerService {
     private final WebDav webDav = new WebDav();
     private static final Logger logger = LogManager.getLogger(WorkflowControllerService.class);
     private final TaskService taskService = ServiceManager.getTaskService();
+    private static final String DIGITIZED_MEDIA_MESSAGE = "%s media file(s) with extension '%s' were added%s to " +
+            "process %s while task %s was processed between %s and %s.";
+    private static final String DIGITIZED_MEDIA_MESSAGE_2 = "[New media files]: process: %s; task: %s; %s files " +
+            "added: %s; file extension: %s; task processing begin: %s; task processing end: %s ";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
     /**
      * Set Task status up.
@@ -238,13 +247,14 @@ public class WorkflowControllerService {
      *            as Task object
      */
     public void close(Task task) throws DataException, IOException, DAOException {
-        task.setProcessingStatus(TaskStatus.DONE);
-        task.setCorrection(false);
-        task.setProcessingTime(new Date());
         User user = null;
         if (!task.isTypeAutomatic()) {
             user = getCurrentUser();
         }
+        logNumberOfDigitizedMedia(task, getCurrentUser());
+        task.setProcessingStatus(TaskStatus.DONE);
+        task.setCorrection(false);
+        task.setProcessingTime(new Date());
         taskService.replaceProcessingUser(task, user);
         task.setProcessingEnd(new Date());
 
@@ -253,6 +263,27 @@ public class WorkflowControllerService {
         automaticTasks = new ArrayList<>();
 
         activateTasksForClosedTask(task);
+    }
+
+    private void logNumberOfDigitizedMedia(Task task, User user) {
+        if (task.isTypeImagesWrite() && Objects.nonNull(task.getProcess())) {
+            try {
+                int numberOfScans = FileService.getNumberOfSourceMediaFilesCreated(task);
+                LocalDateTime startTime = LocalDateTime.parse(task.getProcessingTime().toString(), FORMATTER);
+                LocalDateTime endTime = LocalDateTime.now();
+                String extension = new Subfolder(task.getProcess(), FileService.getGeneratorSource(task)).getFileFormat().getExtension(false);
+                if (Objects.nonNull(user) && !ConfigCore.getBooleanParameterOrDefaultValue(ParameterCore.ANONYMIZE)) {
+                    List<String> userRoles = user.getRoles().stream().map(Role::getId).map(String::valueOf).collect(Collectors.toList());
+                    //logger.info(String.format(DIGITIZED_MEDIA_MESSAGE, numberOfScans, extension, " by user " + user.getId(), task.getProcess().getId(), task.getId(), startTime, endTime));
+                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2,  task.getProcess().getId(), task.getId(), "user " + user.getId() + "; roles: [" + String.join(StringConstants.COMMA_DELIMITER, userRoles) + "];", numberOfScans, extension, startTime, endTime));
+                } else {
+                    //logger.info(String.format(DIGITIZED_MEDIA_MESSAGE, numberOfScans, extension, "", task.getProcess().getId(), task.getId(), startTime, endTime));
+                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2, task.getProcess().getId(), task.getId(), "", numberOfScans, extension, startTime, endTime));
+                }
+            } catch (ConfigException e) {
+                logger.error(e.getMessage());
+            }
+        }
     }
 
     /**
@@ -328,6 +359,7 @@ public class WorkflowControllerService {
         if (task.isTypeImagesRead() || task.isTypeImagesWrite()) {
             this.webDav.uploadFromHome(task.getProcess());
         }
+        logNumberOfDigitizedMedia(task, task.getProcessingUser());
         task.setProcessingStatus(TaskStatus.OPEN);
         taskService.replaceProcessingUser(task, null);
         // if we have a correction task here then never remove startdate
