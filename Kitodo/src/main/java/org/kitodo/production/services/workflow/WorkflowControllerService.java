@@ -36,8 +36,12 @@ import org.kitodo.api.validation.ValidationResult;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.constants.StringConstants;
-import org.kitodo.data.database.beans.*;
+import org.kitodo.data.database.beans.Comment;
 import org.kitodo.data.database.beans.Process;
+import org.kitodo.data.database.beans.Role;
+import org.kitodo.data.database.beans.Task;
+import org.kitodo.data.database.beans.User;
+import org.kitodo.data.database.beans.WorkflowCondition;
 import org.kitodo.data.database.enums.TaskEditType;
 import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.enums.WorkflowConditionType;
@@ -68,10 +72,8 @@ public class WorkflowControllerService {
     private final WebDav webDav = new WebDav();
     private static final Logger logger = LogManager.getLogger(WorkflowControllerService.class);
     private final TaskService taskService = ServiceManager.getTaskService();
-    private static final String DIGITIZED_MEDIA_MESSAGE = "%s media file(s) with extension '%s' were added%s to " +
-            "process %s while task %s was processed between %s and %s.";
-    private static final String DIGITIZED_MEDIA_MESSAGE_2 = "[New media files]: process: %s; task: %s; %s files " +
-            "added: %s; file extension: %s; task processing begin: %s; task processing end: %s ";
+    private static final String DIGITIZED_MEDIA_MESSAGE_2 = "[New media files]: process: %s; task: %s; %s files "
+            + "added: %s; file extension: %s; task processing begin: %s; task processing end: %s ";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
     /**
@@ -271,14 +273,17 @@ public class WorkflowControllerService {
                 int numberOfScans = FileService.getNumberOfSourceMediaFilesCreated(task);
                 LocalDateTime startTime = LocalDateTime.parse(task.getProcessingTime().toString(), FORMATTER);
                 LocalDateTime endTime = LocalDateTime.now();
-                String extension = new Subfolder(task.getProcess(), FileService.getGeneratorSource(task)).getFileFormat().getExtension(false);
+                String extension = new Subfolder(task.getProcess(), FileService.getGeneratorSource(task))
+                        .getFileFormat().getExtension(false);
                 if (Objects.nonNull(user) && !ConfigCore.getBooleanParameterOrDefaultValue(ParameterCore.ANONYMIZE)) {
-                    List<String> userRoles = user.getRoles().stream().map(Role::getId).map(String::valueOf).collect(Collectors.toList());
-                    //logger.info(String.format(DIGITIZED_MEDIA_MESSAGE, numberOfScans, extension, " by user " + user.getId(), task.getProcess().getId(), task.getId(), startTime, endTime));
-                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2,  task.getProcess().getId(), task.getId(), "user " + user.getId() + "; roles: [" + String.join(StringConstants.COMMA_DELIMITER, userRoles) + "];", numberOfScans, extension, startTime, endTime));
+                    List<String> userRoles = user.getRoles().stream().map(Role::getId).map(String::valueOf)
+                            .collect(Collectors.toList());
+                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2,  task.getProcess().getId(), task.getId(),
+                            "user " + user.getId() + "; roles: [" + String.join(StringConstants.COMMA_DELIMITER,
+                                    userRoles) + "];", numberOfScans, extension, startTime, endTime));
                 } else {
-                    //logger.info(String.format(DIGITIZED_MEDIA_MESSAGE, numberOfScans, extension, "", task.getProcess().getId(), task.getId(), startTime, endTime));
-                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2, task.getProcess().getId(), task.getId(), "", numberOfScans, extension, startTime, endTime));
+                    logger.info(String.format(DIGITIZED_MEDIA_MESSAGE_2, task.getProcess().getId(), task.getId(), "",
+                            numberOfScans, extension, startTime, endTime));
                 }
             } catch (ConfigException e) {
                 logger.error(e.getMessage());

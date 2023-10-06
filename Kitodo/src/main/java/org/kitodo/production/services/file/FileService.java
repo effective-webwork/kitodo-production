@@ -1617,7 +1617,7 @@ public class FileService {
         }
         Folder generatorSourceFolder = project.getGeneratorSource();
         if (Objects.isNull(generatorSourceFolder)) {
-            throw new ConfigException(errorMessage+ " no generator source defined for project " + project.getId());
+            throw new ConfigException(errorMessage + " no generator source defined for project " + project.getId());
         }
         return generatorSourceFolder;
     }
