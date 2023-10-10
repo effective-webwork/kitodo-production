@@ -1182,4 +1182,11 @@ public class ProcessForm extends TemplateBaseForm {
     public FilterMenu getFilterMenu() {
         return filterMenu;
     }
+
+    /**
+     * Rename media files of all selected processes.
+     */
+    public void renameMedia() {
+        ServiceManager.getFileService().renameMedia(getSelectedProcesses());
+    }
 }
