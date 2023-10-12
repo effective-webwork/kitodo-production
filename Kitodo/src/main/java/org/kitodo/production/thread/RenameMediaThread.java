@@ -16,14 +16,13 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
-import org.kitodo.data.elasticsearch.exceptions.CustomResponseException;
-import org.kitodo.data.exceptions.DataException;
 import org.kitodo.production.helper.tasks.EmptyTask;
 import org.kitodo.production.metadata.MetadataLock;
 import org.kitodo.production.services.ServiceManager;
@@ -53,26 +52,22 @@ public class RenameMediaThread extends EmptyTask {
             int processId = process.getId();
             URI metaXmlUri = ServiceManager.getProcessService().getMetadataFileUri(process);
             DualHashBidiMap<URI, URI> renamingMap = new DualHashBidiMap<>();
-            boolean success = false;
+            Workpiece workpiece = null;
             try {
-                Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metaXmlUri);
+                workpiece = ServiceManager.getMetsService().loadWorkpiece(metaXmlUri);
                 int numberOfRenamedFiles = ServiceManager.getFileService().renameMediaFiles(process, workpiece,
                         renamingMap);
                 try (OutputStream out = ServiceManager.getFileService().write(metaXmlUri)) {
                     ServiceManager.getMetsService().save(workpiece, out);
-                    ServiceManager.getProcessService().saveToIndex(process, false);
-                    success = true;
                     logger.info("Renamed " + numberOfRenamedFiles + " media files for process " + process.getId());
-                } catch (CustomResponseException | DataException e) {
-                    logger.error(e.getMessage());
                 }
-                if (!success) {
-                    ServiceManager.getFileService().revertRenaming(renamingMap, workpiece);
-                }
-                MetadataLock.setFree(processId);
             } catch (IOException | URISyntaxException e) {
                 logger.error(e.getMessage());
+                if (Objects.nonNull(workpiece)) {
+                    ServiceManager.getFileService().revertRenaming(renamingMap.inverseBidiMap(), workpiece);
+                }
             }
+            MetadataLock.setFree(processId);
             setProgress((100 / processes.size()) * (processes.indexOf(process) + 1));
         }
         setProgress(100);

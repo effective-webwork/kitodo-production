@@ -1572,8 +1572,14 @@ public class FileService {
         try {
             List<URI> tempUris = new LinkedList<>();
             for (Entry<URI, URI> mapping : filenameMappings.entrySet()) {
-                tempUris.add(fileManagementModule.rename(mapping.getKey(), mapping.getValue().toString()
-                        + TEMP_EXTENSION));
+                if (mapping.getKey().toString().endsWith(TEMP_EXTENSION)) {
+                    // if current URI has '.tmp' extension, directly revert to original name (without '.tmp' extension)
+                    tempUris.add(fileManagementModule.rename(mapping.getKey(), mapping.getValue().toString()));
+                } else {
+                    // rename to new filename with '.tmp' extension otherwise
+                    tempUris.add(fileManagementModule.rename(mapping.getKey(), mapping.getValue().toString()
+                            + TEMP_EXTENSION));
+                }
             }
             for (URI tempUri : tempUris) {
                 fileManagementModule.rename(tempUri, StringUtils.removeEnd(tempUri.toString(), TEMP_EXTENSION));
