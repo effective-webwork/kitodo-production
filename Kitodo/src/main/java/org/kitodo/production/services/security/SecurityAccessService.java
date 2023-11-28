@@ -203,15 +203,6 @@ public class SecurityAccessService extends SecurityAccess {
     }
 
     /**
-     * Check if the current user has the authority to add the authority.
-     *
-     * @return true if the current user has the authority to add the authority
-     */
-    public boolean hasAuthorityToAddAuthority() {
-        return hasAuthorityGlobal("addAuthority");
-    }
-
-    /**
      * Check if current user has authority to add anything on user page. It returns
      * true if user has at least one of below given authorities.
      *
@@ -529,15 +520,6 @@ public class SecurityAccessService extends SecurityAccess {
     }
 
     /**
-     * Check if the current user has the authority to edit the authority.
-     *
-     * @return true if the current user has the authority to edit the authority
-     */
-    public boolean hasAuthorityToEditAuthority() {
-        return hasAuthorityGlobal("editAuthority");
-    }
-
-    /**
      * Check if the current user has the authority to edit the index.
      *
      * @return true if the current user has the authority to edit the index
@@ -698,16 +680,6 @@ public class SecurityAccessService extends SecurityAccess {
      */
     public boolean hasAuthorityToViewClient() {
         return hasAnyAuthorityGlobalOrForClient("viewClient, addClient, editClient");
-    }
-
-    /**
-     * Check if the current user has the authority to view the authority. Add and
-     * edit authorities include also view.
-     *
-     * @return true if the current user has the authority to view the authority
-     */
-    public boolean hasAuthorityToViewAuthority() {
-        return hasAnyAuthorityGlobalOrForClient("viewAuthority, addAuthority, editAuthority");
     }
 
     /**

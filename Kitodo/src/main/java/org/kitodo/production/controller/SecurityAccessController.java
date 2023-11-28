@@ -192,15 +192,6 @@ public class SecurityAccessController {
     }
 
     /**
-     * Check if the current user has the authority to add the authority.
-     *
-     * @return true if the current user has the authority to add the authority
-     */
-    public boolean hasAuthorityToAddAuthority() {
-        return securityAccessService.hasAuthorityToAddAuthority();
-    }
-
-    /**
      * Check if current user has authority to add anything on user page. It returns
      * true if user has at least one of below given authorities.
      *
@@ -515,15 +506,6 @@ public class SecurityAccessController {
     }
 
     /**
-     * Check if the current user has the authority to edit the authority.
-     *
-     * @return true if the current user has the authority to edit the authority
-     */
-    public boolean hasAuthorityToEditAuthority() {
-        return securityAccessService.hasAuthorityToEditAuthority();
-    }
-
-    /**
      * Check if the current user has the authority to edit the index.
      *
      * @return true if the current user has the authority to edit the index
@@ -669,15 +651,6 @@ public class SecurityAccessController {
      */
     public boolean hasAuthorityToViewClient() {
         return securityAccessService.hasAuthorityToViewClient();
-    }
-
-    /**
-     * Check if the current user has the authority to view the authority.
-     *
-     * @return true if the current user has the authority to view the authority
-     */
-    public boolean hasAuthorityToViewAuthority() {
-        return securityAccessService.hasAuthorityToViewAuthority();
     }
 
     /**
