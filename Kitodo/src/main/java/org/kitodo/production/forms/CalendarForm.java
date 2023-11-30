@@ -85,7 +85,7 @@ public class CalendarForm implements Serializable {
 
     private static final String BLOCK = "calendar.block.";
     private static final String BLOCK_NEGATIVE = BLOCK + "negative";
-    private static final String UPLOAD_ERROR = "calendar.upload.error";
+    private static final String UPLOAD_ERROR = "errorLoadingFile";
     private static final String REDIRECT_PARAMETER = "faces-redirect=true";
     private static final String DEFAULT_REFERER = "processes?" + REDIRECT_PARAMETER;
     private static final String TASK_MANAGER_REFERER = "system.jsf?tabIndex=0&" + REDIRECT_PARAMETER;

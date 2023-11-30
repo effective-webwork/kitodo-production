@@ -210,6 +210,8 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
 
     private String renamingError = "";
 
+    private String metadataLoadingError = "";
+
     /**
      * Public constructor.
      */
@@ -294,8 +296,11 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
             } else {
                 PrimeFaces.current().executeScript("PF('metadataLockedDialog').show();");
             }
-        } catch (IOException | DAOException | InvalidImagesException | NoSuchElementException e) {
+        } catch (DAOException | InvalidImagesException | NoSuchElementException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+        } catch (IOException e) {
+            metadataLoadingError = e.getMessage();
+            PrimeFaces.current().executeScript("PF('metadataLoadingFailedDialog').show();");
         }
     }
 
@@ -1154,4 +1159,13 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
         paginationPanel.show();
         structurePanel.show();
     }
+
+    /**
+     * Return potential metadata loading error message.
+     * @return metadata loading error message
+     */
+    public String getMetadataLoadingError() {
+        return metadataLoadingError;
+    }
+
 }
