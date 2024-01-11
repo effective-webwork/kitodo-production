@@ -85,8 +85,8 @@ public class LanguageForm implements Serializable {
      * <p>
      * It’s a good practice to identify a language in its own spelling, since
      * this will be most likely what a speaker of that language will recognize.
-     * See also: http://www.cs.tut.fi/~jkorpela/flags.html Note that
-     * capitalisation is subject to the respective language. If the language is
+     * See also: <a href="http://www.cs.tut.fi/~jkorpela/flags.html">http://www.cs.tut.fi/~jkorpela/flags.html</a>
+     * Note that capitalisation is subject to the respective language. If the language is
      * unknown, the id will be returned. displayLanguageTranslated − the name of
      * the language in the currently selected language, e.g., if the current
      * language is English: “English”, “German”, “French”, …
@@ -107,24 +107,26 @@ public class LanguageForm implements Serializable {
     public List<Map<String, Object>> getSupportedLocales() {
         List<Map<String, Object>> supportedLocales = new ArrayList<>();
         Locale currentDisplayLanguage = FacesContext.getCurrentInstance().getViewRoot().getLocale();
-        // It seems we have an old Faces API, Faces 2.1’s getSupportedLocales()
-        // returns Iterator<Locale>
-        // TODO: Update JSF API
         Iterator<Locale> localesIterator = FacesContext.getCurrentInstance().getApplication().getSupportedLocales();
         while (localesIterator.hasNext()) {
             Locale supportedLocale = localesIterator.next();
-            if (supportedLocale.getLanguage().length() > 0) {
-                Map<String, Object> translation = new HashMap<>();
-                translation.put("id", supportedLocale.toString());
-                translation.put("displayLanguageSelf", supportedLocale.getDisplayLanguage(supportedLocale));
-                translation.put("displayLanguageTranslated",
-                    supportedLocale.getDisplayLanguage(currentDisplayLanguage));
-                translation.put("selected", supportedLocale.equals(currentDisplayLanguage));
-                translation.put("flag", "javax.faces.resource/images/" + supportedLocale.toString() + ".svg.jsf");
+            if (!supportedLocale.getLanguage().isEmpty()) {
+                Map<String, Object> translation = getStringObjectMap(supportedLocale, currentDisplayLanguage);
                 supportedLocales.add(translation);
             }
         }
         return supportedLocales;
+    }
+
+    private static Map<String, Object> getStringObjectMap(Locale supportedLocale, Locale currentDisplayLanguage) {
+        Map<String, Object> translation = new HashMap<>();
+        translation.put("id", supportedLocale.toString());
+        translation.put("displayLanguageSelf", supportedLocale.getDisplayLanguage(supportedLocale));
+        translation.put("displayLanguageTranslated",
+            supportedLocale.getDisplayLanguage(currentDisplayLanguage));
+        translation.put("selected", supportedLocale.equals(currentDisplayLanguage));
+        translation.put("flag", "javax.faces.resource/images/" + supportedLocale + ".svg.jsf");
+        return translation;
     }
 
     /**
