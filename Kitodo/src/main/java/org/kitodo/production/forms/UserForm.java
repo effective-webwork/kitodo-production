@@ -291,7 +291,15 @@ public class UserForm extends BaseForm {
 
     void deleteUser(User user) {
         try {
+            long numberOfUsers = ServiceManager.getUserService().countDatabaseRows();
             userService.removeFromDatabase(user);
+            int rowsPerPage = ServiceManager.getUserService().getCurrentUser().getTableSize();
+            int firstRow = getFirstRow();
+            // manually subtract 1 from number of users because database transaction is not guaranteed to have finished
+            if ((numberOfUsers - 1) % rowsPerPage == 0 && firstRow > rowsPerPage - 1) {
+                setFirstRow(firstRow - rowsPerPage);
+                PrimeFaces.current().ajax().update("listWrapper");
+            }
         } catch (DAOException e) {
             Helper.setErrorMessage(ERROR_SAVING, new Object[]{ObjectType.USER.getTranslationSingular()}, logger, e);
         }
