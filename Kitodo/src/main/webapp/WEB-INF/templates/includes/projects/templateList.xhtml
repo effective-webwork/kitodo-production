@@ -53,6 +53,18 @@
                           title="#{item.title}"/>
         </p:column>
 
+        <p:column headerText="#{msgs.workflow}"
+                  sortBy="#{item.workflow.title.keyword}">
+            <h:outputText value="#{item.workflow.title}"
+                          title="#{item.workflow.title}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs.docket}"
+                  sortBy="#{item.docket.title.keyword}">
+            <h:outputText value="#{item.docket.title}"
+                          title="#{item.docket.title}"/>
+        </p:column>
+
         <p:column headerText="#{msgs.ruleset}"
                   sortBy="#{item.ruleset.title.keyword}"
                   rendered="#{ProjectForm.showColumn('template.ruleset')}">

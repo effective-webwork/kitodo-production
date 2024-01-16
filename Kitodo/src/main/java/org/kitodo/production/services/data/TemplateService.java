@@ -187,7 +187,7 @@ public class TemplateService extends ClientSearchService<Template, TemplateDTO, 
         templateDTO.setActive(TemplateTypeField.ACTIVE.getBooleanValue(jsonObject));
         templateDTO.setCreationDate(TemplateTypeField.CREATION_DATE.getStringValue(jsonObject));
         templateDTO.setDocket(
-            ServiceManager.getDocketService().findById(TemplateTypeField.DOCKET.getIntValue(jsonObject)));
+            ServiceManager.getDocketService().findById(TemplateTypeField.DOCKET_ID.getIntValue(jsonObject)));
         templateDTO.setRuleset(
             ServiceManager.getRulesetService().findById(TemplateTypeField.RULESET_ID.getIntValue(jsonObject)));
         WorkflowDTO workflowDTO = new WorkflowDTO();
@@ -219,7 +219,7 @@ public class TemplateService extends ClientSearchService<Template, TemplateDTO, 
      * @return list of JSON objects with templates for specific docket id
      */
     public List<Map<String, Object>> findByDocket(int docketId) throws DataException {
-        QueryBuilder query = createSimpleQuery(TemplateTypeField.DOCKET.getKey(), docketId, true);
+        QueryBuilder query = createSimpleQuery(TemplateTypeField.DOCKET_ID.getKey(), docketId, true);
         return findDocuments(query);
     }
 

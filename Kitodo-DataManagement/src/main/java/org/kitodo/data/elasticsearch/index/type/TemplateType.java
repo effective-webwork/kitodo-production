@@ -30,7 +30,8 @@ public class TemplateType extends BaseType<Template> {
             preventNull(template.getSortHelperStatus()));
         jsonObject.put(TemplateTypeField.CLIENT_ID.getKey(), getId(template.getClient()));
         jsonObject.put(TemplateTypeField.CLIENT_NAME.getKey(), getTitle(template.getClient()));
-        jsonObject.put(TemplateTypeField.DOCKET.getKey(), getId(template.getDocket()));
+        jsonObject.put(TemplateTypeField.DOCKET_ID.getKey(), getId(template.getDocket()));
+        jsonObject.put(TemplateTypeField.DOCKET_TITLE.getKey(), getTitle(template.getDocket()));
         jsonObject.put(TemplateTypeField.RULESET_ID.getKey(), getId(template.getRuleset()));
         jsonObject.put(TemplateTypeField.RULESET_TITLE.getKey(), getTitle(template.getRuleset()));
         jsonObject.put(TemplateTypeField.WORKFLOW_TITLE.getKey(), getTitle(template.getWorkflow()));

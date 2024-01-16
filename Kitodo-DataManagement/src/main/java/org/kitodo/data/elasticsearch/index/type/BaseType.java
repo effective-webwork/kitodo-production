@@ -26,6 +26,7 @@ import org.kitodo.data.database.beans.BaseTemplateBean;
 import org.kitodo.data.database.beans.Batch;
 import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.Comment;
+import org.kitodo.data.database.beans.Docket;
 import org.kitodo.data.database.beans.Filter;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Role;
@@ -176,6 +177,8 @@ public abstract class BaseType<T extends BaseIndexedBean> implements TypeInterfa
             return preventNull(((Client) baseBean).getName());
         } else if (baseBean instanceof Ruleset) {
             return preventNull(((Ruleset) baseBean).getTitle());
+        } else if (baseBean instanceof Docket) {
+            return preventNull(((Docket) baseBean).getTitle());
         }
         return "";
     }
