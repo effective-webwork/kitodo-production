@@ -61,6 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String VIEW_TEMPLATE = "viewTemplate_";
     private static final String VIEW_WORKFLOW = "viewProcess_";
     private static final String LOGIN_PAGE = "/pages/login.jsf";
+    private static final String SESSION_EXPIRED_PAGE = "/pages/sessionExpired.jsf";
 
     /**
      * Constructor for SecurityConfig which also sets instance variable for
@@ -97,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
         http.sessionManagement().maximumSessions(1).sessionRegistry(getSessionRegistry())
-                .expiredUrl(LOGIN_PAGE);
+                .expiredUrl(SESSION_EXPIRED_PAGE);
 
         // site specific rules
         authorizeSpecificPages(http);
