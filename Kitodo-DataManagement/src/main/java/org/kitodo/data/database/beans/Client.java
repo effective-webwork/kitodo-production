@@ -114,7 +114,7 @@ public class Client extends BaseBean {
     }
 
     /**
-     * Set import configurations
+     * Set import configurations.
      *
      * @param configurations import configurations
      */

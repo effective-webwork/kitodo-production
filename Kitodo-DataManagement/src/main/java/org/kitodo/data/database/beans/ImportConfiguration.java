@@ -161,14 +161,11 @@ public class ImportConfiguration extends BaseBean {
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "client_x_importconfiguration", joinColumns = {
-            @JoinColumn(name = "importconfiguration_id",
-                    foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_importconfiguration_id"))
-             },
+        @JoinColumn(name = "importconfiguration_id",
+                foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_importconfiguration_id")) },
             inverseJoinColumns = {
-            @JoinColumn(name = "client_id",
-                    foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_client_id"))
-
-    })
+                @JoinColumn(name = "client_id",
+                    foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_client_id")) })
     private List<Client> clients;
 
     /**
