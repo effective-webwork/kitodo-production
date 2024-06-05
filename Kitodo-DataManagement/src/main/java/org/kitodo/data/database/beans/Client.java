@@ -18,6 +18,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -39,6 +40,9 @@ public class Client extends BaseBean {
             inverseJoinColumns = {@JoinColumn(name = "column_id",
                     foreignKey = @ForeignKey(name = "FK_column_id"))})
     private List<ListColumn> listColumns;
+
+    @ManyToMany(mappedBy = "clients", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<ImportConfiguration> importConfigurations;
 
     /**
      * Gets name.
@@ -98,5 +102,23 @@ public class Client extends BaseBean {
      */
     public void setListColumns(List<ListColumn> columns) {
         this.listColumns = columns;
+    }
+
+    /**
+     * Get import configuration.
+     *
+     * @return import configurations
+     */
+    public List<ImportConfiguration> getImportConfigurations() {
+        return importConfigurations;
+    }
+
+    /**
+     * Set import configurations
+     *
+     * @param configurations import configurations
+     */
+    public void setImportConfigurations(List<ImportConfiguration> configurations) {
+        this.importConfigurations = configurations;
     }
 }

@@ -30,6 +30,7 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
 import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
+import org.kitodo.data.database.persistence.ClientDAO;
 import org.kitodo.data.database.persistence.MappingFileDAO;
 import org.kitodo.data.database.persistence.SearchFieldDAO;
 import org.kitodo.data.database.persistence.UrlParameterDAO;
@@ -157,6 +158,18 @@ public class ImportConfiguration extends BaseBean {
 
     @Column(name = "metadata_record_title_xpath")
     private String metadataRecordTitleXPath;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "client_x_importconfiguration", joinColumns = {
+            @JoinColumn(name = "importconfiguration_id",
+                    foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_importconfiguration_id"))
+             },
+            inverseJoinColumns = {
+            @JoinColumn(name = "client_id",
+                    foreignKey = @ForeignKey(name = "FK_client_x_importconfiguration_client_id"))
+
+    })
+    private List<Client> clients;
 
     /**
      * Default constructor.
@@ -842,6 +855,28 @@ public class ImportConfiguration extends BaseBean {
         return "";
     }
 
+    /**
+     * Get clients.
+     *
+     * @return value of clients
+     */
+    public List<Client> getClients() {
+        initialize(new ClientDAO(), this.clients);
+        if (Objects.isNull(this.clients)) {
+            this.clients = new ArrayList<>();
+        }
+        return clients;
+    }
+
+    /**
+     * Set clients.
+     *
+     * @param clients List of Client
+     */
+    public void setClients(List<Client> clients) {
+        this.clients = clients;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -898,7 +933,8 @@ public class ImportConfiguration extends BaseBean {
                 sruRecordSchema,
                 oaiMetadataPrefix,
                 metadataRecordIdXPath,
-                metadataRecordTitleXPath
+                metadataRecordTitleXPath,
+                clients
         );
     }
 }
