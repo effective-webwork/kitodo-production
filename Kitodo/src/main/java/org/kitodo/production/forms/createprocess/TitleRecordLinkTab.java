@@ -215,7 +215,7 @@ public class TitleRecordLinkTab {
 
         boolean linkingAllowedHere = Objects.isNull(currentLogicalDivision.getLink())
                 && currentStructuralElementView.getAllowedSubstructuralElements()
-                        .containsKey(createProcessForm.getProcessDataTab().getDocType());
+                        .containsKey(currentLogicalDivision.getType());
 
         if (linkingAllowedHere) {
             new InsertionPositionSelectionTreeNode(logicalDivisionNode, selectableInsertionPositions.size());
