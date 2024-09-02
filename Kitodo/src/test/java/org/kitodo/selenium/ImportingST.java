@@ -165,12 +165,15 @@ public class ImportingST extends BaseTestSelenium {
         importPage.enterTestSearchValue(TestConstants.KALLIOPE_PARENT_ID);
         importPage.activateChildProcessImport();
         importPage.decreaseImportDepth();
+        assertTrue(importPage.getSearchButton().isEnabled(), "Search button should be enabled");
         importPage.getSearchButton().click();
         assertTrue(importPage.isHierarchyPanelVisible(), "Hierarchy panel should be visible");
         importPage.addPpnAndTitle();
         String parentTitle = importPage.getProcessTitle();
         Pages.getProcessFromTemplatePage().save();
+        processesPage = Pages.getProcessesPage();
         processesPage.applyFilter(parentTitle);
+        processesPage = Pages.getProcessesPage();
         assertEquals(1, processesPage.countListedProcesses(), "Exactly one imported parent process should be displayed");
         List<String> processIds = processesPage.getProcessIds();
         assertEquals(1, processIds.size(), "Exactly one process ID should be visible");
