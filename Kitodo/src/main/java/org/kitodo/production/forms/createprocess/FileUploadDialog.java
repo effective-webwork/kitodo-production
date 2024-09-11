@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +29,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.schemaconverter.DataRecord;
-import org.kitodo.api.schemaconverter.FileFormat;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.exceptions.DAOException;
@@ -39,6 +39,7 @@ import org.kitodo.exceptions.ProcessGenerationException;
 import org.kitodo.exceptions.UnsupportedFormatException;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.TempProcess;
+import org.kitodo.production.helper.XMLUtils;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.ImportService;
 import org.omnifaces.util.Ajax;
@@ -67,30 +68,40 @@ public class FileUploadDialog extends MetadataImportDialog {
         UploadedFile uploadedFile = event.getFile();
         ImportService importService = ServiceManager.getImportService();
         try {
-            Document internalDocument = importService.convertDataRecordToInternal(
-                createRecordFromXMLElement(IOUtils.toString(uploadedFile.getInputStream(), Charset.defaultCharset())),
-                importConfiguration, false);
-            TempProcess tempProcess = importService.createTempProcessFromDocument(importConfiguration, internalDocument,
-                createProcessForm.getTemplate().getId(), createProcessForm.getProject().getId());
-
+            String xmlString = IOUtils.toString(uploadedFile.getInputStream(), Charset.defaultCharset());
+            DataRecord externalRecord = XMLUtils.createRecordFromXMLElement(xmlString, importConfiguration);
             LinkedList<TempProcess> processes = new LinkedList<>();
-            processes.add(tempProcess);
 
-            Collection<String> higherLevelIdentifier = this.createProcessForm.getRulesetManagement()
-                    .getFunctionalKeys(FunctionalMetadata.HIGHERLEVEL_IDENTIFIER);
+            if (MetadataFormat.EAD.name().equals(importConfiguration.getMetadataFormat())) {
+                LinkedList<TempProcess> eadProcesses = importService.parseImportedEADCollection(externalRecord, importConfiguration,
+                        createProcessForm.getProject().getId(), createProcessForm.getTemplate().getId());
+                createProcessForm.setChildProcesses(new LinkedList<>(eadProcesses.subList(1, eadProcesses.size())));
+                processes = new LinkedList<>(Collections.singletonList(eadProcesses.get(0)));
+            } else {
+                Document internalDocument = importService.convertDataRecordToInternal(externalRecord, importConfiguration,
+                        false);
+                TempProcess tempProcess = importService.createTempProcessFromDocument(importConfiguration, internalDocument,
+                        createProcessForm.getTemplate().getId(), createProcessForm.getProject().getId());
 
-            if (!higherLevelIdentifier.isEmpty()) {
-                String parentID = importService.getParentID(internalDocument, higherLevelIdentifier.toArray()[0]
-                                .toString(), importConfiguration.getParentElementTrimMode());
-                importService.checkForParent(parentID, createProcessForm.getTemplate().getRuleset(),
-                    createProcessForm.getProject().getId());
-                if (Objects.isNull(importService.getParentTempProcess())) {
-                    TempProcess parentTempProcess = extractParentRecordFromFile(uploadedFile, internalDocument);
-                    if (Objects.nonNull(parentTempProcess)) {
-                        processes.add(parentTempProcess);
+                processes.add(tempProcess);
+
+                Collection<String> higherLevelIdentifier = this.createProcessForm.getRulesetManagement()
+                        .getFunctionalKeys(FunctionalMetadata.HIGHERLEVEL_IDENTIFIER);
+
+                if (!higherLevelIdentifier.isEmpty()) {
+                    String parentID = importService.getParentID(internalDocument, higherLevelIdentifier.toArray()[0]
+                            .toString(), importConfiguration.getParentElementTrimMode());
+                    importService.checkForParent(parentID, createProcessForm.getTemplate().getRuleset(),
+                            createProcessForm.getProject().getId());
+                    if (Objects.isNull(importService.getParentTempProcess())) {
+                        TempProcess parentTempProcess = extractParentRecordFromFile(uploadedFile, internalDocument);
+                        if (Objects.nonNull(parentTempProcess)) {
+                            processes.add(parentTempProcess);
+                        }
                     }
                 }
             }
+            createProcessForm.setCurrentImportConfiguration(importConfiguration);
 
             if (!createProcessForm.getProcesses().isEmpty() && additionalImport) {
                 extendsMetadataTableOfMetadataTab(processes);
@@ -122,22 +133,13 @@ public class FileUploadDialog extends MetadataImportDialog {
                     importConfiguration.getParentElementTrimMode());
             if (Objects.nonNull(parentID) && Objects.nonNull(importConfiguration.getParentMappingFile())) {
                 Document internalParentDocument = importService.convertDataRecordToInternal(
-                        createRecordFromXMLElement(IOUtils.toString(uploadedFile.getInputStream(), Charset.defaultCharset())),
+                        XMLUtils.createRecordFromXMLElement(IOUtils.toString(uploadedFile.getInputStream(), Charset.defaultCharset()), importConfiguration),
                         importConfiguration, true);
                 return importService.createTempProcessFromDocument(importConfiguration, internalParentDocument,
                         createProcessForm.getTemplate().getId(), createProcessForm.getProject().getId());
             }
         }
         return null;
-    }
-
-    private DataRecord createRecordFromXMLElement(String xmlContent) {
-        DataRecord record = new DataRecord();
-        record.setMetadataFormat(
-            MetadataFormat.getMetadataFormat(importConfiguration.getMetadataFormat()));
-        record.setFileFormat(FileFormat.getFileFormat(importConfiguration.getReturnFormat()));
-        record.setOriginalData(xmlContent);
-        return record;
     }
 
     @Override

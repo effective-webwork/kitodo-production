@@ -29,7 +29,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.externaldatamanagement.SingleHit;
+import org.kitodo.api.schemaconverter.DataRecord;
 import org.kitodo.api.schemaconverter.ExemplarRecord;
+import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.CatalogException;
@@ -176,15 +178,27 @@ public class CatalogImportDialog  extends MetadataImportDialog implements Serial
                 int projectId = this.createProcessForm.getProject().getId();
                 int templateId = this.createProcessForm.getTemplate().getId();
                 ImportConfiguration importConfiguration = this.hitModel.getImportConfiguration();
+                createProcessForm.setCurrentImportConfiguration(importConfiguration);
 
-                // import current and ancestors
-                LinkedList<TempProcess> processes = ServiceManager.getImportService().importProcessHierarchy(
-                        currentRecordId, importConfiguration, projectId, templateId, hitModel.getImportDepth(),
-                        createProcessForm.getRulesetManagement().getFunctionalKeys(
-                                FunctionalMetadata.HIGHERLEVEL_IDENTIFIER));
-                // import children
-                if (this.importChildren) {
-                    importChildren(projectId, templateId, importConfiguration, processes);
+                LinkedList<TempProcess> processes;
+                if (MetadataFormat.EAD.name().equals(importConfiguration.getMetadataFormat())) {
+                    DataRecord externalRecord = ServiceManager.getImportService().
+                            importExternalDataRecord(importConfiguration, this.currentRecordId, false);
+                    LinkedList<TempProcess> eadProcesses = ServiceManager.getImportService().
+                            parseImportedEADCollection(externalRecord, importConfiguration,
+                                    createProcessForm.getProject().getId(), createProcessForm.getTemplate().getId());
+                    createProcessForm.setChildProcesses(new LinkedList<>(eadProcesses.subList(1, eadProcesses.size() - 1)));
+                    processes = new LinkedList<>(Collections.singletonList(eadProcesses.get(0)));
+                } else {
+                    // import current and ancestors
+                    processes = ServiceManager.getImportService().importProcessHierarchy(currentRecordId,
+                            importConfiguration, projectId, templateId, hitModel.getImportDepth(),
+                            createProcessForm.getRulesetManagement().getFunctionalKeys(
+                                    FunctionalMetadata.HIGHERLEVEL_IDENTIFIER));
+                    // import children
+                    if (this.importChildren) {
+                        importChildren(projectId, templateId, importConfiguration, processes);
+                    }
                 }
 
                 if (!createProcessForm.getProcesses().isEmpty() && additionalImport) {
@@ -196,6 +210,7 @@ public class CatalogImportDialog  extends MetadataImportDialog implements Serial
                     attachToExistingParentAndGenerateAtstslIfNotExist(currentTempProcess);
                     showMessageAndRecord(importConfiguration, processes);
                 }
+
             } catch (IOException | ProcessGenerationException | XPathExpressionException | URISyntaxException
                     | ParserConfigurationException | UnsupportedFormatException | SAXException | DAOException
                     | ConfigException | TransformerException | NoRecordFoundException | InvalidMetadataValueException

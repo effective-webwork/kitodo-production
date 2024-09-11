@@ -15,7 +15,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -33,9 +36,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.kitodo.api.schemaconverter.DataRecord;
+import org.kitodo.api.schemaconverter.FileFormat;
+import org.kitodo.api.schemaconverter.MetadataFormat;
+import org.kitodo.data.database.beans.ImportConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -178,5 +186,38 @@ public class XMLUtils {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         xpath.compile(xpathString);
+    }
+
+    public static List<Element> getElementsByTagNameAndAttributeValue(Document document, String tagName,
+                                                                      String attributeName, String attributeValue) {
+        System.out.println("-------------");
+        System.out.println(" Extracting EAD elements of type '" + tagName + "'...");
+        List<Element> elements = new ArrayList<>();
+        NodeList nodes = document.getElementsByTagName(tagName);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element element = (Element) nodes.item(i);
+            String attributeString = element.getAttribute(attributeName);
+            if (attributeValue.equals(attributeString)) {
+                System.out.println(" - extracting '" + tagName +  "' element number " + i);
+                elements.add(element);
+            }
+        }
+        return elements;
+    }
+
+    public static String elementToString(Element element) throws TransformerException {
+        StringWriter stringWriter = new StringWriter();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+        return stringWriter.toString();
+    }
+
+    public static DataRecord createRecordFromXMLElement(String xmlContent, ImportConfiguration importConfiguration) {
+        DataRecord record = new DataRecord();
+        record.setMetadataFormat(
+                MetadataFormat.getMetadataFormat(importConfiguration.getMetadataFormat()));
+        record.setFileFormat(FileFormat.getFileFormat(importConfiguration.getReturnFormat()));
+        record.setOriginalData(xmlContent);
+        return record;
     }
 }

@@ -43,6 +43,7 @@ import org.kitodo.api.dataformat.Division;
 import org.kitodo.api.dataformat.LogicalDivision;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
+import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Project;
@@ -98,6 +99,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
     private TempProcess currentProcess;
     private Boolean rulesetConfigurationForOpacImportComplete = null;
     private String defaultConfigurationType;
+    private ImportConfiguration currentImportConfiguration;
     static final int TITLE_RECORD_LINK_TAB_INDEX = 1;
 
     public CreateProcessForm() {
@@ -524,7 +526,8 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
             throw new IOException("Unable to create directories for process hierarchy!");
         }
 
-        if (this.catalogImportDialog.isImportChildren() && !createProcessesLocation(this.childProcesses)) {
+        // TODO: refactor and streamline this check
+        if (saveChildProcesses() && !createProcessesLocation(this.childProcesses)) {
             throw new IOException("Unable to create directories for child processes!");
         }
         saveProcessHierarchyMetadata();
@@ -672,12 +675,15 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
     }
 
     private boolean createProcessesLocation(List<TempProcess> processes) {
+        System.out.println("------------");
+        System.out.println("Creating process location for " + processes.size() + " processes");
         for (TempProcess tempProcess : processes) {
             if (processes.indexOf(tempProcess) > 0 && Objects.isNull(tempProcess.getMetadataNodes())) {
                 // skip creating directories for processes that already exist!
                 continue;
             }
             try {
+                System.out.printf("- creating process location for process '%s'%n", tempProcess.getProcess().getTitle());
                 URI processBaseUri = ServiceManager.getFileService().createProcessLocation(tempProcess.getProcess());
                 tempProcess.getProcess().setProcessBaseUri(processBaseUri);
             } catch (IOException | CommandException e) {
@@ -866,5 +872,19 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
      */
     public Collection<RecordIdentifierMissingDetail> getDetailsOfRecordIdentifierMissingError() {
         return ServiceManager.getImportService().getDetailsOfRecordIdentifierMissingError();
+    }
+
+    /**
+     * Set the current import configuration.
+     *
+     * @param currentImportConfiguration current import configuration
+     */
+    public void setCurrentImportConfiguration(ImportConfiguration currentImportConfiguration) {
+        this.currentImportConfiguration = currentImportConfiguration;
+    }
+
+    private boolean saveChildProcesses() {
+        return (MetadataFormat.EAD.name().equals(currentImportConfiguration.getMetadataFormat())
+                || catalogImportDialog.isImportChildren());
     }
 }
