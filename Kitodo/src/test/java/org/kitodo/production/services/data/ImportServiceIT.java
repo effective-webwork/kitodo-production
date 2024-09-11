@@ -94,6 +94,7 @@ public class ImportServiceIT {
     private static final ImportService importService = ServiceManager.getImportService();
     private static StubServer server;
     private static final String TEST_FILE_PATH = "src/test/resources/sruTestRecord.xml";
+    private static final String EAD_COLLECTION_FILE = "src/test/resources/eadCollection.xml";
     private static final String TEST_FILE_PATH_NUMBER_OF_HITS = "src/test/resources/importRecords/sruResponseNumberOfHits.xml";
     private static final String TEST_FILE_SUCCESS_RESPONSE_PATH = "src/test/resources/customInterfaceSuccessResponse.xml";
     private static final String TEST_FILE_ERROR_RESPONSE_PATH = "src/test/resources/customInterfaceErrorResponse.xml";
@@ -551,6 +552,11 @@ public class ImportServiceIT {
         } finally {
             ProcessTestUtils.removeTestProcess(processId);
         }
+    }
+
+    @Test
+    public void shouldImportEadCollection() {
+
     }
 
     private String getProcessDetailByMetadataId(String metadataId, List<ProcessDetail> processDetails) {

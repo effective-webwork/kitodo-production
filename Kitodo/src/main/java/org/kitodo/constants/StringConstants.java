@@ -17,4 +17,17 @@ public class StringConstants {
     public static final String SEMICOLON_DELIMITER = "; ";
     public static final String EDIT_FORM_SAVE = "editForm:save";
 
+    // acquisition stages
+    public static final String CREATE = "create";
+
+    // EAD string constants
+    public static final String EAD = "ead";
+    public static final String LEVEL = "level";
+    public static final String C_TAG_NAME = "c";
+    // EAD levels
+    public static final String COLLECTION = "collection";
+    public static final String CLASS = "class";
+    public static final String SERIES = "series";
+    public static final String FILE = "file";
+    public static final String ITEM = "item";
 }
