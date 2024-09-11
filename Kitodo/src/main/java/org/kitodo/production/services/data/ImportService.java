@@ -66,6 +66,7 @@ import org.kitodo.api.schemaconverter.SchemaConverterInterface;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.ConfigProject;
 import org.kitodo.config.enums.ParameterCore;
+import org.kitodo.constants.StringConstants;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.MappingFile;
 import org.kitodo.data.database.beans.Process;
@@ -442,7 +443,8 @@ public class ImportService {
             NoRecordFoundException, UnsupportedFormatException, URISyntaxException, SAXException, TransformerException,
             InvalidMetadataValueException, NoSuchMetadataFieldException {
 
-        Document internalDocument = importDocument(importConfiguration, recordId, allProcesses.isEmpty(), isParentInRecord);
+        DataRecord dataRecord = importExternalDataRecord(importConfiguration, recordId, allProcesses.isEmpty());
+        Document internalDocument = convertDataRecordToInternal(dataRecord, importConfiguration, isParentInRecord);
         TempProcess tempProcess = createTempProcessFromDocument(importConfiguration, internalDocument, templateID, projectID);
 
         // Workaround for classifying MultiVolumeWorks with insufficient information
@@ -459,7 +461,7 @@ public class ImportService {
         }
         allProcesses.add(tempProcess);
         if (!isParentInRecord && StringUtils.isNotBlank(parentIdMetadata)) {
-            return getParentID(internalDocument, parentIdMetadata,importConfiguration.getParentElementTrimMode());
+            return getParentID(internalDocument, parentIdMetadata, importConfiguration.getParentElementTrimMode());
         }
         return null;
     }
@@ -668,11 +670,10 @@ public class ImportService {
         }
     }
 
-    private Document importDocument(ImportConfiguration importConfiguration, String identifier,
-                                    boolean extractExemplars, boolean isParentInRecord)
-            throws NoRecordFoundException, UnsupportedFormatException, URISyntaxException, IOException,
-            XPathExpressionException, ParserConfigurationException, SAXException, ProcessGenerationException {
-        // ################ IMPORT #################
+    public DataRecord importExternalDataRecord(ImportConfiguration importConfiguration, String identifier,
+                                                boolean extractExemplars)
+            throws NoRecordFoundException, IOException,
+            XPathExpressionException, ParserConfigurationException, SAXException {
         importModule = initializeImportModule();
         DataRecord dataRecord = importModule.getFullRecordById(
                 createDataImportFromImportConfiguration(importConfiguration),
@@ -680,7 +681,68 @@ public class ImportService {
         if (extractExemplars) {
             exemplarRecords = extractExemplarRecords(dataRecord, importConfiguration);
         }
-        return convertDataRecordToInternal(dataRecord, importConfiguration, isParentInRecord);
+        return dataRecord;
+    }
+
+    /**
+     * This method transforms a given data record that contains an EAD collection as an XML string into a list of
+     * temp processes. The first temp process in the list will contain the 'collection' itself, while all following temp
+     * processes contain the 'item' level child records of the collection.
+     *
+     * @param importedEADRecord XML string representation of
+     * @return list of temp processes
+     */
+    public LinkedList<TempProcess> parseImportedEADCollection(DataRecord importedEADRecord,
+                                                              ImportConfiguration importConfiguration, int projectId,
+                                                              int templateId)
+            throws IOException, ParserConfigurationException, SAXException, ProcessGenerationException,
+            TransformerException, UnsupportedFormatException, XPathExpressionException, URISyntaxException,
+            InvalidMetadataValueException, NoSuchMetadataFieldException {
+        LinkedList<TempProcess> eadCollectionProcesses = new LinkedList<>();
+
+        Document eadCollectionDocument = XMLUtils.parseXMLString((String) importedEADRecord.getOriginalData());
+
+        List<Element> collectionElements = getEADElements(eadCollectionDocument, StringConstants.COLLECTION);
+        List<Element> fileElements = getEADElements(eadCollectionDocument, StringConstants.FILE);
+
+        if (collectionElements.size() != 1) {
+            throw new ProcessGenerationException("EAD XML does not contain exactly one element of level 'collection'!");
+        }
+
+        // create temp processes for collection and files
+        TempProcess collectionProcess = createTempProcessFromElement(collectionElements.get(0), importConfiguration,
+                projectId, templateId);
+        eadCollectionProcesses.add(collectionProcess);
+
+        List<TempProcess> parentProcesses = Collections.singletonList(collectionProcess);
+
+        // TODO: add progress bar to UI
+        System.out.println("Creating temp processes for extracted file elements...");
+        for (Element fileElement : fileElements) {
+            System.out.println(" - " + fileElements.indexOf(fileElement) + ". file element...");
+            TempProcess currentFileProcess = createTempProcessFromElement(fileElement, importConfiguration,
+                    projectId, templateId);
+            ProcessHelper.generateAtstslFields(currentFileProcess, parentProcesses, ACQUISITION_STAGE_CREATE, false);
+            eadCollectionProcesses.add(currentFileProcess);
+        }
+
+        return eadCollectionProcesses;
+    }
+
+    public TempProcess createTempProcessFromElement(Element element, ImportConfiguration importConfiguration,
+                                                           int projectId, int templateId) throws TransformerException,
+            UnsupportedFormatException, XPathExpressionException, ProcessGenerationException, URISyntaxException,
+            IOException, ParserConfigurationException, SAXException, InvalidMetadataValueException,
+            NoSuchMetadataFieldException {
+        String collectionString = XMLUtils.elementToString(element);
+        DataRecord externalCollectionRecord = XMLUtils.createRecordFromXMLElement(collectionString, importConfiguration);
+        Document internalEadCollectionDocument = convertDataRecordToInternal(externalCollectionRecord, importConfiguration, false);
+        return createTempProcessFromDocument(importConfiguration, internalEadCollectionDocument, templateId, projectId);
+    }
+
+    private List<Element> getEADElements(Document document, String level) {
+        return XMLUtils.getElementsByTagNameAndAttributeValue(document, StringConstants.C_TAG_NAME,
+                StringConstants.LEVEL, level);
     }
 
     /**
