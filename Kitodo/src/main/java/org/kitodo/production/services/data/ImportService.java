@@ -717,13 +717,19 @@ public class ImportService {
         List<TempProcess> parentProcesses = Collections.singletonList(collectionProcess);
 
         // TODO: add progress bar to UI
-        System.out.println("Creating temp processes for extracted file elements...");
-        for (Element fileElement : fileElements) {
-            System.out.println(" - " + fileElements.indexOf(fileElement) + ". file element...");
-            TempProcess currentFileProcess = createTempProcessFromElement(fileElement, importConfiguration,
-                    projectId, templateId);
-            ProcessHelper.generateAtstslFields(currentFileProcess, parentProcesses, ACQUISITION_STAGE_CREATE, false);
-            eadCollectionProcesses.add(currentFileProcess);
+        System.out.printf("Creating temp processes for %d extracted file elements...%n", fileElements.size());
+        if (fileElements.size() > ConfigCore.getIntParameterOrDefaultValue(ParameterCore.
+                MAX_NUMBER_OF_PROCESSES_FOR_IMPORT_MASK)) {
+            // TODO: show dialog and move import to background task!
+            throw new ProcessGenerationException("Max number of processes exceeded!");
+        } else {
+            for (Element fileElement : fileElements) {
+                System.out.println(" - " + fileElements.indexOf(fileElement) + ". file element...");
+                TempProcess currentFileProcess = createTempProcessFromElement(fileElement, importConfiguration,
+                        projectId, templateId);
+                ProcessHelper.generateAtstslFields(currentFileProcess, parentProcesses, ACQUISITION_STAGE_CREATE, false);
+                eadCollectionProcesses.add(currentFileProcess);
+            }
         }
 
         return eadCollectionProcesses;
