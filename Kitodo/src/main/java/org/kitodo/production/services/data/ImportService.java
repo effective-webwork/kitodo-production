@@ -472,8 +472,9 @@ public class ImportService {
                                          int projectID)
             throws UnsupportedFormatException, NoRecordFoundException, XPathExpressionException,
             ProcessGenerationException, URISyntaxException, IOException, ParserConfigurationException, SAXException,
-            InvalidMetadataValueException, TransformerException, NoSuchMetadataFieldException {
-        Document internalDocument = importDocument(importConfiguration, recordId, false, false);
+            TransformerException {
+        DataRecord dataRecord = importExternalDataRecord(importConfiguration, recordId, false);
+        Document internalDocument = convertDataRecordToInternal(dataRecord, importConfiguration, false);
         return createTempProcessFromDocument(importConfiguration, internalDocument, templateID, projectID);
     }
 
