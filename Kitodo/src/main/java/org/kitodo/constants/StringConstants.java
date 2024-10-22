@@ -19,6 +19,7 @@ public class StringConstants {
 
     // acquisition stages
     public static final String CREATE = "create";
+    public static final String EDIT = "edit";
 
     // EAD string constants
     public static final String EAD = "ead";
