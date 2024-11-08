@@ -52,7 +52,6 @@ import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Role;
 import org.kitodo.data.database.beans.Task;
 import org.kitodo.data.database.beans.User;
-import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.exceptions.DataException;
 import org.kitodo.production.dto.ProjectDTO;
@@ -66,6 +65,7 @@ import org.kitodo.production.security.SecuritySession;
 import org.kitodo.production.security.password.KitodoPassword;
 import org.kitodo.production.security.password.SecurityPasswordEncoder;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.TaskService;
 import org.kitodo.production.services.data.UserService;
 import org.primefaces.PrimeFaces;
 
@@ -250,20 +250,29 @@ public class UserForm extends BaseForm {
     }
 
     /**
+     * Retrieve and return list of tasks that are assigned to the user, have TaskStatus "INWORK" and belong to processes
+     * of the client with the given ID 'clientId'.
+     *
+     * @param user User whose tasks are reset
+     * @param clientId ID of client by which tasks are filtered.
+     * @return list of tasks
+     */
+    public List<Task> getTasksInProgress(User user, int clientId) {
+        List<Task> tasks = ServiceManager.getUserService().getTasksInProgress(user);
+        return tasks.stream().filter(task -> task.getProcess().getProject().getClient().getId().equals(clientId))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Unassign all tasks in work from user and set their status back to open.
      *
      * @param user user
      */
     public void resetTasksToOpen(User user) {
-        List<Task> tasksInProgress = getTasksInProgress(user);
-        for (Task taskInProgress : tasksInProgress) {
-            ServiceManager.getTaskService().replaceProcessingUser(taskInProgress, null);
-            taskInProgress.setProcessingStatus(TaskStatus.OPEN);
-            try {
-                ServiceManager.getTaskService().save(taskInProgress);
-            } catch (DataException e) {
-                Helper.setErrorMessage(ERROR_SAVING, new Object[]{ObjectType.TASK.getTranslationSingular()}, logger, e);
-            }
+        try {
+            TaskService.resetTasksToOpen(getTasksInProgress(user));
+        } catch (DataException e) {
+            Helper.setErrorMessage(ERROR_SAVING, new Object[]{ObjectType.TASK.getTranslationSingular()}, logger, e);
         }
     }
 
@@ -376,9 +385,19 @@ public class UserForm extends BaseForm {
      * 'removeClientId'.
      */
     public void removeUserFromClientProjects() {
-        if (Objects.nonNull(this.removeClientId)) {
-            this.userObject.getProjects().removeAll(this.userObject.getProjects().stream()
-                    .filter(p -> p.getClient().getId().equals(this.removeClientId)).collect(Collectors.toList()));
+        try {
+            if (Objects.nonNull(this.removeClientId)) {
+                // FIXME: this call already _saves_ the updated task status! If the user decided _not_ to save the
+                //  updated userObject without the removed client, the tasks should also not be set to open!
+                //  -> move this method call to 'save' method of userForm!
+                TaskService.resetTasksToOpen(getTasksInProgress(user, removeClientId));
+                this.userObject.getRoles().removeAll(this.userObject.getRoles().stream()
+                        .filter(r -> r.getClient().getId().equals(this.removeClientId)).collect(Collectors.toList()));
+                this.userObject.getProjects().removeAll(this.userObject.getProjects().stream()
+                        .filter(p -> p.getClient().getId().equals(this.removeClientId)).collect(Collectors.toList()));
+            }
+        } catch (DataException e) {
+            Helper.setErrorMessage(e);
         }
     }
 

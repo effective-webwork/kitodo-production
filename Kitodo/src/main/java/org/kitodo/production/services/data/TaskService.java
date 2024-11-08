@@ -965,4 +965,18 @@ public class TaskService extends ProjectSearchService<Task, TaskDTO, TaskDAO> {
         }
         return -1;
     }
+
+    /**
+     * Reset given list of tasks to TaskStatus 'OPEN'.
+     *
+     * @param tasks list of tasks to reset
+     * @throws DataException when saving tasks after status reset fails
+     */
+    public static void resetTasksToOpen(List<Task> tasks) throws DataException {
+        for (Task taskInProgress : tasks) {
+            ServiceManager.getTaskService().replaceProcessingUser(taskInProgress, null);
+            taskInProgress.setProcessingStatus(TaskStatus.OPEN);
+            ServiceManager.getTaskService().save(taskInProgress);
+        }
+    }
 }
