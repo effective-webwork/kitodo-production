@@ -1,0 +1,76 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <!-- edit dialog -->
+    <p:dialog id ="dialogAddPhysicalDivision"
+              widgetVar="dialogAddPhysicalDivision"
+              width="480px"
+              modal="true"
+              resizable="false"
+              showHeader="false"
+              styleClass="editDialog"
+              dynamic="true"
+              appendTo="@(body)">
+        <h:form id="dialogAddPhysicalDivisionForm">
+            <p:panelGrid columns="1" layout="grid">
+                <p:row>
+                    <h3>#{msgs.addPhysicalDivision}</h3>
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogFieldWrapper">
+                        <div>
+                            <p:outputLabel value="#{msgs.position}"
+                                           for="physicalPosition"/>
+                            <p:selectOneMenu id="physicalPosition"
+                                             value="#{DataEditorForm.addPhysicalDivisionDialog.selectedPosition}">
+                                <f:selectItems value="#{DataEditorForm.addPhysicalDivisionDialog.possiblePositions}"/>
+                                <p:ajax listener="#{DataEditorForm.addPhysicalDivisionDialog.preparePossibleTypes}"
+                                        update="physicalType addPhysicalDivisionBtn"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div>
+                            <p:outputLabel value="#{msgs.typ}:"
+                                           for="physicalType"/>
+                            <p:selectOneMenu id="physicalType"
+                                             value="#{DataEditorForm.addPhysicalDivisionDialog.selectedType}">
+                                <f:selectItems value="#{DataEditorForm.addPhysicalDivisionDialog.possibleTypes}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogButtonWrapper">
+                        <p:commandButton id="addPhysicalDivisionBtn"
+                                         value="#{msgs.apply}"
+                                         disabled="#{DataEditorForm.addPhysicalDivisionDialog.possibleTypes.size() lt 1}"
+                                         action="#{DataEditorForm.addPhysicalDivisionDialog.addPhysicalDivision}"
+                                         icon="fa fa-check fa-lg"
+                                         iconPos="right"
+                                         styleClass="primary right"
+                                         update="physicalTree,paginationForm:paginationWrapperPanel,metadataAccordion:physicalMetadataWrapperPanel"
+                                         oncomplete="PF('dialogAddPhysicalDivision').hide();"/>
+                        <p:commandButton value="#{msgs.cancel}"
+                                         icon="fa fa-times fa-lg"
+                                         iconPos="right"
+                                         styleClass="secondary right"
+                                         onclick="PF('dialogAddPhysicalDivision').hide();"/>
+                    </h:panelGroup>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+    </p:dialog>
+</ui:composition>

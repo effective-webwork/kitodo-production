@@ -1,0 +1,126 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="migrationForm">
+        <p:commandButton value="#{msgs.migrateMetadata}"
+                         id="migrateMetadata"
+                         update="systemTabView:migrationForm"
+                         action="#{MigrationForm.migrateMetadata()}"
+                         style="margin: 10px;"
+                         styleClass="primary"/>
+        <p:commandButton value="#{msgs.migrateWorkflow}"
+                         id="migrateWorkflows"
+                         update="systemTabView:migrationForm"
+                         styleClass="primary"
+                         action="#{MigrationForm.showPossibleProjects()}"
+                         immediate="true"/>
+        <p:commandButton value="#{msgs.migrateNewspaperBatches}"
+                         id="migrateNewspaperBatches"
+                         update="systemTabView:migrationForm"
+                         style="margin: 10px;"
+                         styleClass="primary"
+                         action="#{MigrationForm.showPossibleBatches()}"
+                         immediate="true"/>
+        <p:commandButton value="#{msgs.migrateLdapManagerPasswords}"
+                         id="migrateLdapManagerPasswords"
+                         update="systemTabView:migrationForm"
+                         style="margin: 10px;"
+                         styleClass="primary"
+                         action="#{MigrationForm.showLdapManagerPasswordsMigration()}"
+                         immediate="true"/>
+        <h:panelGroup rendered="#{MigrationForm.projectListRendered}">
+            <div style="margin: 0 10px;"><h:outputText value="#{msgs.projectsForMigration}:"/></div>
+            <p:selectManyCheckbox value="#{MigrationForm.selectedProjects}" layout="grid" columns="1" converter="#{projectConverter}" style="margin: 10px;">
+                <f:selectItems value="#{MigrationForm.allProjects}" var="project" itemLabel="#{project.title}"
+                               itemValue="#{project}"/>
+            </p:selectManyCheckbox>
+            <p:commandButton value="#{msgs.migrateMetadataOfSelectedProjects}"
+                             id="migrate"
+                             rendered="#{MigrationForm.metadataRendered}"
+                             update="systemTabView:migrationForm"
+                             styleClass="primary"
+                             style="margin: 0 10px;"
+                             action="#{MigrationForm.convertMetadata()}"
+                             oncomplete="alert('#{msgs.migrateMetadataHint}');"/>
+            <p:commandButton value="#{msgs.migrateSerialPublication}"
+                             id="migrateHierarchy"
+                             rendered="#{MigrationForm.metadataRendered}"
+                             update="systemTabView:migrationForm"
+                             styleClass="primary"
+                             style="margin: 0 10px;"
+                             action="#{MigrationForm.convertHierarchys()}"
+                             oncomplete="alert('#{msgs.migrateMetadataHint}');"/>
+            <p:commandButton value="#{msgs.listProcesses}"
+                             id="migrateProject"
+                             rendered="#{MigrationForm.workflowRendered}"
+                             update="systemTabView:migrationForm"
+                             styleClass="primary"
+                             style="margin: 0 10px 10px;"
+                             action="#{MigrationForm.showAggregatedProcesses()}"/>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{MigrationForm.processListRendered}">
+            <p:dataTable id="aggregatedTasksTable" var="tasks" value="#{MigrationForm.aggregatedTasks}">
+                <p:column style="width: 100%;">
+                    <h:outputText value="#{MigrationForm.tasksWithoutHashCode(tasks)}"
+                                  styleClass="full-width"/>
+                </p:column>
+                <p:column style="width: 100%;">
+                    <h:outputText value="#{MigrationForm.getNumberOfProcesses(tasks)}"
+                                  styleClass="full-width"/>
+                </p:column>
+                <p:column headerText="#{msgs.actions}" styleClass="actionsColumn">
+                    <h:commandLink id="createWorkflowActionButton"
+                                   action="#{MigrationForm.convertTasksToWorkflow(tasks)}"
+                                   styleClass="action"
+                                   title="#{msgs.createNewWorkflow}">
+                        <h:outputText><i class="fa fa-random fa-lg"/></h:outputText>
+                    </h:commandLink>
+                </p:column>
+            </p:dataTable>
+        </h:panelGroup>
+
+        <h:panelGroup id="newspaperMigration" rendered="#{MigrationForm.newspaperMigrationRendered}">
+            <div style="margin: 0 10px;"><h:outputText value="#{msgs.batchesForMigration}:"/></div>
+            <p:selectManyCheckbox id="newspaperBatches"
+                layout="grid" columns="3"
+                value="#{MigrationForm.newspaperBatchesSelectedItems}"  style="margin: 10px;">
+                <f:selectItems value="#{MigrationForm.newspaperBatchesItems}" var="batch" itemLabel="#{batch.title}"
+                               itemValue="#{batch.id}"/>
+            </p:selectManyCheckbox>
+            <p:commandButton id="startNewspaperMigration" value="#{msgs.ok}"
+                action="#{MigrationForm.startNewspaperMigration}"
+                update="systemTabView:migrationForm" style="margin: 0 10px;" />
+            <p:commandButton id="cancelNewspaperMigration" value="#{msgs.cancel}"
+                action="#{MigrationForm.hideNewspaperMigration}"
+                update="systemTabView:migrationForm"/>
+        </h:panelGroup>
+
+        <h:panelGroup id="ldapManagerPasswordsMigration" rendered="#{MigrationForm.ldapManagerPasswordsMigrationRendered}">
+            <div style="margin: 10px; width: 50%;"><h:outputText value="#{msgs.migrateLdapManagerPasswordsDesc}:"/></div>
+            <p:commandButton id="startLdapManagerPasswordMigration" value="#{msgs.ok}"
+                             action="#{MigrationForm.startLdapManagerPasswordsMigration}"
+                             update="systemTabView:migrationForm" style="margin: 0 10px;" />
+            <p:commandButton id="cancelLdapManagerPasswordMigration" value="#{msgs.cancel}"
+                             action="#{MigrationForm.hideLdapManagerPasswordsMigrationRendered}"
+                             update="systemTabView:migrationForm"/>
+        </h:panelGroup>
+
+    </h:form>
+
+</ui:composition>

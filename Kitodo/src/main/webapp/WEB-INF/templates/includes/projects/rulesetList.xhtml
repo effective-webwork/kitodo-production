@@ -1,0 +1,100 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <!--@elvariable id="item" type="org.kitodo.production.dto.RulesetDTO"-->
+    <p:dataTable id="rulesetTable"
+                 styleClass="default-layout"
+                 var="item"
+                 value="#{RulesetForm.lazyDTOModel}"
+                 first="#{RulesetForm.firstRow}"
+                 lazy="true"
+                 paginator="true"
+                 resizableColumns="true"
+                 liveResize="true"
+                 sortBy="#{item.title.keyword}"
+                 rows="#{LoginForm.loggedUser.tableSize}"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
+                 currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
+                 paginatorPosition="bottom">
+
+        <p:ajax event="page"
+                listener="#{RulesetForm.onPageChange}"/>
+
+        <p:column headerText="#{msgs.title}"
+                  sortBy="#{item.title.keyword}"
+                  rendered="#{ProjectForm.showColumn('ruleset.title')}">
+            <h:outputText value="#{item.title}"
+                          title="#{item.title}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs.file}"
+                  sortBy="#{item.file.keyword}"
+                  rendered="#{ProjectForm.showColumn('ruleset.filename')}">
+            <h:outputText value="#{item.file}"
+                          title="#{item.file}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs.metadataSortByRuleset}" styleClass="checkboxColumn" style="width: initial;"
+                  sortBy="#{item.orderMetadataByRuleset}"
+                  rendered="#{ProjectForm.showColumn('ruleset.sorting')}">
+            <ui:fragment rendered="#{item.orderMetadataByRuleset}">
+                <i class="fa fa-check-square-o fa-lg checkbox-checked"/>
+            </ui:fragment>
+            <ui:fragment rendered="#{!item.orderMetadataByRuleset}">
+                <i class="fa fa-minus-square-o fa-lg checkbox-unchecked"/>
+            </ui:fragment>
+        </p:column>
+
+        <p:column headerText="#{msgs.actions}"
+                  resizable="false"
+                  width="70"
+                  styleClass="actionsColumn">
+            <h:form id="actionForm">
+                <h:link id="viewRuleset"
+                        outcome="rulesetEdit"
+                        styleClass="action"
+                        title="#{msgs.view}"
+                        rendered="#{SecurityAccessController.hasAuthorityToViewRuleset() and not SecurityAccessController.hasAuthorityToEditRuleset()}">
+                    <f:param name="id" value="#{item.id}" />
+                    <i class="fa fa-eye fa-lg"/>
+                </h:link>
+                <h:link id="editRuleset"
+                        outcome="rulesetEdit"
+                        styleClass="action"
+                        title="#{msgs.edit}"
+                        rendered="#{SecurityAccessController.hasAuthorityToEditRuleset()}">
+                    <f:param name="id" value="#{item.id}" />
+                    <i class="fa fa-pencil-square-o fa-lg"/>
+                </h:link>
+                <p:commandLink id="deleteRuleset"
+                               action="#{RulesetForm.delete}"
+                               styleClass="action"
+                               title="#{msgs.delete}"
+                               rendered="#{SecurityAccessController.hasAuthorityToDeleteRuleset()}"
+                               update="rulesetTable">
+                    <h:outputText><i class="fa fa-trash-o"/></h:outputText>
+                    <f:setPropertyActionListener value="#{item.id}" target="#{RulesetForm.rulesetById}"/>
+                    <p:confirm header="#{msgs.confirmDelete}"
+                               message="#{RulesetForm.formatString('confirmDeleteRuleset', item.title)}"
+                               icon="ui-icon-alert"/>
+                </p:commandLink>
+            </h:form>
+        </p:column>
+
+    </p:dataTable>
+</ui:composition>

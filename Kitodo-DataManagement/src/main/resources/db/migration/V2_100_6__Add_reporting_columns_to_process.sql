@@ -1,0 +1,12 @@
+DROP PROCEDURE IF EXISTS `addReportingColumns`;
+DELIMITER //
+CREATE PROCEDURE `addReportingColumns`()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION BEGIN END;
+    ALTER TABLE process ADD COLUMN structuralError TINYINT(1) DEFAULT 0;
+    ALTER TABLE process ADD COLUMN missingInformation TINYINT(1) DEFAULT 0;
+    ALTER TABLE process ADD COLUMN reimport TINYINT(1) DEFAULT 0;
+END //
+DELIMITER ;
+CALL `addReportingColumns`();
+DROP PROCEDURE `addReportingColumns`;

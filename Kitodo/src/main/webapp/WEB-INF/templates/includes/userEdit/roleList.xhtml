@@ -1,0 +1,57 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <!--@elvariable id="item" type="org.kitodo.data.database.beans.Role"-->
+    <p:dataTable id="roleDatatable"
+                 var="item"
+                 sortBy="#{item.title}"
+                 value="#{UserForm.userObject.roles}">
+        <p:column headerText="#{msgs.role}" sortBy="#{item.title}">
+            <h:outputText value="#{item.title}"/>
+        </p:column>
+        <p:column headerText="#{msgs.client}" sortBy="#{item.client.name}">
+            <h:outputText value="#{item.client.name}"/>
+        </p:column>
+        <p:column styleClass="actionsColumn" headerText="#{msgs.actions}">
+            <p:commandLink id="deleteFromRole"
+                           rendered="#{isEditMode || isCreateMode}"
+                           action="#{UserForm.deleteFromRole}"
+                           styleClass="action"
+                           title="#{msgs.removeUserFromGroup}"
+                           immediate="true"
+                           oncomplete="toggleSave()"
+                           update="editForm:userTabView:roleDatatable">
+                <i class="fa fa-trash-o fa-lg"/>
+                <f:param name="ID" value="#{item.id}"/>
+            </p:commandLink>
+        </p:column>
+    </p:dataTable>
+    <p:commandButton onclick="PF('addRoleDialog').show()"
+                     id="addRoleButton"
+                     value="#{msgs.rolesAdd}"
+                     icon="fa fa-plus-circle fa-lg"
+                     iconPos="right"
+                     update="roleForm:selectRoleTable"
+                     immediate="true"
+                     rendered="#{isEditMode || isCreateMode}"
+                     class="callto m-1em">
+    </p:commandButton>
+
+</ui:composition>

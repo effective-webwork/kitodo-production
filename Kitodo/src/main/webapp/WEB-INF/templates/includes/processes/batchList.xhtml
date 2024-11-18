@@ -1,0 +1,164 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="batchForm">
+        <p:panelGrid id="detailForm" columns="2" cellpadding="10" layout="grid">
+            <p:row>
+                <h4><h:outputText value="#{msgs.batches}"/></h4>
+
+                <div>
+                    <p:inputText id="batchFilter"
+                                 placeholder="#{msgs.filter}"
+                                 styleClass="input-with-button"
+                                 value="#{BatchForm.batchfilter}">
+                        <p:ajax event="blur"/>
+                    </p:inputText>
+                    <p:commandButton id="batchFilterButton"
+                                     action="#{BatchForm.filterBatches}"
+                                     update="processesTabView:batchForm:selectBatches"
+                                     icon="fa fa-search"/>
+                </div>
+
+                <div>
+                    <h:selectManyListbox id="selectBatches"
+                                         value="#{BatchForm.selectedBatches}"
+                                         size="20"
+                                         styleClass="input select-box"
+                                         converter="#{batchConverter}"
+                                         valueChangeListener="#{BatchForm.changeSelectedBatch}">
+                        <f:selectItems value="#{BatchForm.currentBatches}"
+                                       var="batch"
+                                       itemValue="#{batch}"
+                                       itemLabel="#{BatchForm.getBatchLabel(batch)}"/>
+                        <p:ajax event="change"
+                                update="processesTabView:batchForm:selectProcesses"/>
+                    </h:selectManyListbox>
+                </div>
+
+                <p:commandButton id="batchActionsButton"
+                                 value="#{msgs.actions}"
+                                 styleClass="secondary"
+                                 icon="fa fa-sort"
+                                 iconPos="right"/>
+                <p:menu overlay="true"
+                        trigger="processesTabView:batchForm:batchActionsButton"
+                        my="left bottom"
+                        at="left top">
+                    <p:menuitem id="exportBatchSelection"
+                                value="#{msgs.exportBatch}"
+                                action="#{BatchForm.export}"
+                                icon="fa fa-file"/>
+                    <p:menuitem id="loadProcessDataSelection"
+                                value="#{msgs.loadProcessesOfBatch}"
+                                action="#{BatchForm.loadProcessData}"
+                                update="processesTabView:batchForm:selectProcesses"
+                                icon="fa fa-refresh"/>
+                    <p:menuitem id="filterProcessesSelection"
+                                value="#{msgs.loadAllProcesses}"
+                                action="#{BatchForm.filterProcesses}"
+                                update="processesTabView:batchForm:selectProcesses"
+                                icon="fa fa-refresh"/>
+                    <p:menuitem id="downloadDocketSelection"
+                                value="#{msgs.docketPrint}"
+                                action="#{BatchForm.downloadDocket}"
+                                icon="fa fa-print"/>
+                    <p:menuitem id="batchPropertiesSelection"
+                                value="#{msgs.editProperty}"
+                                outcome="batchProperties"
+                                icon="fa fa-pencil-square-o fa-lg"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditBatch()}">
+                        <f:param name="id" value="#{BatchForm.selectedBatchId}"/>
+                    </p:menuitem>
+                    <p:menuitem id="deleteBatchSelection"
+                                value="#{msgs.deleteBatch}"
+                                action="#{BatchForm.delete}"
+                                icon="fa fa-trash-o"
+                                update="processesTabView:batchForm:selectProcesses
+                                        processesTabView:batchForm:selectBatches"
+                                rendered="#{SecurityAccessController.hasAuthorityToDeleteBatch()}"/>
+                </p:menu>
+            </p:row>
+            <p:row>
+                <h4><h:outputText value="#{msgs.processes}"/></h4>
+
+                <div>
+                    <p:inputText id="processFilter"
+                                 placeholder="#{msgs.filter}"
+                                 styleClass="input-with-button"
+                                 value="#{BatchForm.processfilter}">
+                        <p:ajax event="blur"/>
+                    </p:inputText>
+                    <p:commandButton id="processFilterButton"
+                                     action="#{BatchForm.filterProcesses}"
+                                     update="processesTabView:batchForm:selectProcesses"
+                                     icon="fa fa-search"/>
+                </div>
+
+                <div>
+                    <h:selectManyListbox id="selectProcesses"
+                                         value="#{BatchForm.selectedProcesses}"
+                                         converter="#{processConverter}"
+                                         styleClass="input select-box"
+                                         size="20">
+                        <f:selectItems value="#{BatchForm.currentProcesses}"/>
+                    </h:selectManyListbox>
+                </div>
+
+                <p:commandButton id="processActionsButton"
+                                 value="#{msgs.actions}"
+                                 styleClass="secondary"
+                                 icon="fa fa-sort"
+                                 iconPos="right"/>
+                <p:menu overlay="true"
+                        trigger="processesTabView:batchForm:processActionsButton"
+                        my="left bottom"
+                        at="left top">
+                    <p:menuitem id="loadBatchDataSelection"
+                                value="#{msgs.loadAssociatedBatchOfProcess}"
+                                action="#{BatchForm.loadBatchData}"
+                                update="processesTabView:batchForm:selectBatches"
+                                icon="fa fa-refresh"/>
+                    <p:menuitem id="addProcessesToBatchSelection"
+                                value="#{msgs.addToSelectedBatch}"
+                                action="#{BatchForm.addProcessesToBatch}"
+                                update="processesTabView:batchForm:selectBatches"
+                                icon="fa fa-check-circle-o"/>
+                    <p:menuitem id="removeProcessesFromBatchSelection"
+                                value="#{msgs.removeFromAssociatedBatch}"
+                                action="#{BatchForm.removeProcessesFromBatch}"
+                                update="processesTabView:batchForm:selectBatches"
+                                icon="fa fa-times-circle-o"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditBatch()}"/>
+                    <p:menuitem id="renameBatchSelection"
+                                value="#{msgs.renameBatch}"
+                                oncomplete="PF('renameBatchDialog').show();"
+                                update="@(.editDialog)"
+                                icon="fa fa-pencil-square-o fa-lg"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditBatch()}"/>
+                    <p:menuitem id="createBatchSelection"
+                                value="#{msgs.createNewBatchFromSelectedProcesses}"
+                                oncomplete="PF('createBatchDialog').show()"
+                                update="@(.editDialog)"
+                                icon="fa fa-plus"
+                                rendered="#{SecurityAccessController.hasAuthorityToAddBatch()}"/>
+                </p:menu>
+            </p:row>
+        </p:panelGrid>
+    </h:form>
+</ui:composition>

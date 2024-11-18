@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:o="http://omnifaces.org/ui">
+
+    <f:view locale="#{LanguageForm.locale}">
+        <h:head>
+            <ui:insert name="head">
+                <ui:include src="/WEB-INF/templates/includes/head.xhtml" />
+            </ui:insert>
+        </h:head>
+        <h:body styleClass="#{LoginForm.firstVisit ? 'first-visit' : ''}" lang="#{LanguageForm.locale}">
+            <h:outputStylesheet name="css/kitodo.css"/>
+            <h:outputStylesheet name="css/pattern-library.css"/>
+            <p:ajaxStatus onstart="$('html').addClass('progressCursor')"
+                          oncomplete="$('html').removeClass('progressCursor')" />
+            <p:growl id="notifications" widgetVar="notifications" severity="info" escape="false"/>
+            <p:growl id="sticky-notifications" widgetVar="sticky-notifications" sticky="true" severity="info"/>
+            <h:panelGroup id="indexErrorPanel" layout="block" rendered="#{empty indexingForm.serverInformation}">
+               <p:ajax event="click" onclick="PF('sticky-notifications').renderMessage({'summary':'The elastic search server is not running.','detail':'Elastic Search','severity':'info'});"/>
+            </h:panelGroup>
+            <div id="loadingScreen">
+                <div>
+                    <h:graphicImage name="images/kitodo-logo-animatable.svg" alt="Kitodo.Production" height="108" width="309" id="kitodo-logo-animatable"/>
+                    <h:graphicImage name="images/kitodo-logo-key-animatable.svg" alt="Kitodo.Production" height="108" width="309" id="kitodo-logo-key-animatable"/>
+                </div>
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div class="flex-container">
+                <header class="flex-item" role="banner" id="portal-header">
+                    <div class="wrapper">
+                        <h:outputScript library="js" name="collapse.js" target="body"/>
+                        <ui:insert name="search">
+                            <ui:include src="/WEB-INF/templates/includes/header/search.xhtml" />
+                        </ui:insert>
+                        <section id="breadcrumbs">
+                            <h:form id="breadcrumbForm">
+                                <p:breadCrumb id="breadcrumbMenu" styleClass="breadcrumb-menu">
+                                    <ui:insert name="breadcrumbs"/>
+                                </p:breadCrumb>
+                            </h:form>
+                        </section>
+                        <ui:insert name="navigation">
+                            <ui:include src="/WEB-INF/templates/includes/header/navigation.xhtml" />
+                        </ui:insert>
+                    </div>
+                </header>
+                <main class="flex-item" role="main">
+                    <ui:insert name="content">
+                        <ui:include src="/WEB-INF/templates/includes/content.xhtml" />
+                    </ui:insert>
+                </main>
+                <footer class="flex-item" role="contentinfo">
+                    <ui:insert name="footer">
+                        <ui:include src="/WEB-INF/templates/includes/footer.xhtml" />
+                    </ui:insert>
+                </footer>
+            </div>
+            <ui:include src="includes/base/deleteDialog.xhtml"/>
+            <ui:include src="/WEB-INF/templates/includes/legal.xhtml"/>
+            <ui:insert name="dialog"/>
+            <ui:insert name="page-scripts">
+                <h:outputScript name="js/defaultScript.js"
+                                target="body" />
+            </ui:insert>
+            <o:highlight styleClass="ui-state-error" />
+        </h:body>
+    </f:view>
+</html>

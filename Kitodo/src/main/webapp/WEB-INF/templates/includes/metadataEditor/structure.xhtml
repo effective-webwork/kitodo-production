@@ -1,0 +1,49 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <!--@elvariable id="separateStructure" type="boolean"-->
+    <ui:param name="separateStructure"
+              value="#{DataEditorForm.structurePanel.separateMedia}"/>
+    <p:accordionPanel id="structureAccordion"
+                      styleClass="wrapperPanel #{separateStructure ? 'separateStructure' : ''}"
+                      multiple="true"
+                      activeIndex="#{DataEditorForm.structurePanel.activeTabs}"
+                      prependId="false">
+        <!--@elvariable id="readOnly" type="boolean"-->
+        <ui:param name="readOnly" value="#{SecurityAccessController.hasAuthorityToViewProcessStructureData() and not SecurityAccessController.hasAuthorityToEditProcessStructureData()}"/>
+
+        <!-- Container tree -->
+        <p:tab id="containerStructure"
+               title="#{msgs.containerStructure}"
+               rendered="#{DataEditorForm.containerStructurePanel.displayContainerStructure}">
+            <ui:include src="/WEB-INF/templates/includes/metadataEditor/containerStructure.xhtml"/>
+        </p:tab>
+
+        <!-- Logical Tree -->
+        <p:tab id="logicalStructure"
+               title="#{msgs.logical} #{msgs.structure}">
+            <ui:include src="/WEB-INF/templates/includes/metadataEditor/logicalStructure.xhtml"/>
+        </p:tab>
+
+        <!-- Physical Tree -->
+        <p:tab id="physicalStructure"
+               title="#{msgs.physical} #{msgs.structure}"
+               rendered="#{separateStructure}">
+            <ui:include src="/WEB-INF/templates/includes/metadataEditor/physicalStructure.xhtml"/>
+        </p:tab>
+    </p:accordionPanel>
+</ui:composition>

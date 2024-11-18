@@ -1,0 +1,14 @@
+# local development
+/config-local
+# Maven
+**/target/
+# Tests
+/Kitodo/modules
+# local build of Javadoc (cf. docs/javadoc/README.md)
+/javadoc
+# local build of docs with mkdocs
+/site
+docker/db
+docker/esdata
+docker/local/logs
+dbchangelog.xml

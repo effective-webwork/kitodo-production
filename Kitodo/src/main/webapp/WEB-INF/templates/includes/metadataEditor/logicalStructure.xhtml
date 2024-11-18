@@ -1,0 +1,286 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+        xmlns:p="http://primefaces.org/ui">
+    <p:outputPanel id="logicalStructureHeader">
+        <!--
+        <p:selectOneMenu styleClass="logicalStructureTitle" value="#{DataEditorForm.structurePanel.titleMetadata}"
+                         autoWidth="#{false}">
+            <f:selectItem itemLabel="#{msgs.typ}" itemValue="type"/>
+            <f:selectItems value="#{DataEditorForm.structurePanel.getTitleMetadataItems()}"/>
+            <p:ajax event="change" update="@(.ui-tree, .stripe)"/>
+        </p:selectOneMenu>
+        -->
+        <!-- This dropdown is overwritten in Vecteur until Kitodo can display more than one metadata. -->
+        <p:selectOneMenu styleClass="logicalStructureTitle" value="#{DataEditorForm.structureViewMode}">
+            <f:selectItem itemLabel="Typ" itemValue="Typ"/>
+            <f:selectItem itemLabel="Signatur" itemValue="Signatur"/>
+            <f:selectItem itemLabel="Typ_ID" itemValue="Typ_ID"/>
+            <f:selectItem itemLabel="Typ_Signatur" itemValue="Typ_Signatur"/>
+            <f:selectItem itemLabel="Voll" itemValue="Voll"/>
+            <p:ajax event="change" partialSubmit="true" update="logicalTree"/>
+        </p:selectOneMenu>
+
+        <p:outputPanel styleClass="logicalStructureMenuWrapper">
+            <p:commandButton id="expandAllButton"
+                             process="@this"
+                             action="#{DataEditorForm.structurePanel.expandAll}"
+                             styleClass="secondary"
+                             style="margin-right: 8px;"
+                             update="logicalTree"
+                             icon="fa fa-expand"
+                             iconPos="right"
+                             title="#{msgs['dataEditor.structureTree.expandAll']}"/>
+        </p:outputPanel>
+        <p:outputPanel styleClass="logicalStructureMenuWrapper">
+            <p:commandButton id="collapseAllButton"
+                             process="@this"
+                             action="#{DataEditorForm.structurePanel.collapseAll}"
+                             styleClass="secondary"
+                             style="margin-right: 8px;"
+                             update="logicalTree"
+                             icon="fa fa-compress"
+                             iconPos="right"
+                             title="#{msgs['dataEditor.structureTree.collapseAll']}"/>
+        </p:outputPanel>
+        <p:outputPanel styleClass="logicalStructureMenuWrapper">
+            <p:commandButton id="logicalStructureMenuButton"
+                             type="button"
+                             icon="fa fa-ellipsis-v"
+                             styleClass="secondary"
+                             title="#{msgs['dataEditor.structure.customizeDisplay']}"/>
+        </p:outputPanel>
+    </p:outputPanel>
+    <div class="scroll-up-area"></div>
+    <div class="scroll-wrapper">
+        <p:tree id="logicalTree"
+                value="#{DataEditorForm.structurePanel.logicalTree}"
+                var="logicalNode"
+                nodeVar="defaultTreeNode"
+                styleClass="focusable"
+                selectionMode="single"
+                selection="#{DataEditorForm.structurePanel.selectedLogicalNode}"
+                draggable="#{not readOnly and SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
+                droppable="#{not readOnly and SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
+                dragdropScope="logicalTree"
+                onNodeClick="metadataEditor.logicalTree.onNodeClick(node,event)">
+            <p:ajax event="select"
+                    listener="#{DataEditorForm.structurePanel.treeLogicalSelect}"
+                    oncomplete="scrollToSelectedTreeNode('logicalStructure');
+                                scrollToSelectedThumbnail();
+                                scrollToSelectedPaginationRow();
+                                changeToMapView();
+                                metadataEditor.gallery.mediaView.update();
+                                expandMetadata('logical-metadata-tab');"
+                    update="galleryHeadingWrapper
+                            imagePreviewForm:mediaDetail
+                            imagePreviewForm:mediaPartialList
+                            contextMenuLogicalTree
+                            imagePreviewForm:stripeContextMenu
+                            imagePreviewForm:mediaContextMenu
+                            metadataAccordion:logicalMetadataWrapperPanel"/>
+            <p:ajax event="contextMenu"
+                    listener="#{DataEditorForm.structurePanel.treeLogicalSelect}"
+                    onstart="$('#contextMenuLogicalTree .ui-menuitem').addClass('ui-state-disabled')"
+                    oncomplete="scrollToSelectedTreeNode('logicalStructure');
+                                scrollToSelectedThumbnail();
+                                scrollToSelectedPaginationRow();
+                                changeToMapView();
+                                metadataEditor.gallery.mediaView.update();
+                                PF('contextMenuLogicalTree').show(currentEvent)"
+                    update="@(.stripe)
+                            @(.thumbnail)
+                            galleryHeadingWrapper
+                            imagePreviewForm:mediaDetail
+                            imagePreviewForm:mediaPartialList
+                            contextMenuLogicalTree
+                            metadataAccordion:logicalMetadataWrapperPanel"/>
+            <p:ajax event="dragdrop"
+                    disabled="#{not SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
+                    listener="#{DataEditorForm.structurePanel.onDragDrop}"
+                    update="logicalTree
+                            contextMenuLogicalTree
+                            metadataAccordion:logicalMetadataWrapperPanel
+                            @(.pageList)
+                            paginationForm:paginationWrapperPanel
+                            imagePreviewForm:thumbnailStripe
+                            imagePreviewForm:mediaContextMenu"/>
+            <p:ajax event="collapse"
+                    listener="#{DataEditorForm.structurePanel.onNodeCollapse}"/>
+            <p:ajax event="expand"
+                    listener="#{DataEditorForm.structurePanel.onNodeExpand}"/>
+            <p:treeNode type="#{StructurePanel.STRUCTURE_NODE_TYPE}"
+                        expandedIcon="ui-icon-folder-expanded"
+                        collapsedIcon="ui-icon-folder-collapsed"
+                        styleClass="#{logicalNode.linked ? 'linked' : ''} #{logicalNode.undefined ? 'undefined' : ''}">
+                <!--@elvariable id="logicalElementType" type="java.lang.String"-->
+                <ui:param name="logicalElementType" value="#{logicalNode.label}"/>
+                <!--@elvariable id="defaultTreeNode" type="org.primefaces.model.DefaultTreeNode"-->
+                <h:outputText rendered="#{DataEditorForm.structurePanel.showHierarchyLevel}"
+                              value="&lt;#{fn:length(fn:split(defaultTreeNode.rowKey, '_'))}&gt; "/>
+                <h:outputText value="#{empty logicalElementType ? msgs['dataEditor.withoutType'] : logicalElementType}"
+                              rendered="#{DataEditorForm.structureViewMode.contains('Typ')}"
+                              style="#{logicalNode.undefined ? 'background-color: gold' : ''}"/>
+                <h:outputText value="_"
+                              rendered="#{DataEditorForm.structureViewMode.contains('Typ_')}"
+                              style="#{logicalNode.undefined ? 'background-color: gold' : ''}"/>
+                <h:outputText value="#{DataEditorForm.getElementId(logicalNode)}"
+                              rendered="#{DataEditorForm.structureViewMode.equals('Typ_ID')}"/>
+                <h:outputText value="#{DataEditorForm.getSignature(logicalNode)}"
+                              rendered="#{DataEditorForm.structureViewMode.contains('Signatur')}"
+                              style="#{logicalNode.undefined ? 'background-color: gold' : ''}"/>
+                <h:outputText value="#{empty logicalElementType ? msgs['dataEditor.unknownType'] : logicalElementType}#{DataEditorForm.getAllMetadata(logicalNode)}"
+                              title="#{empty logicalElementType ? msgs['dataEditor.unknownType'] : logicalElementType}#{DataEditorForm.getAllMetadata(logicalNode)}"
+                              rendered="#{DataEditorForm.structureViewMode.contains('Voll')}"
+                              style="#{logicalNode.undefined ? 'background-color: gold' : ''}"/>
+                <h:outputText value="#{DataEditorForm.structurePanel.getMultipleAssignmentsIndex(logicalNode) + 1}"
+                              rendered="#{logicalNode.assignedSeveralTimes}"
+                              styleClass="assigned-several-times"/>
+                <h:outputText value="[#{logicalNode.pageRange}]"
+                              rendered="#{DataEditorForm.structurePanel.showPageRangeInLogicalTree and logicalNode.pageRange ne null}"
+                              styleClass="pageRange"/>
+            </p:treeNode>
+            <p:treeNode type="#{StructurePanel.VIEW_NODE_TYPE}"
+                        icon="ui-icon-document">
+                <h:outputText value="#{empty logicalNode.label ? msgs['dataEditor.withoutType'] : logicalNode.label}"
+                              title="#{logicalNode.undefined ? msgs['dataEditor.undefinedStructure'] : ''}"/>
+                <h:outputText value="#{DataEditorForm.structurePanel.getMultipleAssignmentsIndex(logicalNode) + 1}"
+                              rendered="#{logicalNode.assignedSeveralTimes}"
+                              styleClass="assigned-several-times"/>
+            </p:treeNode>
+            <p:treeNode type="#{StructurePanel.MEDIA_PARTIAL_NODE_TYPE}"
+                        icon="ui-icon-media-partial">
+                <h:outputText value="#{empty logicalNode.label ? msgs['dataEditor.withoutType'] : logicalNode.label}"
+                              title="#{logicalNode.undefined ? msgs['dataEditor.undefinedStructure'] : ''}"
+                              rendered="#{DataEditorForm.structurePanel.titleMetadata eq 'type'}"/>
+            </p:treeNode>
+        </p:tree>
+        <p:contextMenu for="logicalTree" id="contextMenuLogicalTree" widgetVar="contextMenuLogicalTree">
+            <p:menuitem value="#{msgs.addElement}"
+                        rendered="#{DataEditorForm.selectedMedia.size() lt 1 and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                        icon="fa fa-plus fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        action="#{DataEditorForm.addDocStrucTypeDialog.prepare}"
+                        actionListener="#{DataEditorForm.addDocStrucTypeDialog.resetValues}"
+                        process="@this"
+                        oncomplete="PF('dialogAddDocStrucType').show()"
+                        update="dialogAddDocStrucTypeDialog">
+                <f:actionListener binding="#{DataEditorForm.addDocStrucTypeDialog.preparePreselectedViews()}"/>
+            </p:menuitem>
+            <p:menuitem
+                    value="#{DataEditorForm.consecutivePagesSelected() ? msgs.addElement.concat(' ').concat(msgs.assignMedia) : msgs['dataEditor.removeElement.noConsecutivePagesSelected']}"
+                    rendered="#{DataEditorForm.selectedMedia.size() ge 1 and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                    icon="fa fa-plus fa-sm"
+                    styleClass="plain"
+                    disabled="#{readOnly or not DataEditorForm.consecutivePagesSelected()}"
+                    action="#{DataEditorForm.addDocStrucTypeDialog.prepare}"
+                    process="@this"
+                    oncomplete="PF('dialogAddDocStrucType').show()"
+                    update="dialogAddDocStrucTypeDialog">
+                <f:actionListener binding="#{DataEditorForm.addDocStrucTypeDialog.preparePreselectedViews()}"/>
+            </p:menuitem>
+            <p:menuitem value="#{msgs.changeDocstructType}"
+                        rendered="#{DataEditorForm.structurePanel.selectedLogicalNode.type eq StructurePanel.STRUCTURE_NODE_TYPE and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                        icon="fa fa-pencil fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        actionListener="#{DataEditorForm.changeDocStrucTypeDialog.prepare}"
+                        process="@this"
+                        oncomplete="PF('dialogEditDocStrucType').show()"
+                        update="dialogEditDocStrucTypeDialog"/>
+            <p:menuitem value="#{msgs.assignToNextElement}"
+                        icon="fa fa-link fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        rendered="#{DataEditorForm.structurePanel.assignableSeveralTimes and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                        action="#{DataEditorForm.structurePanel.assign}"
+                        process="@this"
+                        oncomplete="$('#loadingScreen').hide()"
+                        update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+            <p:menuitem value="#{msgs.unassign}"
+                        icon="fa fa-chain-broken fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        rendered="#{DataEditorForm.structurePanel.assignedSeveralTimes and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                        action="#{DataEditorForm.structurePanel.unassign}"
+                        process="@this"
+                        oncomplete="$('#loadingScreen').hide()"
+                        update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+            <p:menuitem value="#{msgs.uploadMedia}"
+                        action="#{DataEditorForm.uploadFileDialog.prepare}"
+                        rendered="#{SecurityAccessController.hasAuthorityToUploadMedia() and DataEditorForm.isFolderConfigurationComplete() and not DataEditorForm.structurePanel.selectedLogicalNode.data.linked}"
+                        icon="fa fa-upload fa-sm"
+                        styleClass="plain"
+                        update="uploadFileDialog"
+                        disabled="#{readOnly}"
+                        process="@this"/>
+            <p:menuitem value="#{DataEditorForm.structurePanel.selectedLogicalNode.data.linked ? msgs.unlinkProcess : msgs.removeElement}"
+                        rendered="#{DataEditorForm.structurePanel.selectedLogicalNode.data.dataObject ne null and DataEditorForm.structurePanel.selectedLogicalNode.type ne StructurePanel.VIEW_NODE_TYPE and DataEditorForm.structurePanel.selectedLogicalNode.type ne StructurePanel.MEDIA_PARTIAL_NODE_TYPE}"
+                        icon="fa fa-trash fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        onclick="$('#loadingScreen').show()"
+                        oncomplete="$('#loadingScreen').hide()"
+                        action="#{DataEditorForm.deleteStructure()}"
+                        process="@this"
+                        update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+            <p:menuitem value="#{msgs.deleteMedia}"
+                        rendered="#{SecurityAccessController.hasAuthorityToDeleteMedia() and DataEditorForm.structurePanel.selectedLogicalNode.type eq StructurePanel.VIEW_NODE_TYPE}"
+                        icon="fa fa-trash fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        onclick="$('#loadingScreen').show()"
+                        oncomplete="$('#loadingScreen').hide()"
+                        action="#{DataEditorForm.deletePhysicalDivision()}"
+                        process="@this"
+                        update="numberOfScans
+                                logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+            <p:menuitem value="#{msgs.deleteMediaPartial}"
+                        rendered="#{SecurityAccessController.hasAuthorityToDeleteMedia() and DataEditorForm.structurePanel.selectedLogicalNode.type eq StructurePanel.MEDIA_PARTIAL_NODE_TYPE}"
+                        icon="fa fa-trash fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        onclick="$('#loadingScreen').show()"
+                        oncomplete="$('#loadingScreen').hide()"
+                        action="#{DataEditorForm.deletePhysicalDivision()}"
+                        process="@this"
+                        update="numberOfScans
+                                logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+        </p:contextMenu>
+    </div>
+    <div class="scroll-down-area"></div>
+</ui:composition>

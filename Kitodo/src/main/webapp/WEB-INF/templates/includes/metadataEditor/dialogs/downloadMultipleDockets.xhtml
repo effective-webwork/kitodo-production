@@ -1,0 +1,40 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <p:overlayPanel id="downloadMultipleDocketsMenu"
+                    for="downloadMultipleDocketsMenuTrigger"
+                    my="left bottom"
+                    at="left top"
+                    style="width: 400px">
+        <p:commandButton id="downloadMultipleDocketsSelectAll"
+                         icon="fa fa-square-o"
+                         value="#{msgs.selectAll}"
+                         onclick="PF('downloadMultipleDocketsSelection').selectAll();$('#downloadMultipleDocketsSelectAll').hide();$('#downloadMultipleDocketsUnselectAll').show()"
+                         styleClass="secondary"
+                         type="button"/>
+        <p:commandButton id="downloadMultipleDocketsUnselectAll"
+                         icon="fa fa-check-square-o"
+                         value="#{msgs.selectAll}"
+                         onclick="PF('downloadMultipleDocketsSelection').unselectAll();$('#downloadMultipleDocketsSelectAll').show();$('#downloadMultipleDocketsUnselectAll').hide()"
+                         style="display:none"
+                         styleClass="secondary"
+                         type="button"/>
+        <p:selectManyMenu id="downloadMultipleDocketsSelection"
+                          widgetVar="downloadMultipleDocketsSelection"
+                          value="#{DataEditorForm.structurePanel.selectedDocketsToPrint}"
+                          onchange="this.options.length === $(this).val().length ? ($('#downloadMultipleDocketsSelectAll').hide(),$('#downloadMultipleDocketsUnselectAll').show()) : ($('#downloadMultipleDocketsSelectAll').show(),$('#downloadMultipleDocketsUnselectAll').hide())"
+                          showCheckbox="true">
+            <f:selectItems value="#{DataEditorForm.structurePanel.savedPartialJobs}"/>
+            <p:ajax event="change"
+                    update="downloadMultipleDocketsSelection"/>
+        </p:selectManyMenu>
+        <p:commandLink action="#{DataEditorForm.structurePanel.downloadMultiplePartialJobDockets()}"
+                       value="#{msgs.docketPrint}"
+                       target="_blank"
+                       ajax="false"
+                       styleClass="primary"/>
+    </p:overlayPanel>
+</ui:composition>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<ruleset xmlns="http://names.kitodo.org/ruleset/v2">
+    <declaration>
+        <division id="Monograph">
+            <label>Monographie</label>
+        </division>
+        <key id="TitleDocMain" domain="source">
+            <label>HauptTitel</label>
+        </key>
+        <key id="TitleDocMainShort" domain="technical">
+            <label>Haupttitel (Sortierung)</label>
+        </key>
+        <key id="TSL_ATS">
+            <label>TSL/ATS</label>
+        </key>
+        <key id="CatalogIDDigital">
+            <label>PPN (digital)</label>
+        </key>
+        <key id="CatalogIDSource" domain="source">
+            <label>PPN (Vorlage)</label>
+        </key>
+        <key id="Person">
+            <label>Person</label>
+            <key id="Role">
+                <label>Rolle</label>
+                <option value="Author">
+                    <label>Autor</label>
+                </option>
+            </key>
+            <key id="FirstName">
+                <label>Vorname</label>
+            </key>
+            <key id="LastName">
+                <label>Nachname</label>
+            </key>
+        </key>
+    </declaration>
+    <correlation>
+        <restriction key="Person">
+            <permit key="Role" minOccurs="1" maxOccurs="1"/>
+            <permit key="FirstName" minOccurs="1" maxOccurs="1"/>
+            <permit key="LastName" minOccurs="1" maxOccurs="1"/>
+        </restriction>
+
+        <restriction division="Monograph" unspecified="forbidden">
+            <permit key="TitleDocMain" minOccurs="1"/>
+            <permit key="TitleDocMainShort" minOccurs="1"/>
+            <permit key="TSL_ATS" minOccurs="1"/>
+            <permit key="CatalogIDDigital" minOccurs="1"/>
+            <permit key="CatalogIDSource" minOccurs="1"/>
+            <permit key="Person" minOccurs="1">
+                <permit key="Role" unspecified="forbidden">
+                    <permit value="Author"/>
+                </permit>
+            </permit>
+        </restriction>
+    </correlation>
+</ruleset>

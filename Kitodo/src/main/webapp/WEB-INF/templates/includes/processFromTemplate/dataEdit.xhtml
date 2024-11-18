@@ -1,0 +1,189 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:panel id="processHierarchy"
+             toggleable="true"
+             header="#{msgs['newProcess.processHierarchy']}"
+             rendered="#{CreateProcessForm.processAncestors.size() gt 1 or not empty CreateProcessForm.processChildren}"
+             layout="block">
+        <h:panelGroup id="processHierarchyContent">
+
+            <p:dataList id="processAncestors"
+                        value="#{CreateProcessForm.processAncestors}"
+                        var="processAncestor"
+                        itemStyleClass="process-ancestor"
+                        rendered="#{not empty CreateProcessForm.processAncestors}">
+                <p:commandButton action="#{CreateProcessForm.fillCreateProcessForm(processAncestor)}"
+                                 actionListener="#{CreateProcessForm.processMetadata.preserve()}"
+                                 process="@this"
+                                 styleClass="#{CreateProcessForm.currentProcess.equals(processAncestor) ? 'selected' : ''}"
+                                 value="#{CreateProcessForm.getCatalogId(processAncestor)}"
+                                 update="editForm:processFromTemplateTabView:processData
+                                         editForm:processFromTemplateTabView:processHierarchy"/>
+            </p:dataList>
+
+            <p:carousel id="processChildren"
+                        headerText="#{msgs['newProcess.childProcesses']}"
+                        rendered="#{not empty CreateProcessForm.processChildren}"
+                        value="#{CreateProcessForm.processChildren}"
+                        var="childProcess"
+                        numVisible="3"
+                        responsive="true">
+                <p:commandButton action="#{CreateProcessForm.fillCreateProcessForm(childProcess)}"
+                                 actionListener="#{CreateProcessForm.processMetadata.preserve()}"
+                                 process="@this"
+                                 styleClass="#{CreateProcessForm.currentProcess.equals(childProcess) ? 'selected' : ''}"
+                                 value="#{CreateProcessForm.getCatalogId(childProcess)}"
+                                 update="editForm:processFromTemplateTabView:processData
+                                         editForm:processFromTemplateTabView:processHierarchy"/>
+            </p:carousel>
+        </h:panelGroup>
+    </p:panel>
+
+    <p:panelGrid id="processData"
+                 layout="grid"
+                 columns="2">
+        <p:row>
+            <div class="import-table-section-title">
+                <h:outputText value="#{msgs.basicData}"/>
+            </div>
+            <p:panelGrid id="processDataEditGrid" layout="grid" columns="1">
+                <p:row>
+                    <div>
+                        <!-- process title -->
+                        <p:outputLabel for="processTitle"
+                                       value="#{msgs.processTitle}#{empty param['editForm:save'] and empty param['editForm:saveContinue'] ? ' *' : ''}"/>
+                        <p:inputText id="processTitle"
+                                     value="#{CreateProcessForm.currentProcess.process.title}"
+                                     styleClass="input-with-button"
+                                     required="#{not empty param['editForm:save'] or not empty param['editForm:saveContinue']}">
+                            <p:ajax event="change"/>
+                        </p:inputText>
+                        <p:commandButton id="generateTitleButton"
+                                         process="@this"
+                                         actionListener="#{CreateProcessForm.processDataTab.generateAtstslFields}"
+                                         icon="fa fa-cog"
+                                         title="#{msgs.generate}"
+                                         resetValues="true"/>
+                    </div>
+
+                    <div>
+                        <!-- DocType -->
+                        <p:outputLabel value="#{msgs.documentType}"/>
+                        <p:selectOneMenu id="docType" value="#{CreateProcessForm.processDataTab.docType}">
+                            <f:selectItems value="#{CreateProcessForm.processDataTab.allDoctypes}"
+                                           var="step"
+                                           itemLabel="#{step.localizedLabel}"
+                                           itemValue="#{step.title}"/>
+                            <p:ajax event="valueChange"
+                                    oncomplete="updateProcessMetadata();"
+                                    listener="#{CreateProcessForm.titleRecordLinkTab.createInsertionPositionSelectionTree()}"
+                                    update="editForm:processFromTemplateTabView:insertionTree"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <h:panelGroup layout="block"
+                                  title="#{msgs['newProcess.rulesetSelection.deactivated']}">
+                        <p:outputLabel for="ruleset"
+                                       value="#{msgs.ruleset}"/>
+                        <p:inputText id="ruleset"
+                                     styleClass="input"
+                                     disabled="#{true}"
+                                     value="#{CreateProcessForm.currentProcess.process.ruleset.title}"/>
+                    </h:panelGroup>
+
+                    <div>
+                        <p:outputLabel for="usingTemplates"
+                                       value="#{msgs.processTemplate}"
+                                       rendered="#{CreateProcessForm.processDataTab.usingTemplates}"/>
+                        <p:selectBooleanCheckbox styleClass="switch input"
+                                                 id="usingTemplates"
+                                                 rendered="#{CreateProcessForm.processDataTab.usingTemplates}"
+                                                 value="#{CreateProcessForm.currentProcess.process.inChoiceListShown}"/>
+                    </div>
+
+                    <div>
+                        <!-- Tifheader - Documentname -->
+                        <p:outputLabel for="tifHeaderDocumentName"
+                                       value="#{msgs.tifHeaderDocumentName}"/>
+                        <p:inputText class="input" id="tifHeaderDocumentName"
+                                     value="#{CreateProcessForm.currentProcess.tiffHeaderDocumentName}">
+                            <p:ajax event="change"/>
+                        </p:inputText>
+                    </div>
+
+                    <div>
+                        <!-- Tifheader - Imagedescription -->
+                        <p:outputLabel for="tifHeaderImageDescription"
+                                       value="#{msgs.tifHeaderImageDescription}"/>
+                        <p:inputText class="input" id="tifHeaderImageDescription"
+                                     value="#{CreateProcessForm.currentProcess.tiffHeaderImageDescription}">
+                            <p:ajax event="change"/>
+                        </p:inputText>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="guessImages"
+                                       value="#{msgs.guessImages}"/>
+                        <p:inputText class="input"
+                                     id="guessImages"
+                                     value="#{CreateProcessForm.currentProcess.guessedImages}">
+                            <p:ajax event="change"/>
+                        </p:inputText>
+                    </div>
+                </p:row>
+
+            </p:panelGrid>
+        </p:row>
+        <p:row>
+            <div class="import-table-section-title">
+                <h:outputText value="#{msgs.metadata}"/>
+                <h:panelGroup id="addMetadataButtonWrapper"
+                              title="#{CreateProcessForm.addMetadataDialog.metadataAddableToStructureElement() ? msgs['dataEditor.addMetadata.newMetadata'] : msgs['dataEditor.addMetadata.noMetadataAddable']}">
+                    <p:commandButton id="addMetadataButton"
+                                     value="#{msgs['dataEditor.addMetadata.newMetadata']}"
+                                     icon="fa fa-plus"
+                                     styleClass="secondary"
+                                     update="addMetadataDialog"
+                                     disabled="#{not CreateProcessForm.addMetadataDialog.metadataAddableToStructureElement()}"
+                                     action="#{CreateProcessForm.addMetadataDialog.prepareAddableMetadataForStructure()}"
+                                     oncomplete="PF('addMetadataDialog').show();">
+                    </p:commandButton>
+                </h:panelGroup>
+            </div>
+
+            <h:panelGroup layout="block" styleClass="metadata-tree-wrapper">
+                <ui:include src="/WEB-INF/templates/includes/metadataTreeTable.xhtml">
+                    <ui:param name="root" value="#{CreateProcessForm.processMetadata.logicalMetadataTree}"/>
+                    <ui:param name="readOnly" value="#{false}"/>
+                    <ui:param name="Form" value="#{CreateProcessForm}"/>
+                </ui:include>
+            </h:panelGroup>
+        </p:row>
+    </p:panelGrid>
+
+    <p:remoteCommand name="preserveMetadata"
+                     update="@none"
+                     actionListener="#{CreateProcessForm.processMetadata.preserve}"/>
+
+    <p:remoteCommand name="updateProcessMetadata"
+                     update="metadataTable"
+                     actionListener="#{CreateProcessForm.processDataTab.updateProcessMetadata()}"/>
+</ui:composition>

@@ -1,0 +1,150 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog styleClass="help-dialog"
+              id="filterHelpDialog"
+              widgetVar="filterHelpDialog"
+              dynamic="true"
+              width="820"
+              showHeader="false"
+              resizable="false"
+              modal="true">
+        <h3>Filter</h3>
+        <h:panelGroup layout="block"
+                      styleClass="dialogFieldWrapper">
+            <h4><h:outputText value="#{msgs.title}"/></h4>
+            <p:panelGrid columns="2"
+                         layout="grid">
+                <p:row>
+                    <pre>"[Auftragstitel]"</pre>
+                </p:row>
+                <p:row>
+                    (z.B. <pre>"Testtitel"</pre>)
+                </p:row>
+            </p:panelGrid>
+            <br/>
+
+            <h4><h:outputText value="#{msgs.project}"/></h4>
+            <p:panelGrid columns="2"
+                         layout="grid">
+                <p:row>
+                    <pre>"projekt:[Projekttitel]"</pre>
+                </p:row>
+                <p:row>
+                    (z.B. <pre>"projekt:Vecteur"</pre>)
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <h4><h:outputText value="Auftrags-ID"/></h4>
+            <p:panelGrid columns="2"
+                         layout="grid">
+                <p:row>
+                    <pre>"eigenschaft:AuftragsId:[Wert]"</pre>
+                </p:row>
+                <p:row>
+                    (z.B. <pre>"eigenschaft:AuftragsId:2356"</pre>)
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <h4><h:outputText value="Aufgaben"/></h4>
+            <p:panelGrid columns="2"
+                         layout="grid">
+                <p:row>
+                    <pre>"[Aufgabenstatus]:[Aufgabentitel]"</pre>
+                </p:row>
+                <p:row>
+                    (z.B. <pre>"schrittaktuell:Dossier prüfen"</pre>)
+                </p:row>
+            </p:panelGrid>
+            <p:panelGrid columns="2"
+                         style="padding: 8px 16px;"
+                         layout="grid">
+                <p:row>Gesperrt</p:row>
+                <p:row>
+                    <pre>schrittgesperrt</pre>
+                </p:row>
+                <p:row>Offen</p:row>
+                <p:row>
+                    <pre>schrittoffen</pre>
+                </p:row>
+                <p:row>In Bearbeitung</p:row>
+                <p:row>
+                    <pre>schrittinarbeit</pre>
+                </p:row>
+                <p:row>Offen / In Bearbeitung</p:row>
+                <p:row>
+                    <pre>schrittaktuell</pre>
+                </p:row>
+                <p:row>Abgeschlossen</p:row>
+                <p:row>
+                    <pre>schrittabgeschlossen</pre>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <h4><h:outputText value="Kitodo-ID"/></h4>
+            <p:panelGrid columns="2"
+                         layout="grid">
+                <p:row>
+                    <pre>"id:[ID]"</pre>
+                </p:row>
+                <p:row>
+                    (z.B. <pre>"id:110"</pre>)
+                </p:row>
+            </p:panelGrid>
+            <h:panelGroup layout="block" rendered="false">
+                <h4><h:outputText value="Verfügbare Aufgabenstatus"/></h4>
+                <pre>"schrittgesperrt"</pre>, <pre>"schrittgesperrt"</pre>, <pre>"schrittgesperrt"</pre>
+                <h4><h:outputText value="Wildcard-Filter"/></h4>
+                Eigenschaftsfilter erlauben sowohl bei Name als auch beim Wert das Eintrages eines Wildcard-Symbols.
+                Folgender Filter liefert alle Aufträge, die die Eigenschaft "AuftragsId" mit irgendeinem Wert haben zurück:
+                <div style="margin: 16px;">
+                    <pre>"eigenschaft:AuftragsId:*"</pre>
+                </div>
+                Folgender Filter liefert alle Aufträge, die irgendeine Eigenschaft mit dem Wert "123" haben:
+                <div style="margin: 16px;">
+                    <pre>"eigenschaft:*:123"</pre>
+                </div>
+                <br/>
+                <h4><h:outputText value="Filter kombinieren"/></h4>
+                Filter können auf diese Weise beliebig kombiniert werden, indem sie hintereinander durch Leerzeichen
+                voneinander getrennt in das Filterfeld eingetragen werden, z.B.
+                <div style="margin: 16px;">
+                    <pre>"projekt:Vecteur" "schrittaktuell:Dossier prüfen"</pre>
+                </div>
+                Hierdurch wird die Auftragsliste nach allen Aufträgen des Projekts Vecteur gefiltert, in denen die
+                "Dossier prüfen" aktuell ist (d.h. "offen" oder "in Bearbeitung").
+                <br/>
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block"
+                      styleClass="dialogButtonWrapper">
+            <h:form id="closeDialogForm">
+                <p:commandButton id="closeDialog"
+                                 value="#{msgs.close}"
+                                 icon="fa fa-times fa-lg"
+                                 iconPos="right"
+                                 immediate="true"
+                                 styleClass="secondary right"
+                                 onclick="PF('filterHelpDialog').hide();"/>
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+
+</ui:composition>

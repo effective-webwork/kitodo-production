@@ -1,0 +1,59 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <p:dataTable var="item"
+                 id="authoritiesTable"
+                 styleClass="default-layout"
+                 value="#{AuthorityForm.lazyDTOModel}"
+                 first="#{AuthorityForm.firstRow}"
+                 lazy="true"
+                 paginator="true"
+                 resizableColumns="true"
+                 liveResize="true"
+                 rows="#{LoginForm.loggedUser.tableSize}"
+                 sortBy="#{item.title}"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
+                 currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
+                 paginatorPosition="bottom">
+        <p:ajax event="page"
+                listener="#{AuthorityForm.onPageChange}"/>
+        <p:column headerText="#{msgs.authority}" sortBy="#{item.title}">
+            <h:outputText value="#{HelperForm.getTranslated(item.titleWithoutSuffix)}"
+                          title="#{HelperForm.getTranslated(item.titleWithoutSuffix)}"/>
+        </p:column>
+        <p:column headerText="#{msgs.type}" sortBy="#{item.type}">
+            <h:outputText value="#{HelperForm.getTranslated(item.type)}"
+                          title="#{HelperForm.getTranslated(item.type)}"/>
+        </p:column>
+        <p:column headerText="#{msgs.actions}"
+                  resizable="false"
+                  width="70"
+                  styleClass="actionsColumn">
+            <h:form id="actionForm">
+                <h:link id="viewAuthority"
+                        outcome="authorityEdit"
+                        styleClass="action"
+                        title="#{msgs.view}"
+                        rendered="#{SecurityAccessController.hasAuthorityToViewAuthority() and not SecurityAccessController.hasAuthorityToEditAuthority()}">
+                    <f:param name="id" value="#{item.id}" />
+                    <i class="fa fa-eye fa-lg"/>
+                </h:link>
+            </h:form>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

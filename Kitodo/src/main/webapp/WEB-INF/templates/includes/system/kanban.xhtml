@@ -1,0 +1,423 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:f="http://java.sun.com/jsf/core">
+    <!-- Overall table -->
+    <div id="kanbanBoard">
+        <!-- OPEN task columns -->
+        <!-- Dossier anfordern -->
+        <p:panel styleClass="column">
+            <h:outputText value="Dossier anfordern" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenOrInWorkTask('Dossier anfordern')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Dossier anfordern')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- CheckDossier -->
+        <p:panel styleClass="column">
+            <h:outputText value="Dossier prüfen" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Dossier prüfen')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Dossier prüfen')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- Dossier vorbereiten -->
+        <p:panel styleClass="column">
+            <h:outputText value="Dossier vorbereiten" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Dossier vorbereiten')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Dossier vorbereiten')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Auftragserteilung Extern" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Auftragserteilung Extern" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Auftragserteilung Extern')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Auftragserteilung Extern')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Einzug-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Einzug-Scanner" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Einzug-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Einzug-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Buch-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Buch-Scanner" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Buch-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Buch-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Grossformat-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Grossformat-Scanner" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Grossformat-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Grossformat-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Multifunktionsscanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Multifunktionsscanner" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Multifunktionsscanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Multifunktionsscanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Mikrofilmscanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Mikrofilmscanner" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Mikrofilmscanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Mikrofilmscanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Datenimport" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Datenimport" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Datenimport')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Datenimport')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Manuelle Bildbearbeitung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Manuelle Bildbearbeitung" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Manuelle Bildbearbeitung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Manuelle Bildbearbeitung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Strukturtrennblatterkennung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Strukturtrennblatterkennung" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Strukturtrennblatterkennung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Strukturtrennblatterkennung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Automatische Bildbearbeitung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Automatische Bildbearbeitung" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Automatische Bildbearbeitung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Automatische Bildbearbeitung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Qualitätsprüfung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="Qualitätsprüfung" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('Qualitätsprüfung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'Qualitätsprüfung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "SIP erstellen" -->
+        <p:panel styleClass="column">
+            <h:outputText value="SIP erstellen" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('SIP erstellen')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'SIP erstellen')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "SIP senden" -->
+        <p:panel styleClass="column">
+            <h:outputText value="SIP senden" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesWithOpenTask('SIP senden')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, 'SIP senden')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- Correction -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.correction}" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getProcessesInCorrection(false)}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, null)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- Closed --> <!-- should not be displayed at the moment -->
+        <p:panel styleClass="column" rendered="false">
+            <h:outputText value="#{msgs.statusDone}" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getClosedProcesses()}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, null)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+
+
+        <!-- INWORK task columns -->
+        <!-- No task OPEN or INWORK -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.noTask}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithoutOpenTasks()}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, null)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- CheckDossier -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Dossier prüfen')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Dossier prüfen')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- PrepareDossier -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask(msgs.PrepareDossier)}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, msgs.PrepareDossier)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Auftragserteilung Extern" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Auftragserteilung Extern')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Auftragserteilung Extern')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Einzug-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Einzug-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Einzug-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Buch-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Buch-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Buch-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Grossformat-Scanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Grossformat-Scanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Grossformat-Scanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Multifunktionsscanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Multifunktionsscanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Multifunktionsscanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Mikrofilmscanner" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Mikrofilmscanner')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Mikrofilmscanner')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Datenimport" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Datenimport')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Datenimport')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Manuelle Bildbearbeitung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Manuelle Bildbearbeitung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Manuelle Bildbearbeitung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Strukturtrennblatterkennung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Strukturtrennblatterkennung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Strukturtrennblatterkennung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Automatische Bildbearbeitung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Automatische Bildbearbeitung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Automatische Bildbearbeitung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "Qualitätsprüfung" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('Qualitätsprüfung')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'Qualitätsprüfung')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "SIP erstellen" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('SIP erstellen')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'SIP erstellen')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- "SIP senden" -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesWithInWorkTask('SIP senden')}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, 'SIP senden')}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- Correction -->
+        <p:panel styleClass="column">
+            <h:outputText value="#{msgs.statusInProcessing}" styleClass="column-heading"/>
+            <div class="column-1">
+                <p:repeat value="#{kanbanForm.getProcessesInCorrection(true)}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcessWithUser(process, null)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+        <!-- Cancelled --> <!-- should not be displayed at the moment -->
+        <p:panel styleClass="column" rendered="false">
+            <h:outputText value="#{msgs.cancelled}" styleClass="column-heading"/>
+            <div class="column-2">
+                <p:repeat value="#{kanbanForm.getCancelledProcesses()}" var="process">
+                    <p:panel styleClass="#{kanbanForm.getStylingClasses(process)}">
+                        <h:outputText value="#{kanbanForm.getStringForProcess(process, null)}"/>
+                    </p:panel>
+                </p:repeat>
+            </div>
+        </p:panel>
+    </div>
+    <p:poll interval="60" update="@(.column)"/>
+</ui:composition>

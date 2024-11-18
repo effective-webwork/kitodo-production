@@ -1,0 +1,129 @@
+<!--
+  * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+  *
+  * This file is part of the Kitodo project.
+  *
+  * It is licensed under GNU General Public License version 3 or later.
+  *
+  * For the full copyright and license information, please read the
+  * GPL3-License.txt file that was distributed with this source code.
+  -->
+
+<ui:composition
+    template="/WEB-INF/templates/baseEditView.xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:viewParam name="id"/>
+        <f:viewAction action="#{ClientForm.load(id)}"/>
+    </f:metadata>
+
+    <!--@elvariable id="isEditMode" type="boolean"-->
+    <ui:param name="isEditMode"
+              value="#{ClientForm.client.id ne null and SecurityAccessController.hasAuthorityToEditClient()}"/>
+    <!--@elvariable id="isCreateMode" type="boolean"-->
+    <ui:param name="isCreateMode"
+              value="#{ClientForm.client.id eq null and SecurityAccessController.hasAuthorityToAddClient()}"/>
+    <!--@elvariable id="isViewMode" type="boolean"-->
+    <ui:param name="isViewMode" value="#{not isEditMode and not isCreateMode}"/>
+
+    <ui:define name="contentHeader">
+        <h:outputScript name="js/save.js" target="body" />
+        <h3 id="headerText">
+            <h:outputText value="#{msgs.editClient}"
+                          styleClass="shortable"
+                          rendered="#{isEditMode}"/>
+            <h:outputText value="#{msgs.clientNew}"
+                          styleClass="shortable"
+                          rendered="#{isCreateMode}"/>
+            <h:outputText value="#{msgs.viewClient}"
+                          styleClass="shortable"
+                          rendered="#{isViewMode}"/>
+        </h3>
+
+        <p:button value="#{msgs.cancel}" outcome="users?keepPagination=true" onclick="setConfirmUnload(false);"
+                  icon="fa fa-times fa-lg" iconPos="right" styleClass="secondary"/>
+
+        <p:commandButton id="saveButtonToggler"
+                  actionListener="#{ClientForm.setSaveDisabled(false)}"
+                  update="save"
+                  style="display:none;"/>
+
+        <p:commandButton id="save"
+                         rendered="#{isEditMode || isCreateMode}"
+                         widgetVar="save"
+                         value="#{msgs.save}"
+                         action="#{ClientForm.save}"
+                         update="notifications"
+                         icon="fa fa-floppy-o fa-lg"
+                         iconPos="right"
+                         disabled="#{ClientForm.saveDisabled}"
+                         onclick="setConfirmUnload(false);PF('notifications').renderMessage({'summary':'#{msgs.clientSaving}','detail':'#{msgs.youWillBeRedirected}','severity':'info'});"/>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="clientsTabView">
+            <p:tab id="clientsTab" title="#{msgs.client}">
+                <p:panelGrid id="clientEdit-grid" columns="2" layout="grid">
+                    <p:row>
+                        <div>
+                            <p:outputLabel for="nameInput" value="#{msgs.name}"/>
+                            <p:inputText id="nameInput"
+                                         class="input"
+                                         disabled="#{isViewMode}"
+                                         placeholder="#{msgs.name}"
+                                         value="#{ClientForm.client.name}"
+                                         required="true"/>
+                        </div>
+                    </p:row>
+                    <p:row>
+                        <div>
+                            <p:dataTable id="clientRoleDatatable" var="role" value="#{ClientForm.getRolesForClient()}">
+                                <p:column id="titleColumn"
+                                          headerText="#{msgs.roles}">
+                                    <h:outputText value="#{role.title}"/>
+                                </p:column>
+                                <p:column styleClass="actionsColumn">
+                                    <p:commandLink id="deleteFromClient"
+                                                   action="#{ClientForm.deleteRoleFromClient(role)}"
+                                                   styleClass="action"
+                                                   title="#{msgs.clientDeleteFrom}"
+                                                   rendered="#{role.id==null}"
+                                                   immediate="true"
+                                                   oncomplete="toggleSave()"
+                                                   update="@form">
+                                        <i class="fa fa-trash-o fa-lg"/>
+                                    </p:commandLink>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div rendered="#{isEditMode || isCreateMode}">
+                            <p:selectOneMenu id="clientToCopyRoles" converter="#{clientConverter}" value="#{ClientForm.clientToCopyRoles}"  >
+                                <f:selectItem value="#{null}" itemLabel="#{msgs.clientSelect}"/>
+                                <f:selectItems value="#{ClientForm.possibleClientsForCopying}" var="client" itemValue="#{client}" itemLabel="#{client.name}"/>
+                                <p:ajax update="copyRolesToClient"/>
+                            </p:selectOneMenu>
+                            <p:commandButton id="copyRolesToClient"
+                                             update="editForm:clientsTabView:clientRoleDatatable"
+                                             oncomplete="toggleSave()"
+                                             disabled="#{ClientForm.clientToCopyRoles eq null}"
+                                             action="#{ClientForm.copyRolesToClient()}"
+                                             value="#{msgs.copyRolesToClient}"/>
+                        </div>
+                    </p:row>
+                </p:panelGrid>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.users}" url="users.jsf" icon="fa fa-user"/>
+        <p:menuitem value="#{msgs.editClient}" rendered="#{isEditMode}" icon="fa fa-university"/>
+        <p:menuitem value="#{msgs.clientNew}" rendered="#{isCreateMode}" icon="fa fa-university"/>
+        <p:menuitem value="#{msgs.viewClient}" rendered="#{isViewMode}" icon="fa fa-university"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,51 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <div id="containerStructureHeader">
+        <p:selectOneMenu id="containersViewMode" value="#{DataEditorForm.containersViewMode}">
+            <f:selectItem itemLabel="Typ" itemValue="Typ"/>
+            <f:selectItem itemLabel="Signatur" itemValue="Signatur"/>
+            <f:selectItem itemLabel="Typ_Signatur" itemValue="Typ_Signatur"/>
+            <f:selectItem itemLabel="Voll" itemValue="Voll"/>
+            <p:ajax event="change" partialSubmit="true" update="containerTree"/>
+        </p:selectOneMenu>
+    </div>
+
+    <p:tree id="containerTree"
+            value="#{DataEditorForm.containerStructurePanel.containerStructure}"
+            var="elem"
+            styleClass="focusable"
+            selectionMode="single"
+            selection="#{DataEditorForm.containerStructurePanel.selectedTreeNode}">
+        <p:ajax event="select" listener="#{DataEditorForm.containerStructurePanel.onNodeSelect}"
+                oncomplete="expandMetadata('container-metadata-tab');"
+                update="metadataAccordion:containerMetadataWrapperPanel"/>
+        <p:treeNode>
+            <h:outputText value="#{elem.type}"
+                          rendered="#{DataEditorForm.containersViewMode.contains('Typ')}"/>
+            <h:outputText value="_"
+                          rendered="#{DataEditorForm.containersViewMode.equals('Typ_Signatur')}"/>
+            <h:outputText value="#{DataEditorForm.containerStructurePanel.getSignature(elem)}"
+                          rendered="#{DataEditorForm.containersViewMode.contains('Signatur')}"/>
+            <h:outputText value="#{DataEditorForm.containerStructurePanel.getAllMetadata(elem)}"
+                          title="#{DataEditorForm.containerStructurePanel.getAllMetadata(elem)}"
+                          rendered="#{DataEditorForm.containersViewMode.contains('Voll')}"/>
+        </p:treeNode>
+    </p:tree>
+</ui:composition>

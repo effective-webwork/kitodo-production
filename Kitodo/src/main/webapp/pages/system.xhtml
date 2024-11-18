@@ -1,0 +1,78 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseListView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:viewAction action="#{indexingForm.updateView()}"/>
+        <!--@elvariable id="workflowId" type="int"-->
+        <f:viewParam name="workflowId"/>
+        <f:viewAction action="#{MigrationForm.setRedirectFromWorkflow(workflowId)}"/>
+        <!--@elvariable id="tabIndex" type="java.lang.String"-->
+        <f:viewParam name="tabIndex"/>
+        <f:viewAction action="#{MigrationForm.setActiveTabIndexFromTemplate(tabIndex)}"/>
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h3><h:outputText value="#{msgs.system}"/></h3>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView activeIndex="#{MigrationForm.activeTabIndex}"
+                   dynamic="true"
+                   cache="true"
+                   id="systemTabView"
+                   widgetVar="systemTabView">
+            <p:ajax event="tabChange" listener="#{MigrationForm.onTabChange}"/>
+            <p:tab id="taskManagerTab" title="#{msgs.taskManager}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewTaskManagerPage()}">
+                <ui:include src="/WEB-INF/templates/includes/system/taskmanager.xhtml" />
+            </p:tab>
+            <p:tab id="termsTab" title="#{msgs.legal}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewTermsPage()}">
+                <ui:include src="/WEB-INF/templates/includes/system/legalTextEditor.xhtml" />
+            </p:tab>
+            <p:tab id="indexingTab" title="#{msgs.indexing}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewIndexPage()}">
+                <ui:include src="/WEB-INF/templates/includes/system/indexing.xhtml" />
+            </p:tab>
+            <p:tab id="migrationTab" title="#{msgs.migration}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewMigrationPage()}">
+                <ui:include src="/WEB-INF/templates/includes/system/migration.xhtml" />
+            </p:tab>
+            <p:tab id="taskStatisticsTab" title="#{msgs.taskRuntimes}">
+                <ui:include src="/WEB-INF/templates/includes/system/taskStatistics.xhtml" />
+            </p:tab>
+            <p:tab id="workloadTab" title="#{msgs.workload}">
+                <ui:include src="/WEB-INF/templates/includes/system/workload.xhtml"/>
+            </p:tab>
+            <p:tab id="kanbanTab" title="Kanban-Board">
+                <ui:include src="/WEB-INF/templates/includes/system/kanban.xhtml"/>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.system}" icon="fa fa-wrench"/>
+    </ui:define>
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/system/confirmWorkflowPopup.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/system/createTemplatePopup.xhtml"/>
+    </ui:define>
+
+</ui:composition>

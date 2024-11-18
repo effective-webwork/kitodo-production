@@ -1,0 +1,35 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+
+<ui:composition
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:outputText><i class="fa fa-globe" title="#{msgs.containsExternalPartialJobs}"/></h:outputText>
+    <!--@elvariable id="process" type="org.kitodo.production.dto.ProcessDTO"-->
+    <h:panelGroup
+            class="process-progress"
+            title="#{ProcessForm.getCurrentTaskTitles(process)}"
+            rendered="#{not empty process.tasks or process.hasChildren() and process.progressClosed ne 'NaN'}"
+            style="
+                background-image: linear-gradient(
+                    to right,
+                    var(--green),
+                    var(--green) #{process.progressClosed}%,
+                    var(--light-green) #{process.progressClosed}%,
+                    var(--light-green) #{process.progressInProcessing + process.progressClosed}%,
+                    var(--light-orange) #{process.progressInProcessing + process.progressClosed}%,
+                    var(--light-orange) #{process.progressOpen + process.progressClosed + process.progressInProcessing}%,
+                    var(--focused-orange) #{process.progressOpen + process.progressClosed + process.progressInProcessing}%);"
+    />
+</ui:composition>

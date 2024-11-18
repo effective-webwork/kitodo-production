@@ -1,0 +1,207 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <c:set var="task" value="#{CurrentTaskForm.currentTask}" scope="request"/>
+    <c:set var="process" value="#{CurrentTaskForm.currentTask.process}" scope="request"/>
+
+    <h:panelGroup rendered="#{task.processingUser.id == LoginForm.loggedUser.id and task.processingStatus eq 'INWORK'}">
+
+        <!--  Import -->
+        <h:form id="actionForm">
+            <!-- Action -->
+            <ui:fragment>
+
+                <h4>#{msgs.actions}</h4>
+
+                <h:panelGroup id="taskActionsBlock"
+                              layout="block">
+
+                    <!-- Show Metadata Block -->
+                    <h:panelGroup id="metadataBlocked"
+                                  rendered="#{process.blockedUser != null}">
+                        <h:outputText value="#{msgs.blocked}"/>
+                        <br/>
+                        <h:panelGrid columns="2" cellpadding="3">
+                            <h:outputText value="#{msgs.user}: "/>
+                            <h:outputText value="#{process.blockedUser.fullName}"/>
+                            <h:outputText value="#{msgs.location}: "/>
+                            <h:outputText value="#{process.blockedUser.location}"/>
+                        </h:panelGrid>
+                        <h:outputText value="#{msgs.later}"/>
+
+                        <!-- If blocked by yourself: you can unblocked -->
+                        <h:commandLink id="releaseLock"
+                                       rendered="#{(process.blockedUser != null) and (process.blockedUser.id == LoginForm.loggedUser.id)}"
+                                       action="#{CurrentTaskForm.releaseLock}"
+                                       title="#{msgs.orUnlockHere}">
+                            <h:outputText><i class="fa fa-lock"/> #{msgs.orUnlockHere}</h:outputText>
+                        </h:commandLink>
+                    </h:panelGroup>
+
+                    <!-- Script-button -->
+                    <p:commandButton id="executeScript"
+                                     action="#{CurrentTaskForm.executeScript}"
+                                     process="@this"
+                                     icon="fa fa-cogs"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     rendered="#{task.scriptPath != null and task.scriptPath != '' and task.process.blockedUser == null}"
+                                     value="#{msgs.scriptExecute}: #{task.scriptName}"
+                                     title="#{task.scriptName}">
+                        <f:setPropertyActionListener target="#{CurrentTaskForm.scriptPath}" value="#{task.scriptPath}"/>
+                    </p:commandButton>
+
+                    <!-- tiffHeaderDownload-button -->
+                    <p:commandButton id="downloadTiffHeader"
+                                     action="#{CurrentTaskForm.downloadTiffHeader}"
+                                     process="@this"
+                                     icon="fa fa-file-o"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     rendered="#{0==1 and process.blockedUser == null}"
+                                     value="#{msgs.saveTifHeaderFile}"
+                                     title="#{msgs.saveTifHeaderFile}"/>
+
+                    <!-- TODO: delete this warning once the root cause of the timeout problem is solved  -->
+                    <h:outputText id="timeoutWarning"
+                                  rendered="#{task.typeExportDMS and process.blockedUser == null}"
+                                  value="#{msgs.timeoutWarningDMS}"/>
+
+                    <!-- Upload-button -->
+                    <p:commandButton id="exportDms"
+                                     action="#{CurrentTaskForm.exportDMS}"
+                                     process="@this"
+                                     icon="fa fa-file-archive-o"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     rendered="#{task.typeExportDMS and process.blockedUser == null}"
+                                     value="#{msgs.importDms}"
+                                     title="#{msgs.importDms}"/>
+
+                    <!-- Download dockets-button -->
+                    <p:commandButton id="downloadDockets"
+                                     action="#{ProcessForm.downloadDocket(process.id)}"
+                                     process="@this"
+                                     ajax="false"
+                                     value="#{msgs.docketPrint}"
+                                     title="#{msgs.docketPrint}"
+                                     icon="fa fa-print"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     rendered="#{task.title =='CheckDossier' or task.title =='Dossier prüfen' or task.title =='PrepareDossier' or task.title =='Dossier vorbereiten'}"/>
+
+                    <!-- Metadaten-button -->
+                    <h:link id="editMetadata"
+                            onclick="$('#loadingScreen').show()"
+                            rendered="#{task.typeMetadata and process.blockedUser == null}"
+                            title="#{msgs.metadataEdit}"
+                            outcome="metadataEditor">
+                        <h:outputText><i class="fa fa-list-alt"/> #{msgs.metadataEdit}</h:outputText>
+                        <f:param name="id" value="#{task.process.id}"/>
+                        <f:param name="referer" value="currentTasksEdit.jsf?id=#{task.id}"/>
+                        <f:param name="templateTaskId" value="#{CurrentTaskForm.getCorrespondingTemplateTaskId(task)}"/>
+                    </h:link>
+
+                    <!-- Re-generate all images action link -->
+                    <p:commandButton id="generateAllImages"
+                                     rendered="#{CurrentTaskForm.showingGenerationActions and process.blockedUser == null}"
+                                     action="#{CurrentTaskForm.generateAllImages}"
+                                     process="@this"
+                                     icon="fa fa-cog"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     disabled="#{!CurrentTaskForm.isImageGenerationPossible()}"
+                                     value="#{msgs.regenerateAllImages}"
+                                     title="#{CurrentTaskForm.isImageGenerationPossible() ? msgs.regenerateAllImages : msgs.imageGenerationNotPossible}"/>
+
+                    <!-- Generate missing and re-generate damaged images action link -->
+                    <p:commandButton id="regenerateMissingAndDamagedImages"
+                                     rendered="#{CurrentTaskForm.showingGenerationActions and process.blockedUser == null}"
+                                     action="#{CurrentTaskForm.generateMissingAndDamagedImages}"
+                                     process="@this"
+                                     icon="fa fa-cog"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     disabled="#{!CurrentTaskForm.isImageGenerationPossible()}"
+                                     value="#{msgs.regenerateMissingAndDamagedImages}"
+                                     title="#{CurrentTaskForm.isImageGenerationPossible() ? msgs.regenerateMissingAndDamagedImages : msgs.imageGenerationNotPossible}"/>
+
+                    <!-- Generate missing images action link -->
+                    <p:commandButton id="generateMissingImages"
+                                     rendered="#{CurrentTaskForm.showingGenerationActions and process.blockedUser == null}"
+                                     action="#{CurrentTaskForm.generateMissingImages}"
+                                     process="@this"
+                                     icon="fa fa-cog"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     disabled="#{!CurrentTaskForm.isImageGenerationPossible()}"
+                                     value="#{msgs.generateMissingImages}"
+                                     title="#{CurrentTaskForm.isImageGenerationPossible() ? msgs.generateMissingImages : msgs.imageGenerationNotPossible}"/>
+
+                    <!-- add correction comment -->
+                    <p:commandLink id="addCorrectionComment"
+                                   action="#{CommentForm.newComment(true)}"
+                                   oncomplete="PF('newCommentDialog').show()"
+                                   rendered="false"
+                                   update=":newCommentForm">
+                        <h:outputText><i class="fa fa-exclamation-circle" /> #{msgs.correctionMessageWrite}</h:outputText>
+                    </p:commandLink>
+
+                    <!-- Edit Cancel-buttons -->
+                    <p:commandButton id="cancel"
+                                     action="#{CurrentTaskForm.releaseTask}"
+                                     process="@this"
+                                     icon="fa fa-ban"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     title="#{msgs.releaseTask}"
+                                     value="#{msgs.releaseTask}">
+                        <p:confirm header="#{msgs.confirmRelease}" message="#{msgs.reallyReleaseTask}"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+
+                    <!-- Close button -->
+                    <p:commandButton id="close"
+                                     action="#{CurrentTaskForm.closeTaskByUser}"
+                                     rendered="#{!CurrentTaskForm.getOpenCorrectionComment(task.getProcess()).isPresent()}"
+                                     process="@this"
+                                     icon="fa fa-check"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     value="#{msgs.closeTask}"
+                                     title="#{msgs.closeTask}">
+                        <p:confirm header="#{msgs.confirmClose}" message="#{msgs.closeTaskConfirm}" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                    <p:commandButton id="correctAndClose"
+                                     action="#{CommentForm.solveProblem(CurrentTaskForm.getOpenCorrectionComment(task.getProcess()).get())}"
+                                     rendered="#{CurrentTaskForm.getOpenCorrectionComment(task.getProcess()).isPresent()}"
+                                     process="@this"
+                                     icon="fa fa-check"
+                                     iconPos="right"
+                                     styleClass="secondary"
+                                     value="#{msgs.closeCorrectionTask}"
+                                     title="#{msgs.closeCorrectionTask}">
+                        <p:confirm header="#{msgs.confirmClose}" message="#{msgs.closeTaskConfirm}" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </h:panelGroup>
+            </ui:fragment>
+        </h:form>
+    </h:panelGroup>
+</ui:composition>

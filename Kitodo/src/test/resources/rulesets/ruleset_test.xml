@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<ruleset xmlns="http://names.kitodo.org/ruleset/v2"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://names.kitodo.org/ruleset/v2 ../../../../../Kitodo-DataEditor/src/main/resources/ruleset.xsd">
+    <declaration>
+        <division id="Monograph" processTitle="TSL_ATS+'_'+CatalogIDDigital">
+            <label>Monograph</label>
+        </division>
+        <division id="something">
+            <label>Outline element</label>
+        </division>
+        <division id="ContainedWork" processTitle="TSL_ATS+'_'+CatalogIDDigital">
+            <label>Beigefügtes Werk</label>
+        </division>
+        <division id="MultiVolumeWork" withWorkflow="false" processTitle="TSL_ATS+'_'+CatalogIDDigital"
+                  use="createChildrenFromParent">
+            <label>Mehrbändiges Werk</label>
+        </division>
+        <division id="Volume" withWorkflow="true" processTitle="TSL_ATS+'_'+CatalogIDDigital">
+            <label>Band</label>
+        </division>
+        <key id="TitleDocMain" domain="source">
+            <label>HauptTitel</label>
+        </key>
+        <key id="TitleDocMainShort" domain="technical">
+            <label>Haupttitel (Sortierung)</label>
+        </key>
+        <key id="TSL_ATS">
+            <label>TSL/ATS</label>
+        </key>
+        <key id="document_type" use="docType">
+            <label>Document type</label>
+        </key>
+        <key id="CatalogIDDigital" use="recordIdentifier">
+            <label>PPN (digital)</label>
+        </key>
+        <key id="CatalogIDSource" domain="source">
+            <label>PPN (Vorlage)</label>
+        </key>
+        <key id="ContributorPerson">
+            <label>Contributing Person (group)</label>
+            <label lang="de">Mitwirkende Person (Gruppe)</label>
+            <key id="LastName">
+                <label>Last name</label>
+                <label lang="de">Familienname</label>
+            </key>
+            <key id="RoleText">
+                <label>Relationship designation (text)</label>
+                <label lang="de">Beziehungskennzeichnung (Text)</label>
+            </key>
+            <key id="IdentifierPPN">
+                <label>Identifier (PPN)</label>
+                <label lang="de">Identifier (PPN)</label>
+            </key>
+            <key id="FirstName">
+                <label>First name</label>
+                <label lang="de">Vorname</label>
+            </key>
+            <key id="DisplayForm">
+                <label>Display name</label>
+                <label lang="de">Anzeigename</label>
+            </key>
+            <key id="RoleCode">
+                <label>Relationship designation (code)</label>
+                <label lang="de">Beziehungskennzeichnung (Code)</label>
+            </key>
+            <key id="Prefix">
+                <label>Prefix</label>
+                <label lang="de">Präfix</label>
+            </key>
+            <key id="Authority">
+                <label>Authority</label>
+                <label lang="de">Quelle (Normdaten)</label>
+            </key>
+            <key id="IdentifierGND">
+                <label>Identifier (GND)</label>
+                <label lang="de">Identifier (GND)</label>
+            </key>
+            <key id="IdentifierGNDURI">
+                <label>GND-URI</label>
+                <label lang="de">GND-URI</label>
+            </key>
+            <key id="PersonalName">
+                <label>Personal name</label>
+                <label lang="de">Persönlicher Name</label>
+            </key>
+            <key id="Count">
+                <label>Count</label>
+                <label lang="de">Zählung</label>
+            </key>
+            <key id="AdditionalMetadataPerson">
+                <label>Surname, genus name, territory, title</label>
+                <label lang="de">Beiname, Gattungsname, Territorium, Titulatur</label>
+            </key>
+        </key>
+        <key id="Person">
+            <label>Person</label>
+            <key id="Role">
+                <label>Rolle</label>
+                <option value="Author">
+                    <label>Autor</label>
+                </option>
+            </key>
+            <key id="FirstName">
+                <label>Vorname</label>
+            </key>
+            <key id="LastName">
+                <label>Nachname</label>
+            </key>
+        </key>
+    </declaration>
+    <correlation>
+        <restriction key="Person">
+            <permit key="Role" minOccurs="1" maxOccurs="1"/>
+            <permit key="FirstName"/>
+            <permit key="LastName"/>
+        </restriction>
+
+        <restriction division="Monograph" unspecified="forbidden">
+            <permit division="Monograph"/>
+            <permit key="TitleDocMain" minOccurs="1"/>
+            <permit key="TitleDocMainShort" minOccurs="1"/>
+            <permit key="CatalogIDDigital" minOccurs="1"/>
+            <permit key="CatalogIDSource" minOccurs="1"/>
+            <permit key="TSL_ATS"/>
+            <permit key="ContributorPerson"/>
+            <permit key="Person">
+                <permit key="Role" unspecified="forbidden">
+                    <permit value="Author"/>
+                </permit>
+            </permit>
+        </restriction>
+        <restriction division="ContainedWork" unspecified="forbidden">
+                <permit key="TitleDocMain" minOccurs="1"/>
+                <permit key="TitleDocMainShort" minOccurs="1"/>
+                <permit key="CatalogIDDigital" minOccurs="1"/>
+            <permit key="CatalogIDSource" minOccurs="1"/>
+            <permit key="TSL_ATS"/>
+        </restriction>
+    </correlation>
+    <editing>
+        <setting key="TSL_ATS" alwaysShowing="true"/>
+        <setting key="Person" alwaysShowing="true">
+            <setting key="FirstName" alwaysShowing="true"/>
+            <setting key="LastName" alwaysShowing="true"/>
+        </setting>
+    </editing>
+</ruleset>

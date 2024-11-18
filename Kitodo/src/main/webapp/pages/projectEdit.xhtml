@@ -1,0 +1,110 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:viewParam name="id"/>
+        <f:viewAction action="#{ProjectForm.loadProject(id)}"/>
+        <f:viewAction action="#{ProjectForm.setProjectEditReferer(request.getParameter('referer'))}"/>
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h:outputScript name="js/save.js" target="body" />
+        <h:outputScript name="js/toggleLock.js" target="body"/>
+        <h3 id="headerText">
+            <h:outputText value="#{msgs.editProject} (#{ProjectForm.project.title})"
+                          styleClass="shortable"
+                          rendered="#{ProjectForm.project.id ne null}"/>
+            <h:outputText value="#{msgs.newProject}"
+                          styleClass="shortable"
+                          rendered="#{ProjectForm.project.id eq null and empty ProjectForm.project.title}"/>
+            <h:outputText value="#{msgs.duplicateProject}"
+                          styleClass="shortable"
+                          rendered="#{ProjectForm.project.id eq null and not empty ProjectForm.project.title}"/>
+        </h3>
+        <p:commandButton
+                value="#{ProjectForm.locked ? msgs.locked : msgs.unlocked}"
+                icon="#{ProjectForm.locked ? 'fa fa-lock fa-lg' : 'fa fa-unlock fa-lg'}"
+                iconPos="right"
+                styleClass="callto"
+                id="detailLockedButton"
+                update="editForm"
+                action="#{ProjectForm.switchLock()}">
+        </p:commandButton>
+        <p:button value="#{msgs.cancel}"
+                  onclick="setConfirmUnload(false);"
+                  outcome="#{not empty param['referer'] ? param['referer'] : ProjectForm.projectEditReferer}"
+                  icon="fa fa-times fa-lg"
+                  iconPos="right"
+                  styleClass="secondary"/>
+        <p:commandButton id="saveButtonToggler"
+                         actionListener="#{ProjectForm.setSaveDisabled(false)}"
+                         update="save"
+                         style="display:none;"/>
+        <p:commandButton id="save"
+                         widgetVar="save"
+                         value="#{msgs.save}"
+                         action="#{ProjectForm.save()}"
+                         icon="fa fa-floppy-o fa-lg"
+                         iconPos="right"
+                         onclick="setConfirmUnload(false);PF('notifications').renderMessage({'summary':'#{msgs.projectSaving}','detail':'#{msgs.youWillBeRedirected}','severity':'info'});"
+                         disabled="#{ProjectForm.saveDisabled}"
+                         update="notifications"/>
+    </ui:define>
+
+    <ui:define name="messages">
+        <p:messages id="error-messages" showIcon="false" closable="true"/>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="projectTabView" activeIndex="#{ProjectForm.editActiveTabIndex}">
+            <p:ajax event="tabChange" listener="#{ProjectForm.onEditTabChange}"/>
+            <p:tab title="#{msgs.details}">
+                <ui:include src="/WEB-INF/templates/includes/projectEdit/projectEditDetail.xhtml"/>
+            </p:tab>
+            <p:tab title="#{msgs.technicalData}">
+                <ui:include src="/WEB-INF/templates/includes/projectEdit/projectEditSpecification.xhtml"/>
+            </p:tab>
+            <p:tab title="#{msgs.metsParameter}">
+                <ui:include src="/WEB-INF/templates/includes/projectEdit/projectEditMets.xhtml"/>
+            </p:tab>
+            <p:tab title="#{msgs.templates}" id="templates">
+                <ui:include src="/WEB-INF/templates/includes/projectEdit/templateList.xhtml"/>
+            </p:tab>
+            <p:tab title="#{msgs['importConfig.configurations']}" id="importConfigurations">
+                <ui:include src="/WEB-INF/templates/includes/projectEdit/defaultImportConfiguration.xhtml"/>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.projects}" url="projects.jsf" icon="fa fa-archive"/>
+        <p:menuitem value="#{msgs.editProject}" rendered="#{not empty ProjectForm.project.title}" icon="fa fa-archive"/>
+        <p:menuitem value="#{msgs.newProject}"
+                    rendered="#{empty ProjectForm.project.title and empty ProjectForm.project.folders}" icon="fa fa-archive"/>
+        <p:menuitem value="#{msgs.duplicateProject}"
+                    rendered="#{empty ProjectForm.project.title and not empty ProjectForm.project.folders}" icon="fa fa-archive"/>
+    </ui:define>
+
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/projectEdit/projectEditMetsPopup.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/projectEdit/templateAddPopup.xhtml"/>
+    </ui:define>
+
+</ui:composition>

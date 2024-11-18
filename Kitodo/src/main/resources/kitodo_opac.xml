@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<opacCatalogues>
+    <doctypes>
+        <type isContainedWork="false" isMultiVolume="false" isPeriodical="false" isNewspaper="false"
+              rulesetType="deliverable" tifHeaderType="deliverable" title="deliverable">
+            <label language="de">Ablieferung</label>
+            <label language="en">Deliverable</label>
+        </type>
+        <type isContainedWork="false" isMultiVolume="false" isPeriodical="false" isNewspaper="false"
+              rulesetType="inventory" tifHeaderType="inventory" title="inventory">
+            <label language="de">Bestand/Serie</label>
+            <label language="en">Inventory</label>
+        </type>
+        <type isContainedWork="false" isMultiVolume="false" isPeriodical="false" isNewspaper="false"
+              rulesetType="dossier" tifHeaderType="dossier" title="dossier">
+            <label language="de">Dossier</label>
+            <label language="en">Dossier</label>
+        </type>
+        <type isContainedWork="false" isMultiVolume="false" isPeriodical="false" isNewspaper="false"
+              rulesetType="container" tifHeaderType="container" title="container">
+            <label language="de">Behältnis</label>
+            <label language="en">Container</label>
+        </type>
+        <type isContainedWork="false" isMultiVolume="false" isPeriodical="false" isNewspaper="false"
+              rulesetType="document" tifHeaderType="document" title="document">
+            <label language="de">Dokument</label>
+            <label language="en">Document</label>
+        </type>
+    </doctypes>
+
+    <!--
+    Catalog / OPAC configurations are now configured using the GUI and the new "ImportConfiguration" class.
+    These can be created on the "Projects" page by users with the necessary permissions!
+    -->
+
+</opacCatalogues>

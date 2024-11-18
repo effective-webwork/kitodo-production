@@ -1,0 +1,12 @@
+UPDATE role SET title = 'Administration' WHERE title = 'AdminGroup';
+UPDATE role SET title = 'Qualitätssicherung' WHERE title = 'CheckQualityGroup';
+UPDATE role SET title = 'Dossier Scannen A' WHERE title = 'ScanDossierAGroup';
+UPDATE role SET title = 'Dossier Scannen B' WHERE title = 'ScanDossierBGroup';
+UPDATE role SET title = 'Dossier Scannen C' WHERE title = 'ScanDossierCGroup';
+UPDATE role SET title = 'Dossier prüfen' WHERE title = 'CheckDossierGroup';
+UPDATE role SET title = 'Dossier vorbereiten' WHERE title = 'PrepareDossierGroup';
+UPDATE role SET title = 'Spaltenkonfiguration' WHERE title = 'ConfigureColumns';
+UPDATE role SET title = 'Workflow Management' WHERE title = 'WorkflowManagement';
+UPDATE role SET title = 'Qualitätssicherung Scans' WHERE title = 'CheckScansGroup';
+UPDATE role SET title = 'Datenbankstatistik' WHERE title = 'DatabaseStatistic';
+UPDATE role SET title = 'Datenimport Extern' WHERE title = 'ExternGroup';

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<ruleset xmlns="http://names.kitodo.org/ruleset/v2"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://names.kitodo.org/ruleset/v2 ruleset.xsd">
+    <declaration>
+        <division id="newspaper" processTitle="shelfMark">
+            <label>Newspaper ‹complete edition›</label>
+            <label lang="de">Zeitung ‹Gesamtausgabe›</label>
+            <subdivisionByDate>
+                <division id="newspaperYear" dates="ORDERLABEL"
+                    scheme="yyyy" processTitle="shelfMark+'_'+#YEAR">
+                    <label>Year’s issues ‹newspaper›</label>
+                    <label lang="de">Jahrgang ‹Zeitung›</label>
+                </division>
+                <division id="newspaperMonth" dates="ORDERLABEL" scheme="M"
+                    processTitle="shelfMark+'_'+#YEAR+#MONTH+#DAY+#ISSU">
+                    <label>Month’s issues ‹newspaper›</label>
+                    <label lang="de">Monat ‹Zeitung›</label>
+                </division>
+                <division id="newspaperDay" dates="ORDERLABEL"
+                    scheme="d">
+                    <label>Day’s issues ‹newspaper›</label>
+                    <label lang="de">Tag ‹Zeitung›</label>
+                </division>
+            </subdivisionByDate>
+        </division>
+        <division id="newspaperLimitedTest" processTitle="shelfMark">
+            <label>Newspaper ‹complete edition›—limited test</label>
+            <subdivisionByDate>
+                <division id="newspaperYearLimitedTest" dates="ORDERLABEL"
+                    scheme="yyyy" processTitle="shelfMark+'_'+#YEAR">
+                    <label>Year’s issues ‹newspaper›—limited test</label>
+                </division>
+                <division id="newspaperMonthLimitedTest" dates="ORDERLABEL" scheme="M"
+                    processTitle="shelfMark+'_'+#YEAR+#MONTH+#DAY+#ISSU">
+                    <label>Month’s issues ‹newspaper›—limited test</label>
+                </division>
+                <division id="newspaperDayLimitedTest" dates="ORDERLABEL" scheme="d">
+                    <label>Day’s issues ‹newspaper›—limited test</label>
+                </division>
+            </subdivisionByDate>
+        </division>
+        <division id="newspaperIssue">
+            <label>Issue ‹newspaper›</label>
+            <label lang="de">Ausgabe ‹Zeitung›</label>
+        </division>
+        <key id="ORDERLABEL" domain="mets:div">
+            <label>METS order label</label>
+            <label lang="de">METS Reihenfolge-Etikett</label>
+        </key>
+    </declaration>
+    <correlation>
+        <restriction division="newspaperDayLimitedTest" unspecified="forbidden">
+            <permit division="newspaperIssue"/>
+        </restriction>
+    </correlation>
+</ruleset>

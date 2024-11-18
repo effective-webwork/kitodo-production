@@ -1,0 +1,112 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:o="http://omnifaces.org/ui">
+    <!--@elvariable id="id" type="java.lang.Integer"-->
+    <f:metadata>
+        <f:viewParam name="id"/>
+        <o:viewAction action="#{TemplateForm.loadTemplate(id)}" if="#{not empty id}"/>
+    </f:metadata>
+
+    <!--@elvariable id="isCreateMode" type="boolean"-->
+    <ui:param name="isCreateMode"
+              value="#{TemplateForm.template.id eq null and empty TemplateForm.template.title and SecurityAccessController.hasAuthorityToAddTemplate()}"/>
+    <!--@elvariable id="isDuplicateMode" type="boolean"-->
+    <ui:param name="isDuplicateMode"
+              value="#{TemplateForm.template.id eq null and not empty TemplateForm.template.title and SecurityAccessController.hasAuthorityToAddTemplate()}"/>
+    <!--@elvariable id="isEditMode" type="boolean"-->
+    <ui:param name="isEditMode"
+              value="#{TemplateForm.template.id ne null and not TemplateForm.currentTemplateInUse and SecurityAccessController.hasAuthorityToEditTemplate()}"/>
+    <!--@elvariable id="isViewMode" type="boolean"-->
+    <ui:param name="isViewMode"
+              value="#{not isEditMode and not isDuplicateMode and not isCreateMode and SecurityAccessController.hasAuthorityToViewTemplate()}"/>
+
+    <ui:define name="contentHeader">
+        <h:outputScript name="js/save.js" target="body" />
+
+        <h3 id="headerText">
+            <h:outputText value="#{msgs.newTemplate}"
+                          styleClass="shortable"
+                          rendered="#{isCreateMode}"/>
+            <h:outputText value="#{msgs.duplicateTemplate}"
+                          styleClass="shortable"
+                          rendered="#{isDuplicateMode}"/>
+            <h:outputText value="#{msgs.editTemplate} (#{TemplateForm.template.title})"
+                          styleClass="shortable"
+                          rendered="#{isEditMode}"/>
+            <h:outputText value="#{msgs.viewTemplate} (#{TemplateForm.template.title})"
+                          styleClass="shortable"
+                          rendered="#{isViewMode}"/>
+        </h3>
+
+        <p:button id="cancel"
+                  value="#{isViewMode ? msgs.close : msgs.cancel}"
+                  outcome="#{'projects'}"
+                  onclick="setConfirmUnload(false);"
+                  icon="fa fa-times fa-lg"
+                  iconPos="right"
+                  styleClass="secondary"/>
+
+        <p:commandButton id="saveButtonToggler"
+                         actionListener="#{TemplateForm.setSaveDisabled(false)}"
+                         update="save"
+                         style="display:none;"/>
+
+        <p:commandButton id="save"
+                         widgetVar="save"
+                         value="#{msgs.save}"
+                         action="#{TemplateForm.save}"
+                         icon="fa fa-floppy-o fa-lg"
+                         iconPos="right"
+                         rendered="#{not isViewMode}"
+                         disabled="#{TemplateForm.saveDisabled}"
+                         onclick="setConfirmUnload(false);PF('notifications').renderMessage({'summary':'#{msgs.templateSaving}','detail':'#{msgs.youWillBeRedirected}','severity':'info'});"
+                         update="notifications"
+                         immediate="true"/>
+        
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="templateTabView" cache="false">
+            <p:tab title="#{msgs.templateDetails}" id="details">
+                <ui:include src="/WEB-INF/templates/includes/templateEdit/details.xhtml">
+                    <ui:param name="isViewMode" value="#{isViewMode}" />
+                </ui:include>
+            </p:tab>
+            <p:tab title="#{msgs.taskList}" id="taskOrder" rendered="#{not empty TemplateForm.template.title}">
+                <ui:include src="/WEB-INF/templates/includes/templateEdit/taskList.xhtml">
+                    <ui:param name="isCreateMode" value="#{isCreateMode}" />
+                    <ui:param name="isEditMode" value="#{isEditMode}" />
+                    <ui:param name="isDuplicateMode" value="#{isDuplicateMode}" />
+                    <ui:param name="isViewMode" value="#{isViewMode}" />
+                </ui:include>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.projects}" url="projects.jsf" icon="fa fa-archive"/>
+        <p:menuitem value="#{msgs.newTemplate}" rendered="#{isCreateMode}" icon="fa fa-inbox"/>
+        <p:menuitem value="#{msgs.duplicateTemplate}" rendered="#{isDuplicateMode}" icon="fa fa-inbox"/>
+        <p:menuitem value="#{msgs.editTemplate}" rendered="#{isEditMode}" icon="fa fa-inbox"/>
+        <p:menuitem value="#{msgs.viewTemplate}" rendered="#{isViewMode}" icon="fa fa-inbox"/>
+    </ui:define>
+
+</ui:composition>

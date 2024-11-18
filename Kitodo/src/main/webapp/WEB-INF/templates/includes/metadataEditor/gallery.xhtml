@@ -1,0 +1,298 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    <p:panel id="galleryWrapperPanel" styleClass="wrapperPanel">
+        <!--@elvariable id="readOnly" type="boolean"-->
+        <ui:param name="readOnly" value="#{SecurityAccessController.hasAuthorityToViewProcessStructureData() and not SecurityAccessController.hasAuthorityToEditProcessStructureData()}"/>
+
+        <!--@elvariable id="editImages" type="boolean"-->
+        <ui:param name="editImages" value="#{SecurityAccessController.hasAuthorityToEditProcessImages()}"/>
+
+        <h:form id="imagePreviewForm" style="height: 100%;" styleClass="focusable">
+
+            <p:remoteCommand
+                name="triggerOnPageDrop"
+                actionListener="#{DataEditorForm.galleryPanel.onPageDrop}"
+                update="@(.pageList)
+                        logicalTree
+                        physicalTree
+                        paginationForm:paginationWrapperPanel"/>
+
+            <p:remoteCommand name="sendGallerySelect"
+                             action="#{DataEditorForm.galleryPanel.select}"
+                             update="galleryHeadingWrapper
+                                     imagePreviewForm:mediaDetail
+                                     imagePreviewForm:stripeContextMenu
+                                     imagePreviewForm:mediaContextMenu
+                                     metadataAccordion:logicalMetadataWrapperPanel"/>
+            <p:remoteCommand name="setGalleryViewMode"
+                             action="#{DataEditorForm.galleryPanel.setGalleryViewMode}"
+                             update="imagePreviewForm galleryHeadingWrapper"
+                             oncomplete="metadataEditor.shortcuts.updateViews()"/>
+            <p:outputLabel id="galleryViewMode"
+                           value="#{DataEditorForm.galleryPanel.galleryViewMode}"
+                           style="display: none;"/>
+
+            <p:panelGrid id="imageControlPanel" columns="3"
+                         style="right: 47px; top: 0; position: absolute;">
+                <p:column>
+                    <p:commandButton id="listViewButton"
+                                     update="imagePreviewForm galleryHeadingWrapper"
+                                     icon="fa fa-list"
+                                     oncomplete="metadataEditor.shortcuts.updateViews();scrollToSelectedStructureThumbnail()"
+                                     title="#{msgs['dataEditor.galleryStructuredView']}"
+                                     styleClass="#{DataEditorForm.galleryPanel.galleryViewMode eq 'list' ? 'active' : 'inactive'}">
+                        <f:setPropertyActionListener value="list" target="#{DataEditorForm.galleryPanel.galleryViewMode}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column>
+                    <p:commandButton id="previewButton"
+                                     update="imagePreviewForm galleryHeadingWrapper"
+                                     icon="fa fa-file"
+                                     oncomplete="metadataEditor.shortcuts.updateViews();scrollToSelectedPreviewThumbnail();changeToMapView();metadataEditor.gallery.mediaView.update();"
+                                     title="#{msgs['dataEditor.galleryDetailView']}"
+                                     styleClass="#{DataEditorForm.galleryPanel.galleryViewMode eq 'preview' ? 'active' : 'inactive'}">
+                        <f:setPropertyActionListener value="preview" target="#{DataEditorForm.galleryPanel.galleryViewMode}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:panelGrid>
+
+            <!-- Pages in structured view -->
+            <ui:fragment rendered="#{DataEditorForm.galleryPanel.galleryViewMode eq 'list' and not empty DataEditorForm.galleryPanel.stripes}">
+                <p:fieldset id="structuredPagesField"
+                            a:onmousedown="metadataEditor.gallery.handleMouseDown(event)"
+                            a:onmouseup="metadataEditor.gallery.handleMouseUp(event)"
+                            a:ondragstart="metadataEditor.gallery.handleDragStart(event)">
+                    <!--@elvariable id="currentElement" type="org.kitodo.production.forms.dataeditor.GalleryStripe"-->
+                    <p:dataList id="structuredPages"
+                                var="stripe"
+                                value="#{DataEditorForm.galleryPanel.stripes}"
+                                type="definition"
+                                styleClass="pageList"
+                                binding="#{currentElement}">
+                        <!-- Index 0 of stripes is used to identify the logical root element. -->
+                        <p:outputLabel value="#{DataEditorForm.structurePanel.titleMetadata eq 'type' ? stripe.label : DataEditorForm.getStructureElementTitle(stripe.structure)}"
+                                       styleClass="stripe #{DataEditorForm.structurePanel.selectedLogicalNode.selected and DataEditorForm.isStripeSelected(stripe.getStructure()) ? 'selected' : ''}"
+                                       a:data-stripe="#{DataEditorForm.galleryPanel.stripes.indexOf(stripe)}"
+                                       a:data-logicalTreeNodeId="#{stripe.logicalTreeNodeId}"
+                                       rendered="#{DataEditorForm.galleryPanel.stripes.indexOf(stripe) ne 0}"/>
+                        <p:outputPanel>
+                            <!--@elvariable id="structuredThumbnail" type="org.kitodo.production.forms.dataeditor.GalleryMediaContent"-->
+                            <p:dataList styleClass="structureElementDataList"
+                                        itemStyleClass="media-position"
+                                        rendered="#{DataEditorForm.galleryPanel.stripes.indexOf(stripe) ne 0}"
+                                        id="structureElementDataList"
+                                        var="media"
+                                        emptyMessage="#{msgs['noMedia']}"
+                                        value="#{stripe.medias}"
+                                        binding="#{structuredThumbnail}">
+                                <p:panel id="structuredPageDropArea"
+                                         rendered="#{editImages}"
+                                         styleClass="page-drop-area"/>
+                                <p:panel id="structuredPagePanel" styleClass="draggableStructurePagePanel">
+                                    <ui:include
+                                            src="/WEB-INF/templates/includes/metadataEditor/partials/media-list.xhtml">
+                                        <ui:param name="uiParamStripeIndex"
+                                                  value="#{DataEditorForm.galleryPanel.stripes.indexOf(stripe)}"/>
+                                    </ui:include>
+                                </p:panel>
+                                <!-- add one last drop area after the last page in a stripe -->
+                                <ui:fragment rendered="#{editImages and stripe.medias.size() ne 0 and  stripe.medias.size() - 1 eq structuredThumbnail.rowIndex}">
+                                    <p:panel id="structuredPageLastDropArea"
+                                             styleClass="page-drop-area"/>
+                                </ui:fragment>
+                            </p:dataList>
+                        </p:outputPanel>
+                    </p:dataList>
+
+                    <!-- Unstructured media-->
+                    <p:outputPanel>
+                        <p:outputLabel value="#{msgs['dataEditor.unstructuredMedia']}"
+                                       styleClass="gallery-stripe-header stripe #{DataEditorForm.structurePanel.selectedLogicalNode.selected and DataEditorForm.isStripeSelected(DataEditorForm.galleryPanel.stripes.get(0).getStructure()) ? 'selected' : ''}"
+                                       a:data-stripe="0"
+                                       a:data-logicalTreeNodeId="#{DataEditorForm.galleryPanel.stripes.get(0).logicalTreeNodeId}"
+                                       />
+                        <h:panelGroup id="unstructuredMedia"
+                                      layout="block">
+                            <p:outputPanel>
+                                <!-- Index 0 of stripes is used to retrieve the logical root element. -->
+                                <!--@elvariable id="currentMedia" type="org.kitodo.production.forms.dataeditor.GalleryMediaContent"-->
+                                <p:dataList id="unstructuredMediaList"
+                                            styleClass="pageList"
+                                            itemStyleClass="media-position"
+                                            value="#{DataEditorForm.galleryPanel.stripes.get(0).medias}"
+                                            binding="#{currentMedia}"
+                                            emptyMessage="#{msgs['noMedia']}"
+                                            var="media">
+                                    <p:panel id="unstructuredPageDropArea"
+                                             rendered="#{editImages}"
+                                             styleClass="page-drop-area"/>
+                                    <p:panel id="unstructuredMediaPanel" styleClass="draggableUnstructuredMediaPanel">
+                                        <ui:include
+                                                src="/WEB-INF/templates/includes/metadataEditor/partials/media-list.xhtml">
+                                            <ui:param name="uiParamStripeIndex" value="0"/>
+                                        </ui:include>
+                                    </p:panel>
+                                    <!-- add one last drop area after the last page in a stripe -->
+                                    <ui:fragment rendered="#{editImages and DataEditorForm.galleryPanel.stripes.get(0).medias.size() ne 0 and DataEditorForm.galleryPanel.stripes.get(0).medias.size() - 1 eq currentMedia.rowIndex}">
+                                        <p:panel id="unstructuredPageLastDropArea"
+                                                 styleClass="page-drop-area"/>
+                                    </ui:fragment>
+                                </p:dataList>
+                            </p:outputPanel>
+                        </h:panelGroup>
+                    </p:outputPanel>
+
+                </p:fieldset>
+            </ui:fragment>
+
+            <!-- View current page with OpenLayers -->
+            <ui:fragment rendered="#{DataEditorForm.galleryPanel.galleryViewMode eq 'preview' and not empty DataEditorForm.galleryPanel.medias}">
+                <!-- OpenLayers Kitodo custom controls -->
+                <h:panelGroup id="mediaDetailContainer"
+                              layout="block"
+                              a:onmousedown="metadataEditor.gallery.handleMouseDown(event)"
+                              a:onmouseup="metadataEditor.gallery.handleMouseUp(event)">
+                    <ui:include src="/WEB-INF/templates/includes/metadataEditor/partials/media-detail.xhtml"/>
+                    <h:panelGroup layout="block" id="thumbnailStripe">
+                        <p:commandButton icon="fa fa-arrow-up fa-lg" id="scroll-up" styleClass="scroll-button scroll-up"/>
+                        <div id="thumbnailStripeScrollableContent">
+                            <h:panelGroup id="thumbnailWrapper"
+                                          layout="block">
+                                <ui:repeat value="#{DataEditorForm.galleryPanel.medias}"
+                                           var="media">
+                                    <ui:include
+                                            src="/WEB-INF/templates/includes/metadataEditor/partials/media-list.xhtml"/>
+                                </ui:repeat>
+                            </h:panelGroup>
+                        </div>
+                        <p:commandButton icon="fa fa-arrow-down fa-lg" id="scroll-down" styleClass="scroll-button"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </ui:fragment>
+            <p:button id="contextMenuHiddenTrigger"
+                      style="display:none;"/>
+            <p:contextMenu id="mediaContextMenu"
+                           widgetVar="mediaContextMenu"
+                           for="contextMenuHiddenTrigger">
+                <p:menuitem value="#{DataEditorForm.consecutivePagesSelected() ? msgs.addElement.concat(' ').concat(msgs.assignMedia) : msgs['dataEditor.removeElement.noConsecutivePagesSelected']}"
+                            icon="fa fa-plus fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly or not DataEditorForm.consecutivePagesSelected()}"
+                            action="#{DataEditorForm.addDocStrucTypeDialog.prepare}"
+                            oncomplete="PF('dialogAddDocStrucType').show()"
+                            update="dialogAddDocStrucTypeDialog">
+                    <f:actionListener binding="#{DataEditorForm.addDocStrucTypeDialog.preparePreselectedViews()}"/>
+                </p:menuitem>
+                <p:menuitem value="#{msgs.assignToNextElement}"
+                            icon="fa fa-link fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            rendered="#{DataEditorForm.structurePanel.assignableSeveralTimes and
+                            DataEditorForm.selectedMedia.size() eq 1}"
+                            action="#{DataEditorForm.structurePanel.assign}"
+                            process="@this"
+                            oncomplete="$('#loadingScreen').hide()"
+                            update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+                <p:menuitem value="#{msgs.unassign}"
+                            icon="fa fa-chain-broken fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            rendered="#{DataEditorForm.structurePanel.assignedSeveralTimes and DataEditorForm.selectedMedia.size() == 1}"
+                            action="#{DataEditorForm.structurePanel.unassign}"
+                            process="@this"
+                            oncomplete="$('#loadingScreen').hide()"
+                            update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+                <p:menuitem value="#{msgs.uploadMedia}"
+                            action="#{DataEditorForm.uploadFileDialog.prepare}"
+                            rendered="#{SecurityAccessController.hasAuthorityToUploadMedia() and DataEditorForm.isFolderConfigurationComplete()}"
+                            icon="fa fa-upload fa-sm"
+                            styleClass="plain"
+                            update = "uploadFileDialog"
+                            disabled="#{readOnly}"
+                            process="@this"/>
+                <p:menuitem value="#{msgs.removeElement}"
+                            rendered="#{SecurityAccessController.hasAuthorityToDeleteMedia()}"
+                            icon="fa fa-trash fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            onclick="$('#loadingScreen').show()"
+                            oncomplete="$('#loadingScreen').hide()"
+                            action="#{DataEditorForm.deletePhysicalDivision()}"
+                            process="@this"
+                            update="logicalTree
+                                physicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+            </p:contextMenu>
+            <p:contextMenu id="stripeContextMenu"
+                           widgetVar="stripeContextMenu"
+                           for="contextMenuHiddenTrigger">
+                <p:menuitem value="#{msgs.addElement}"
+                            icon="fa fa-plus fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            action="#{DataEditorForm.addDocStrucTypeDialog.prepare}"
+                            actionListener="#{DataEditorForm.addDocStrucTypeDialog.resetValues}"
+                            oncomplete="PF('dialogAddDocStrucType').show()"
+                            update="dialogAddDocStrucTypeDialog"/>
+                <p:menuitem value="#{msgs.changeDocstructType}"
+                            icon="fa fa-pencil fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            actionListener="#{DataEditorForm.changeDocStrucTypeDialog.prepare}"
+                            process="@this"
+                            oncomplete="PF('dialogEditDocStrucType').show()"
+                            update="dialogEditDocStrucTypeDialog"/>
+                <p:menuitem value="#{msgs.uploadMedia}"
+                            action="#{DataEditorForm.uploadFileDialog.prepare}"
+                            rendered="#{SecurityAccessController.hasAuthorityToUploadMedia() and DataEditorForm.isFolderConfigurationComplete()}"
+                            icon="fa fa-upload fa-sm"
+                            styleClass="plain"
+                            update = "uploadFileDialog"
+                            disabled="#{readOnly}"
+                            process="@this"/>
+                <p:menuitem value="#{msgs.removeElement}"
+                            icon="fa fa-trash fa-sm"
+                            styleClass="plain"
+                            disabled="#{readOnly}"
+                            action="#{DataEditorForm.deleteStructure()}"
+                            onclick="$('#loadingScreen').show()"
+                            oncomplete="$('#loadingScreen').hide()"
+                            update="logicalTree
+                                    paginationForm:paginationWrapperPanel
+                                    metadataAccordion:logicalMetadataWrapperPanel
+                                    galleryWrapperPanel"/>
+            </p:contextMenu>
+        </h:form>
+        <h:outputStylesheet name="webjars/openlayers/5.2.0/ol.css"/>
+        <h:outputScript library="webjars" name="openlayers/5.2.0/ol.js" />
+        <h:outputScript name="js/ol_custom.js"/>
+        <h:outputScript name="js/metadataeditor_gallery_drag_drop.js" rendered="#{editImages}" />
+    </p:panel>
+</ui:composition>

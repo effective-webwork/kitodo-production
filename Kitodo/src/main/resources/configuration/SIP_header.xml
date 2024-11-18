@@ -1,0 +1,92 @@
+<ordner>
+    <name>header</name>
+    <originalName>header</originalName>
+    <ordner>
+        <name>xsd</name>
+        <originalName>xsd</originalName>
+        <datei id="_WdZYYExZEei3oJZosTYjHw">
+            <name>ablieferung.xsd</name>
+            <originalName>ablieferung.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>aa1f7ad13064e1643ac85478296165af</pruefsumme>
+        </datei>
+        <datei id="_Wdb0oExZEei3oJZosTYjHw">
+            <name>archivischeNotiz.xsd</name>
+            <originalName>archivischeNotiz.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>847911efbac472d0ecc6fe1e99873799</pruefsumme>
+        </datei>
+        <datei id="_Wde38ExZEei3oJZosTYjHw">
+            <name>archivischerVorgang.xsd</name>
+            <originalName>archivischerVorgang.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>4a237563fd2d40be9a9ecbf4c0bf946e</pruefsumme>
+        </datei>
+        <datei id="_WdhUMExZEei3oJZosTYjHw">
+            <name>arelda.xsd</name>
+            <originalName>arelda.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>f8454632e1ebf97e0aa8d9527ce2641f</pruefsumme>
+        </datei>
+        <datei id="_WdiiUExZEei3oJZosTYjHw">
+            <name>base.xsd</name>
+            <originalName>base.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>cb30854883c6d5640b0965dae5f34afd</pruefsumme>
+        </datei>
+        <datei id="_WdjwcExZEei3oJZosTYjHw">
+            <name>datei.xsd</name>
+            <originalName>datei.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>a4276f0c798ce6c497f0a03660ead0d9</pruefsumme>
+        </datei>
+        <datei id="_WdlloExZEei3oJZosTYjHw">
+            <name>dokument.xsd</name>
+            <originalName>dokument.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>721965e5224766040bf0bcd03978809e</pruefsumme>
+        </datei>
+        <datei id="_Wdna0ExZEei3oJZosTYjHw">
+            <name>dossier.xsd</name>
+            <originalName>dossier.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>f3f1141d95e92a291e84cfb30bb30e9a</pruefsumme>
+        </datei>
+        <datei id="_Wdoo8ExZEei3oJZosTYjHw">
+            <name>ordner.xsd</name>
+            <originalName>ordner.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>83e0f91d1a232c7bdd7416970844af1c</pruefsumme>
+        </datei>
+        <datei id="_WdqeIExZEei3oJZosTYjHw">
+            <name>ordnungssystem.xsd</name>
+            <originalName>ordnungssystem.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>4b64247b25362382d6c648ba8ff76ad6</pruefsumme>
+        </datei>
+        <datei id="_WdrsQExZEei3oJZosTYjHw">
+            <name>ordnungssystemposition.xsd</name>
+            <originalName>ordnungssystemposition.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>1e7f0a9b914c8baf1235740b133ec90e</pruefsumme>
+        </datei>
+        <datei id="_Wds6YExZEei3oJZosTYjHw">
+            <name>paket.xsd</name>
+            <originalName>paket.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>9920c66b7066f645390e922ba803aadb</pruefsumme>
+        </datei>
+        <datei id="_WduIgExZEei3oJZosTYjHw">
+            <name>provenienz.xsd</name>
+            <originalName>provenienz.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>2d6dbc4665cb5169d62549dbbc3f19a7</pruefsumme>
+        </datei>
+        <datei id="_Wdv9sExZEei3oJZosTYjHw">
+            <name>zusatzDaten.xsd</name>
+            <originalName>zusatzDaten.xsd</originalName>
+            <pruefalgorithmus>MD5</pruefalgorithmus>
+            <pruefsumme>a685887b7ad673ea2deac6f96cf3fb4f</pruefsumme>
+        </datei>
+    </ordner>
+</ordner>

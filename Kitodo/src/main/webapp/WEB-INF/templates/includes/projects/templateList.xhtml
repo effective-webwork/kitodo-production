@@ -1,0 +1,228 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:o="http://omnifaces.org/ui"
+        xmlns:p="http://primefaces.org/ui">
+    <!--@elvariable id="item" type="org.kitodo.production.dto.TemplateDTO"-->
+    <p:dataTable id="templateTable"
+                 widgetVar="templateTable"
+                 styleClass="default-layout"
+                 var="item"
+                 value="#{TemplateForm.lazyDTOModel}"
+                 first="#{TemplateForm.firstRow}"
+                 lazy="true"
+                 paginator="true"
+                 resizableColumns="true"
+                 liveResize="true"
+                 sortBy="#{item.title.keyword}"
+                 rows="#{LoginForm.loggedUser.tableSize}"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
+                 currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
+                 paginatorPosition="bottom">
+
+        <p:ajax event="page"
+                listener="#{TemplateForm.onPageChange}"/>
+        <p:ajax event="rowToggle"
+                oncomplete="registerRowToggleEvents();" />
+
+        <p:column style="width: 20px;"
+                  resizable="false"
+                  rendered="#{SecurityAccessController.hasAuthorityForClient('viewTemplate')}">
+            <p:rowToggler/>
+        </p:column>
+
+        <p:column id="titleColumn"
+                  headerText="#{msgs.title}"
+                  sortBy="#{item.title.keyword}"
+                  rendered="#{ProjectForm.showColumn('template.title')}">
+            <h:outputText value="#{item.title}"
+                          title="#{item.title}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs.ruleset}"
+                  sortBy="#{item.ruleset.title.keyword}"
+                  rendered="#{ProjectForm.showColumn('template.ruleset')}">
+            <h:outputText value="#{item.ruleset.title}"
+                          title="#{item.ruleset.title}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs.active}"
+                  styleClass="checkboxColumn"
+                  sortBy="#{item.active}">
+            <h:outputText>
+                <ui:fragment rendered="#{item.isActive()}">
+                    <i class="fa fa-check-square-o fa-lg checkbox-checked"/>
+                </ui:fragment>
+                <ui:fragment rendered="#{not item.isActive()}">
+                    <i class="fa fa-minus-square-o fa-lg checkbox-unchecked"/>
+                </ui:fragment>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="#{msgs.actions}"
+                  resizable="false"
+                  width="115"
+                  styleClass="actionsColumn">
+            <h:outputText>
+                <h:form id="templateActionForm">
+
+                    <h:panelGroup styleClass="action"
+                                  title="#{item.isActive() and item.projects.size() gt 0 ? msgs['createNewProcess'] : msgs['noProjectsConfigured']}">
+                        <p:commandLink id="createProcessFromTemplate"
+                                       actionListener="#{SelectProjectDialogView.setTemplateDTO(item)}"
+                                       action="#{SelectProjectDialogView.createProcessFromTemplate()}"
+                                       disabled="#{item.projects.size() lt 1 or not item.active}"
+                                       rendered="#{SecurityAccessController.hasAuthorityToAddProcess()}">
+                            <f:setPropertyActionListener value="0" target="#{SelectProjectDialogView.selectedProjectId}"/>
+                            <h:outputText><i class="fa fa-plus-square fa-lg"/></h:outputText>
+                        </p:commandLink>
+                    </h:panelGroup>
+
+                    <h:link id="viewTemplate"
+                            outcome="templateEdit"
+                            styleClass="action"
+                            title="#{msgs.view}"
+                            rendered="#{TemplateForm.isTemplateUsed(item.id) or (SecurityAccessController.hasAuthorityToViewTemplate() and not SecurityAccessController.hasAuthorityToEditTemplate())}">
+                        <h:outputText><i class="fa fa-eye fa-lg"/></h:outputText>
+                        <f:param name="id" value="#{item.id}"/>
+                    </h:link>
+
+                    <h:link id="editTemplate"
+                            outcome="templateEdit"
+                            styleClass="action"
+                            title="#{msgs.edit}"
+                            rendered="#{not TemplateForm.isTemplateUsed(item.id) and SecurityAccessController.hasAuthorityToEditTemplate()}">
+                        <h:outputText><i class="fa fa-pencil-square-o fa-lg"/></h:outputText>
+                        <f:param name="id" value="#{item.id}"/>
+                    </h:link>
+
+                    <h:commandLink action="#{TemplateForm.duplicate(item.id)}"
+                                   immediate="true"
+                                   styleClass="action"
+                                   title="#{msgs.duplicateTemplate}"
+                                   rendered="#{SecurityAccessController.hasAuthorityToAddTemplate()}">
+                        <h:outputText><i class="fa fa-clone fa-lg"/></h:outputText>
+                    </h:commandLink>
+
+                    <h:panelGroup styleClass="action"
+                                  title="#{TemplateForm.isTemplateUsed(item.id) ? msgs.cannotDeleteTemplate : msgs.delete}">
+                        <p:commandLink id="deleteTemplate"
+                                       action="#{TemplateForm.delete}"
+                                       disabled="#{TemplateForm.isTemplateUsed(item.id)}"
+                                       title="#{msgs.delete}"
+                                       rendered="#{SecurityAccessController.hasAuthorityToDeleteTemplate()}"
+                                       update="templateTable">
+                            <h:outputText><i class="fa fa-trash-o"/></h:outputText>
+                            <f:setPropertyActionListener value="#{item.id}" target="#{TemplateForm.templateById}"/>
+                            <p:confirm header="#{msgs.confirmDelete}"
+                                       message="#{TemplateForm.formatString('confirmDeleteTemplate', item.title)}"
+                                       icon="ui-icon-alert"/>
+                        </p:commandLink>
+                    </h:panelGroup>
+                </h:form>
+            </h:outputText>
+        </p:column>
+
+        <p:rowExpansion styleClass="expansion-class">
+            <div class="row-expansion-wrapper">
+                <p:panelGrid id="templateRowExpansionTable"
+                             columns="2">
+                    <p:panelGrid id="templateDetailTable"
+                                 styleClass="expansion-column"
+                                 columns="2"
+                                 columnClasses="label, value">
+                        <h:outputText value="#{msgs.workflow}:"/>
+                        <h:outputText title="#{item.workflow.title}"
+                                      value="#{item.workflow.title}"/>
+
+                        <h:outputText value="#{msgs.docket}:"/>
+                        <h:outputText title="#{item.docket.title}"
+                                      value="#{item.docket.title}"/>
+
+                        <h:outputText value="#{msgs.ruleset}:"/>
+                        <h:outputText title="#{item.ruleset.title}"
+                                      value="#{item.ruleset.title}"/>
+                    </p:panelGrid>
+
+                    <p:panelGrid id="templateProjectsTable"
+                                 styleClass="expansion-column"
+                                 columns="2"
+                                 columnClasses="label, value">
+                        <h:outputText value="#{msgs.projects}:"/>
+                        <h:form id="createProcessForm">
+                            <p:panelGrid id="templateActionDetailTable"
+                                         columns="2"
+                                         columnClasses="label, actionsColumn">
+                                <p:repeat id="projects"
+                                          value="#{item.projects}"
+                                          var="project">
+                                    <div class="project-template-action">
+                                        <h:outputText value="#{project.title}"
+                                                      title="#{project.title}"
+                                                      styleClass="expansion-list-item-title"/>
+                                        <h:panelGroup class="expansion-list-item-actions">
+                                            <h:outputText rendered="#{SecurityAccessController.hasAuthorityToAddProcess() and item.isActive()}">
+                                                <h:link id="createProcess"
+                                                        outcome="/pages/processFromTemplate?faces-redirect=true"
+                                                        styleClass="action"
+                                                        title="#{item.canBeUsedForProcess?msgs.createProcessFromTemplate:msgs.templateNotAvailableForProcess}">
+                                                    <f:param name="templateId" value="#{item.id}"/>
+                                                    <f:param name="projectId" value="#{project.id}"/>
+                                                    <f:param name="referrer" value="#{'projects'}"/>
+                                                    <h:outputText><i class="fa fa-inbox fa-lg"/></h:outputText>
+                                                </h:link>
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                    </div>
+                                </p:repeat>
+                            </p:panelGrid>
+                        </h:form>
+                    </p:panelGrid>
+                </p:panelGrid>
+
+                <o:graphicImage title="#{item.workflow.title}"
+                                styleClass="workflow-diagram"
+                                rendered="#{item.workflow ne null}"
+                                value="#{item.diagramImage}"
+                                dataURI="true" />
+            </div>
+        </p:rowExpansion>
+
+    </p:dataTable>
+
+    <div id="dropDownMenus">
+        <h:form id="filterForm"
+                styleClass="filter-form"
+                style="display: inline-block;">
+            <p:selectCheckboxMenu id="templateFilters"
+                                  panelStyleClass="filter-panel"
+                                  value="#{TemplateForm.selectedTemplateFilters}"
+                                  styleClass="secondary"
+                                  label="#{msgs.filter}">
+                <f:selectItems value="#{TemplateForm.templateFilters}"
+                               var="templateFilter"
+                               itemLabel="#{msgs[templateFilter]}"/>
+                <p:ajax event="change"
+                        onstart="PF('templateTable').getPaginator().setPage(0);"
+                        listener="#{TemplateForm.templateFiltersChanged}"
+                        update="templateTable"/>
+            </p:selectCheckboxMenu>
+        </h:form>
+    </div>
+
+    <ui:include src="/WEB-INF/templates/includes/processFromTemplate/dialogs/selectProject.xhtml"/>
+</ui:composition>

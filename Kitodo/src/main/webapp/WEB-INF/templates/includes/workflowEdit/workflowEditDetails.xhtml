@@ -1,0 +1,107 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <!--@elvariable id="isViewMode" type="boolean"-->
+
+    <h:outputStylesheet name="css/modeler.css"/>
+    <!-- The modeler_custom.js has to be included first because it declares global variables that are used in the editor.-->
+    <h:outputScript library="js" name="modeler_custom.js" target="body"/>
+    <h:outputScript library="js" name="modeler_min.js" target="body"/>
+
+    <p:panelGrid columns="3" layout="grid" id="workflowEditorHeader">
+        <p:row>
+            <p:outputLabel for="xmlDiagramName" value="#{msgs.title}"/>
+            <p:inputText id="xmlDiagramName" placeholder="#{msgs.title}" class="input"
+                         value="#{WorkflowForm.workflow.title}" required="#{not empty param['editForm:save']}" disabled="#{isViewMode}"/>
+            <div class="workflow-editor-hidden">
+                <h:inputHidden value="#{WorkflowForm.xmlDiagram}" id="xmlDiagram"/>
+                <h:inputHidden value="#{WorkflowForm.language}" id="editor_language"/>
+                <p:selectOneMenu id="roleId" value="#{WorkflowForm.roleId}">
+                    <f:selectItems value="#{WorkflowForm.roles}"/>
+                </p:selectOneMenu>
+                <p:commandButton id="btnReadXmlDiagram" value="Read XML diagram"
+                                 action="#{WorkflowForm.readXMLDiagram}"
+                                 rendered="#{WorkflowForm.workflow.title ne null}" immediate="true"/>
+            </div>
+        </p:row>
+        <p:row>
+            <p:outputLabel for="status" value="#{msgs.status}"/>
+            <p:selectOneMenu id="status" value="#{WorkflowForm.workflowStatus}" class="input" disabled="#{isViewMode}">
+                <p:ajax event="change" update="@this" />
+                <f:selectItems value="#{WorkflowForm.workflowStatuses}"
+                               var="status"
+                               itemValue="#{status}"
+                               itemLabel="#{msgs[status]}"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row>
+            <p:outputLabel for="separateStructure" value="#{msgs.separateStructure}"/>
+            <p:selectBooleanCheckbox id="separateStructure"
+                                     disabled="#{isViewMode}"
+                                     styleClass="switch input"
+                                     title="#{msgs.separateStructureCheckboxTooltip}"
+                                     value="#{WorkflowForm.workflow.separateStructure}">
+            </p:selectBooleanCheckbox>
+        </p:row>
+    </p:panelGrid>
+
+    <p:panel id="workflowEditorWrapper">
+        <div class="content" id="js-drop-zone">
+
+            <div class="message intro">
+                <div class="note">
+                    Drop BPMN diagram from your desktop or <h:link
+                        id="js-create-diagram">create a new diagram</h:link> to get started.
+                </div>
+            </div>
+
+            <div class="message error">
+                <div class="note">
+                    <p>Ooops, we could not display the BPMN 2.0 diagram.</p>
+
+                    <div class="details">
+                        <span>cause of the problem</span>
+                        <pre></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas" id="js-canvas"></div>
+            <div class="properties-panel-parent" id="js-properties-panel"></div>
+            <div class="modeler-zoom-controls">
+              <ul>
+                <li>
+                  <button title="Zoom Plus" jsaction="click:modeler.zoomIn">
+                    #{msgs['modeler.controls.zoomplus']}
+                  </button>
+                   <button title="Zoom Minus" jsaction="click:modeler.zoomOut">
+                    #{msgs['modeler.controls.zoomminus']}
+                  </button>
+                  <button title="Zoom Reset" jsaction="click:modeler.zoomReset">
+                    #{msgs['modeler.controls.zoomreset']}
+                  </button>
+                   <button title="Toggle Fullscreen" jsaction="click:modeler.toggleFullscreen">
+                    #{msgs['modeler.controls.zoomfullscreen']}
+                  </button>
+                </li>
+              </ul>
+            </div>
+        </div>
+    </p:panel>
+</ui:composition>

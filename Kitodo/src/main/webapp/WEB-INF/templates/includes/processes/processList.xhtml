@@ -1,0 +1,422 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+        xmlns:p="http://primefaces.org/ui">
+    <h:form id="processesForm">
+        <!--@elvariable id="process" type="org.kitodo.production.dto.ProcessDTO"-->
+        <p:dataTable id="processesTable"
+                     widgetVar="processesTable"
+                     styleClass="default-layout allSelectable"
+                     var="process"
+                     value="#{ProcessForm.lazyDTOModel}"
+                     first="#{ProcessForm.firstRow}"
+                     selection="#{ProcessForm.selectedProcessesOrProcessDTOs}"
+                     lazy="true"
+                     paginator="true"
+                     resizableColumns="true"
+                     rowSelectMode="checkbox"
+                     liveResize="true"
+                     sortBy="#{process.id}"
+                     rowStyleClass="#{ProcessForm.getExternalStatus(process.id)}"
+                     sortOrder="ascending"
+                     rows="#{LoginForm.loggedUser.tableSize}"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
+                     currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
+                     paginatorPosition="bottom"
+                     multiViewState="true">
+
+
+            <p:ajax event="page"
+                    listener="#{ProcessForm.onPageChange}"/>
+            <p:ajax event="rowToggle"
+                    oncomplete="registerRowToggleEvents();"/>
+            <p:ajax event="rowSelectCheckbox"
+                    listener="#{ProcessForm.onRowSelect}"/>
+            <p:ajax event="rowUnselectCheckbox"
+                    listener="#{ProcessForm.onRowUnselect}"/>
+            <p:ajax event="toggleSelect"
+                    listener="#{ProcessForm.selectAll}"/>
+
+            <p:column id="selectionColumn" styleClass="checkboxListColumn" selectionMode="multiple" resizable="false"/>
+
+            <p:column styleClass="hierarchy-info">
+                <p:rowToggler rendered="#{process.getParentID() ne 0 or process.hasChildren() or ProcessForm.getCurrentTasksForUser(process).size() gt 0}"/>
+                <h:outputText rendered="#{process.getParentID() ne 0 and not process.hasChildren()}"><i class="fa fa-long-arrow-left" title="#{msgs.hierarchicalParents}"/></h:outputText>
+                <h:outputText rendered="#{process.getParentID() eq 0 and process.hasChildren()}"><i class="fa fa-long-arrow-right" title="#{msgs.hierarchicalChildren}"/></h:outputText>
+                <h:outputText rendered="#{process.getParentID() ne 0 and process.hasChildren()}"><i class="fa fa-exchange fa-rotate-90" title="#{msgs.hierarchicalBoth}"/></h:outputText>
+            </p:column>
+            <p:column id="idColumn"
+                      width="95"
+                      styleClass="numeric"
+                      resizable="false"
+                      headerText="Kitodo-ID"
+                      sortBy="#{process.id}">
+                <h:outputText value="#{process.id}"
+                              title="#{process.id}"/>
+            </p:column>
+            <p:column id="titleColumn"
+                      headerText="#{msgs.title}"
+                      sortBy="#{process.title.keyword}"
+                      rendered="#{ProcessForm.showColumn('process.title')}">
+                <h:outputText><i class="fa fa-exclamation-triangle" title="#{msgs.externalDigitizationOverdue}"/></h:outputText>
+                <h:outputText value="#{process.title}"
+                              title="#{process.title}"/>
+            </p:column>
+            <p:column id="containerColumn"
+                      headerText="#{msgs.containers}"
+                      width="100">
+                <h:outputText value="#{ProcessForm.getProcessContainers(process).size()}"
+                              title="#{ProcessForm.formatProcessContainers(ProcessForm.getProcessContainers(process))}"/>
+            </p:column>
+
+            <p:column id="priorityColumn"
+                      headerText="#{msgs.priority}"
+                      styleClass="amount"
+                      sortBy="#{process.priority}">
+                <h:outputText value="#{msgs[process.priority.priorityString]}"
+                              title="#{msgs[process.priority.priorityString]}"/>
+            </p:column>
+
+            <p:column id="progressColumn"
+                      styleClass="progressColumn genericSortIcon"
+                      headerText="#{msgs.status}"
+                      sortBy="#{process.progressCombined}"
+                      rendered="#{ProcessForm.showColumn('process.state')}">
+                <ui:include src="/WEB-INF/templates/includes/processes/progressColumn.xhtml"/>
+            </p:column>
+
+            <p:column id="lastTaskHandledByColumn"
+                      headerText="#{msgs.lastEditingUser}"
+                      sortBy="#{process.lastEditingUser}"
+                      rendered="#{ProcessForm.showColumn('process.lastEditingUser')}">
+                <h:outputText value="#{process.lastEditingUser}"
+                              title="#{process.lastEditingUser}"/>
+            </p:column>
+            <p:column id="lastTaskProcessingBeginColumn"
+                      headerText="#{msgs.processingBeginLastTask}"
+                      styleClass="numeric"
+                      sortBy="#{process.processingBeginLastTask}"
+                      rendered="#{ProcessForm.showColumn('process.processingBeginLastTask')}">
+                <h:outputText value="#{ProcessForm.convertProcessingDate(process.processingBeginLastTask)}"
+                              title="#{ProcessForm.convertProcessingDate(process.processingBeginLastTask)}"/>
+            </p:column>
+            <p:column id="lastTaskProcessingEndColumn"
+                      headerText="#{msgs.processingEndLastTask}"
+                      styleClass="numeric"
+                      sortBy="#{process.processingEndLastTask}"
+                      rendered="#{ProcessForm.showColumn('process.processingEndLastTask')}">
+                <h:outputText value="#{ProcessForm.convertProcessingDate(process.processingEndLastTask)}"
+                              title="#{ProcessForm.convertProcessingDate(process.processingEndLastTask)}"/>
+            </p:column>
+
+            <p:column styleClass="comment-column genericSortIcon"
+                      width="85"
+                      sortBy="#{process.correctionCommentStatus}"
+                      rendered="#{ProcessForm.showColumn('process.comments')}"
+                      headerText="#{msgs.comments}">
+                <h:panelGroup id="commentIcon">
+                    <h:panelGroup styleClass="fa
+                        #{process.correctionCommentStatus gt 0 ? 'fa-exclamation-circle correction' : 'fa-comment'}
+                        #{process.correctionCommentStatus eq 1 ? 'corrected' : ''}"
+                                  rendered="#{process.hasComments()}"/>
+                    <h:outputText value="#{commentTooltipView.getLastComment(process)}"
+                                  rendered="#{ProcessForm.showLastComment() and process.hasComments()}"/>
+                </h:panelGroup>
+                <p:tooltip for="commentIcon" styleClass="comments" trackMouse="true" rendered="#{process.hasComments()}">
+                    <ui:include src="/WEB-INF/templates/includes/base/commentTooltip.xhtml">
+                        <ui:param name="comments" value="#{commentTooltipView.getComments(process)}"/>
+                    </ui:include>
+                </p:tooltip>
+            </p:column>
+
+            <p:column headerText="#{msgs.project}"
+                      sortBy="#{process.project.title.keyword}"
+                      rendered="#{ProcessForm.showColumn('process.project')}">
+                <h:outputText value="#{process.project.title}"
+                              title="#{process.project.title}"/>
+            </p:column>
+            <p:column headerText="#{msgs.duration}"
+                      sortBy="#{process.creationDate}"
+                      styleClass="numeric"
+                      rendered="#{ProcessForm.showColumn('process.duration')}">
+                <h:outputText value="#{ProcessForm.getProcessDuration(process)}"
+                              title="#{ProcessForm.getProcessDuration(process)}"/>
+            </p:column>
+            <p:column headerText="#{msgs.requestedDate}"
+                      rendered="#{ProcessForm.showColumn('process.requestedDate')}">
+                <h:outputText value="#{ProcessForm.getDateRequested(process)}"/>
+            </p:column>
+            <p:column headerText="#{msgs.retrievedDate}"
+                      rendered="#{ProcessForm.showColumn('process.retrievedDate')}">
+                <h:outputText value="#{ProcessForm.getDateRetrieved(process)}"/>
+            </p:column>
+            <p:column headerText="#{msgs.timeSinceRetrieved}"
+                      rendered="#{ProcessForm.showColumn('process.timeSinceRetrieved')}">
+                <h:outputText value="#{ProcessForm.getTimeSinceRetrieved(process)}"/>
+            </p:column>
+            <!-- columns for process properties that have been configured in kitodo config file! -->
+            <p:columns value="#{ProcessForm.getProcessPropertyNames()}"
+                       var="propertyName"
+                       headerText="#{fn:replace(propertyName, 'process.', '')}"
+                       rendered="#{ProcessForm.showColumn(propertyName)}">
+                <h:outputText value="#{ProcessForm.getPropertyValue(process, fn:replace(propertyName, 'process.', ''))}"
+                              title="#{ProcessForm.getPropertyValue(process, fn:replace(propertyName, 'process.', ''))}"/>
+            </p:columns>
+
+            <ui:include src="/WEB-INF/templates/includes/processes/processActionsColumn.xhtml">
+                <ui:param name="ProcessListView" value="#{ProcessForm}"/>
+                <ui:param name="referer" value="processes"/>
+            </ui:include>
+
+            <p:rowExpansion styleClass="expansion-class">
+                <div class="row-expansion-wrapper">
+                    <p:panelGrid id="processRowExpansionTable"
+                                 columns="2">
+                        <p:panelGrid id="processParentTable"
+                                     styleClass="expansion-column"
+                                     columns="2"
+                                     columnClasses="label, value">
+                            <h:outputText value="#{msgs.hierarchicalParents}:"/>
+                            <p:dataTable var="parent"
+                                         value="#{ProcessForm.getAllParentProcesses(process.id)}"
+                                         rendered="#{process.getParentID() ne 0}">
+                                <p:column>
+                                    <h:outputText value="#{parent.getTitle()}"
+                                                  title="#{parent.getTitle()}"/>
+                                    <p:commandLink value="#{msgs.show}"
+                                                   action="#{ProcessForm.changeFilter('id:'.concat(parent.getId()))}"/>
+                                </p:column>
+                                <p:column styleClass="actionsColumn">
+                                    <h:link outcome="processEdit"
+                                            styleClass="action"
+                                            title="#{msgs.view}"
+                                            rendered="#{SecurityAccessController.hasAuthorityToViewProcess() and not SecurityAccessController.hasAuthorityToEditProcess()}">
+                                        <i class="fa fa-eye fa-lg"/>
+                                        <f:param name="referer" value="processes"/>
+                                        <f:param name="id" value="#{parent.id}"/>
+                                    </h:link>
+                                    <h:link outcome="processEdit"
+                                            styleClass="action"
+                                            title="#{msgs.edit}"
+                                            rendered="#{SecurityAccessController.hasAuthorityToEditProcess()}">
+                                        <i class="fa fa-pencil-square-o fa-lg"/>
+                                        <f:param name="referer" value="processes"/>
+                                        <f:param name="id" value="#{parent.id}"/>
+                                    </h:link>
+                                    <h:panelGroup styleClass="action"
+                                                  title="#{MetadataLock.isLocked(parent.id) ? msgs['blocked'].concat(MetadataLock.getLockUser(parent.id).fullName) : msgs['metadataEdit']}">
+                                        <h:link id="editMetadata"
+                                                outcome="metadataEditor"
+                                                disabled="#{MetadataLock.isLocked(parent.id)}"
+                                                styleClass="#{MetadataLock.isLocked(parent.id) ? 'ui-state-disabled' : ''}"
+                                                rendered="#{SecurityAccessController.hasAuthorityToOpenMetadataEditor()}">
+                                            <h:outputText><i class="fa fa-list-alt fa-lg"/></h:outputText>
+                                            <f:param name="id" value="#{parent.id}"/>
+                                            <f:param name="referer" value="processes"/>
+                                        </h:link>
+                                    </h:panelGroup>
+                                </p:column>
+                            </p:dataTable>
+                            <h:outputText value="#{msgs.none}" rendered="#{process.getParentID() eq 0}"/>
+                        </p:panelGrid>
+                        <p:panelGrid id="processChildrenTable"
+                                     styleClass="expansion-column"
+                                     columns="2"
+                                     columnClasses="label, value">
+                            <h:outputText value="#{msgs.hierarchicalChildren}:"/>
+                            <h:panelGroup>
+                                <h:outputText value="#{ProcessForm.getNumberOfChildProcesses(process.getId())} " rendered="#{process.hasChildren()}"/>
+                                <p:commandLink value="#{msgs.show}"
+                                               action="#{ProcessForm.changeFilter('parentprocessid:'.concat(process.getId()))}"
+                                               rendered="#{process.hasChildren()}"/>
+                                <h:outputText value=" #{msgs.none}" rendered="#{not process.hasChildren()}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:panelGrid>
+                    <p:panel header="#{msgs.tasks}:" rendered="#{ProcessForm.getCurrentTasksForUser(process).size() gt 0}">
+                        <p:dataList value="#{ProcessForm.getCurrentTasksForUser(process)}" var="task">
+                            <h:outputText value="#{task.title}"/>
+                                <!-- assign task -->
+                                <h:commandLink id="take"
+                                               action="#{CurrentTaskForm.takeOverTask}"
+                                               styleClass="action"
+                                               rendered="#{(task.processingStatus == 'OPEN' and !task.batchStep) || (task.processingStatus == 'OPEN' and task.batchStep and !task.batchAvailable)}"
+                                               title="#{msgs.selfAssignTask}">
+                                    <h:outputText><i class="fa fa-bell-o"/></h:outputText>
+                                    <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
+                                </h:commandLink>
+                                <!-- already assigned task (this user) -->
+                                <h:commandLink id="editOwnTask"
+                                               action="#{CurrentTaskForm.editTask}"
+                                               styleClass="action"
+                                               rendered="#{(task.processingStatus == 'INWORK' and task.processingUser.id == LoginForm.loggedUser.id and !task.batchStep) || (task.processingStatus == 'INWORK' and task.processingUser.id == LoginForm.loggedUser.id and task.batchStep and !task.batchAvailable)}"
+                                               title="#{msgs.assignedTo}: #{task.processingUser!=null and task.processingUser.id!=0 ? task.processingUser.fullName:''}">
+                                    <h:outputText><i class="fa fa-bell"/></h:outputText>
+                                    <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
+                                </h:commandLink>
+                                <!-- already assigned task (different user) -->
+                                <h:commandLink id="editOtherTask"
+                                               action="#{CurrentTaskForm.editTask}"
+                                               styleClass="action"
+                                               rendered="#{task.processingStatus == 'INWORK' and task.processingUser.id != LoginForm.loggedUser.id and (!task.batchStep || !task.batchAvailable)}"
+                                               title="#{msgs.assignedTo}: #{(task.processingUser!=null and task.processingUser.id!=0 ? task.processingUser.fullName : '')}">
+                                    <h:outputText><i class="fa fa-bell-slash"/></h:outputText>
+                                    <f:setPropertyActionListener value="#{task.id}" target="#{CurrentTaskForm.taskById}"/>
+                                </h:commandLink>
+                        </p:dataList>
+                    </p:panel>
+                </div>
+            </p:rowExpansion>
+
+        </p:dataTable>
+
+        <p:overlayPanel id="allSelectableOverlayPanel" widgetVar="allSelectableOverlayPanel" dismissable="true" styleClass="allSelectableOverlayPanel" >
+            <ul>
+                <li><p:commandLink id="selectAllRowsOnPage" value="#{msgs.selectAllRowsOnPage}" onclick="PF('processesTable').unselectAllRows();PF('processesTable').selectAllRowsOnPage();PF('allSelectableOverlayPanel').hide();"/></li>
+                <li><p:commandLink id="selectAllRows" value="#{msgs.selectAllRows}" actionListener="#{ProcessForm.setAllSelected(true)}" onclick="PF('processesTable').selectAllRows();PF('allSelectableOverlayPanel').hide();"/></li>
+            </ul>
+        </p:overlayPanel>
+
+        <ul style="display: none" id="excludedProcessIds">
+            <p:repeat value="#{ProcessForm.excludedProcessIds}" var="processId">
+                <li>#{processId}</li>
+            </p:repeat>
+        </ul>
+
+        <div id="dropDownMenus">
+            <p:commandButton id="actionsButton" value="#{msgs.actions}" styleClass="secondary"
+                             icon="fa fa-sort" iconPos="right" process="@this"/>
+            <p:menu overlay="true" trigger="processesTabView:processesForm:actionsButton" my="left bottom" at="left top">
+                    <p:menuitem id="processingStatusUpSelection"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditTask()}"
+                                value="#{msgs.processingStatusUp}"
+                                action="#{ProcessForm.setTaskStatusUpForSelection}"
+                                update="processesTabView:processesForm:processesTable,processCount"
+                                icon="fa fa-arrow-circle-o-up"/>
+                    <p:menuitem id="processingStatusDownSelection"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditTask()}"
+                                value="#{msgs.processingStatusDown}"
+                                action="#{ProcessForm.setTaskStatusDownForSelection}"
+                                update="processesTabView:processesForm:processesTable,processCount"
+                                icon="fa fa-arrow-circle-o-down"/>
+                    <p:menuitem id="executeScriptSelection"
+                                rendered="#{SecurityAccessController.hasAuthorityToRunKitodoScripts()}"
+                                value="#{msgs.executeKitodoScript}"
+                                onclick="PF('executeScriptSelectedDialog').show();"
+                                icon="fa fa-cogs"/>
+                    <p:menuitem id="downloadSelection"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditProcessImages()}"
+                                value="#{msgs.linkHomeDirectory}"
+                                action="#{ProcessForm.downloadToHomeForSelection}"
+                                update="processesTabView:processesForm:processesTable"
+                                icon="fa fa-download"/>
+                    <p:menuitem id="uploadAll"
+                                rendered="#{SecurityAccessController.hasAuthorityToEditProcessImages()}"
+                                value="#{msgs.deleteLinkHomeDirectory}"
+                                action="#{ProcessForm.uploadFromHomeForSelection}"
+                                update="processesTabView:processesForm:processesTable"
+                                icon="fa fa-upload">
+                        <p:confirm header="#{msgs.confirmDelete}" message="#{msgs.deleteLinkHomeDirectory}?"
+                                   icon="ui-icon-alert"/>
+                    </p:menuitem>
+                    <p:menuitem id="exportDmsSelection"
+                                rendered="#{SecurityAccessController.hasAuthorityToExportProcess()}"
+                                value="#{msgs.exportDMS}"
+                                action="#{ProcessForm.exportDMSForSelection}"
+                                update="processesTabView:processesForm:processesTable"
+                                icon="fa fa-file-archive-o"/>
+                    <p:menuitem id="createExcel"
+                                value="#{msgs.createExcel}"
+                                action="#{ProcessForm.generateResult}"
+                                ajax="false"
+                                icon="fa fa-file-excel-o"/>
+                    <p:menuitem id="createPdf"
+                                value="#{msgs.createPdf}"
+                                action="#{ProcessForm.generateResultAsPdf}"
+                                ajax="false"
+                                icon="fa fa-file-pdf-o"/>
+                    <p:menuitem id="renameMedia"
+                                rendered="#{SecurityAccessController.hasAuthorityToRenameMediaFiles()}"
+                                value="#{msgs['renameMediaFiles']}"
+                                action="#{ProcessForm.renameMedia}"
+                                icon="fa fa-files-o"/>
+                </p:menu>
+            <p:commandButton id="statisticButton" value="#{msgs.statisticalEvaluation}" styleClass="secondary"
+                             icon="fa fa-sort" iconPos="right" process="@this"/>
+            <p:menu overlay="true" trigger="processesTabView:processesForm:statisticButton" my="left bottom" at="left top">
+                <p:menuitem id="stateOfVolume"
+                            value="#{msgs.stateOfVolume}"
+                            action="#{ProcessForm.showStateOfVolume}"
+                            icon="fa fa-arrow-circle-o-up"/>
+                <p:menuitem id="durationOfTasks"
+                            value="#{msgs.durationOfTasks}"
+                            action="#{ProcessForm.showDurationOfTasks}"
+                            icon="fa fa-arrow-circle-o-up"/>
+                <p:menuitem id="processMetadataStatistic"
+                            value="#{msgs.numberOfMetadata}"
+                            action="#{ProcessForm.showProcessMetadataStatistic}"
+                            icon="fa fa-arrow-circle-o-up"/>
+            </p:menu>
+
+            <p:commandButton id="priorityButton"
+                             value="#{msgs.priority}#{ProcessForm.priorityRestriction eq null ? '' : ': '.concat(msgs[ProcessForm.priorityRestriction.getPriorityString()])}"
+                             process="@this"
+                             styleClass="secondary"
+                             icon="fa fa-sort"
+                             iconPos="right"/>
+            <p:menu id="priorityMenu"
+                    overlay="true"
+                    trigger="processesTabView:processesForm:priorityButton"
+                    my="left bottom"
+                    at="left top">
+                <p:menuitem id="noFilter"
+                            value="#{msgs.allProcesses}"
+                            onstart="PF('processesTable').getPaginator().setPage(0);"
+                            disabled="#{ProcessForm.priorityRestriction eq null}"
+                            update="processesTabView:processesForm:processesTable priorityButton priorityMenu">
+                    <f:setPropertyActionListener target="#{ProcessForm.priorityRestriction}" value="#{null}"/>
+                </p:menuitem>
+                <!--@elvariable id="LOW" type="org.kitodo.data.database.enums.ProcessPriority"-->
+                <p:menuitem id="lowPriority"
+                            value="#{msgs.low}"
+                            onstart="PF('processesTable').getPaginator().setPage(0);"
+                            disabled="#{ProcessForm.priorityRestriction eq 'LOW'}"
+                            update="processesTabView:processesForm:processesTable priorityButton priorityMenu">
+                    <f:setPropertyActionListener target="#{ProcessForm.priorityRestriction}" value="LOW"/>
+                </p:menuitem>
+                <!--@elvariable id="NORMAL" type="org.kitodo.data.database.enums.ProcessPriority"-->
+                <p:menuitem id="normalPriority"
+                            value="#{msgs.normal}"
+                            onstart="PF('processesTable').getPaginator().setPage(0);"
+                            disabled="#{ProcessForm.priorityRestriction eq 'NORMAL'}"
+                            update="processesTabView:processesForm:processesTable priorityButton priorityMenu">
+                    <f:setPropertyActionListener target="#{ProcessForm.priorityRestriction}" value="NORMAL"/>
+                </p:menuitem>
+                <!--@elvariable id="HIGH" type="org.kitodo.data.database.enums.ProcessPriority"-->
+                <p:menuitem id="highPriority"
+                            value="#{msgs.high}"
+                            onstart="PF('processesTable').getPaginator().setPage(0);"
+                            disabled="#{ProcessForm.priorityRestriction eq 'HIGH'}"
+                            update="processesTabView:processesForm:processesTable priorityButton priorityMenu">
+                    <f:setPropertyActionListener target="#{ProcessForm.priorityRestriction}" value="HIGH"/>
+                </p:menuitem>
+            </p:menu>
+        </div>
+
+    </h:form>
+</ui:composition>

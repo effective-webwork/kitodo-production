@@ -1,0 +1,121 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseListView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <!--@elvariable id="tabIndex" type="java.lang.Integer"-->
+        <f:viewParam name="tabIndex"/>
+        <f:viewAction action="#{UserForm.setActiveTabIndexFromTemplate(tabIndex)}" />
+        <!--@elvariable id="keepPagination" type="java.lang.Boolean"-->
+        <f:viewParam name="keepPagination"/>
+        <f:viewAction action="#{UserForm.resetPaginator(keepPagination)}" />
+        <f:viewAction action="#{RoleForm.resetPaginator(keepPagination)}" />
+        <f:viewAction action="#{ClientForm.resetPaginator(keepPagination)}" />
+        <f:viewAction action="#{AuthorityForm.resetPaginator(keepPagination)}" />
+        <f:viewAction action="#{LdapGroupForm.resetPaginator(keepPagination)}" />
+        <f:viewAction action="#{LdapServerForm.resetPaginator(keepPagination)}" />
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h3>#{msgs.users}</h3>
+        <!-- Filters -->
+        <h:panelGroup id="filterMenuWrapper">
+            <p:outputPanel rendered="#{UserForm.activeTabIndex eq 0}">
+                <ui:include src="/WEB-INF/templates/includes/users/filterMenu.xhtml"/>
+            </p:outputPanel>
+        </h:panelGroup>
+        <h:form id="configureColumnsForm"
+                rendered="#{SecurityAccessController.hasAuthorityToConfigureColumns()}">
+            <p:selectCheckboxMenu styleClass="configure-columns-button secondary"
+                                  label=""
+                                  converter="#{listColumnConverter}"
+                                  title="#{msgs.configureColumns}"
+                                  value="#{UserForm.selectedColumns}">
+                <f:selectItems value="#{UserForm.columns}"/>
+                <p:ajax listener="#{UserForm.saveSelectedColumns()}"
+                        update="usersTabView"/>
+            </p:selectCheckboxMenu>
+        </h:form>
+        <h:form id="newElementForm" rendered="#{SecurityAccessController.hasAuthorityToAddOnUserPage()}">
+            <p:menuButton value="#{msgs.newElement}"
+                          id="newElementButton"
+                          icon="fa fa-plus"
+                          iconPos="right"
+                          styleClass="callto"
+                          menuStyleClass="new-element-menu">
+                <p:menuitem value="#{msgs.newUser}" id="newUserButton"
+                            rendered="#{SecurityAccessController.hasAuthorityToAddUser()}"
+                            action="#{UserForm.newUser}" icon="fa fa-plus"/>
+                <p:menuitem value="#{msgs.newRole}" id="newRoleButton"
+                            rendered="#{SecurityAccessController.hasAuthorityToAddRole()}"
+                            action="#{RoleForm.newRole}" icon="fa fa-plus"/>
+                <p:menuitem value="#{msgs.newClient}" id="newClientButton" immediate="true"
+                            rendered="#{SecurityAccessController.hasAuthorityToAddClient()}"
+                            action="#{ClientForm.newClient}" icon="fa fa-plus"/>
+                <p:menuitem value="#{msgs.newLdapGroup}" id="newLdapGroupButton" action="#{LdapGroupForm.newLdapGroup}"
+                            rendered="#{SecurityAccessController.hasAuthorityGlobal('addLdapGroup')}"
+                            icon="fa fa-plus"/>
+                <p:menuitem value="#{msgs.newLdapServer}" id="newLdapServerButton" action="#{LdapServerForm.newLdapServer}"
+                            rendered="#{SecurityAccessController.hasAuthorityGlobal('addLdapServer')}"
+                            icon="fa fa-plus"/>
+                <p:menuitem value="#{msgs.newAuthority}" id="newAuthority" action="#{AuthorityForm.newAuthority}"
+                            rendered="#{SecurityAccessController.hasAuthorityToAddAuthority()}"
+                            icon="fa fa-plus"/>
+            </p:menuButton>
+        </h:form>        
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView activeIndex="#{UserForm.activeTabIndex}" id="usersTabView" dynamic="true">
+            <p:ajax event="tabChange"
+                    listener="#{UserForm.onTabChange}"
+                    update="filterMenuWrapper"/>
+            <p:tab id="usersTab" title="#{msgs.users}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewUserList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/userList.xhtml"/>
+            </p:tab>
+            <p:tab id="rolesTab" title="#{msgs.roles}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewRoleList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/roleList.xhtml"/>
+            </p:tab>
+            <p:tab id="clientsTab" title="#{msgs.clients}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewClientList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/clientList.xhtml" />
+            </p:tab>
+            <p:tab id="authoritiesTab" title="#{msgs.authorities}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewAuthorityList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/authorityList.xhtml"/>
+            </p:tab>
+            <p:tab id="ldapGroupsTab" title="#{msgs.ldapGroups}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewLdapGroupList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/ldapgroupList.xhtml"/>
+            </p:tab>
+            <p:tab id="ldapServersTab" title="#{msgs.ldapServers}"
+                   rendered="#{SecurityAccessController.hasAuthorityToViewLdapServerList()}">
+                <ui:include src="/WEB-INF/templates/includes/users/ldapserverList.xhtml"/>
+            </p:tab>
+        </p:tabView>
+        <p:ajaxStatus onstart="$('#loadingScreen').show()" oncomplete="$('#loadingScreen').hide()"/>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.users}" icon="fa fa-user"/>
+    </ui:define>
+
+</ui:composition>

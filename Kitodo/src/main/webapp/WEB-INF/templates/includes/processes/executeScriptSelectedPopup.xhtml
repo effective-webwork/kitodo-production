@@ -1,0 +1,128 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog widgetVar="executeScriptSelectedDialog"
+              width="480px"
+              modal="true"
+              dynamic="true"
+              resizable="false"
+              showHeader="false"
+              styleClass="editDialog">
+        <h:form id="executeScriptSelectedForm">
+            <p:panelGrid columns="1" layout="grid">
+                <p:row>
+                    <h3>#{msgs.executeKitodoScript}</h3>
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogFieldWrapper kitodoScript">
+                        <div>
+                            <div>
+                                <p:commandButton value="addRole"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:addRole &quot;tasktitle:TASK_TITLE&quot; role:ROLE_NAME'"/>
+                                <p:commandButton value="createFolders"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:createFolders'"/>
+                                <p:commandButton value="deleteTiffHeaderFile"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:deleteTiffHeaderFile'"/>
+                                <p:commandButton value="importFromFileSystem"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:importFromFileSystem sourcefolder:SOURCE_FOLDER'"/>
+                                <p:commandButton value="setRuleset"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:setRuleset &quot;ruleset:TITLE_RULESET&quot;'"/>
+                                <p:commandButton value="setStepStatus"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:setStepStatus &quot;tasktitle:TASK_TITLE&quot; status:NUMBER_0_TO_3'"/>
+                                <p:commandButton value="addShellScriptToStep"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:addShellScriptToStep &quot;tasktitle:TASK_TITLE&quot; &quot;label:LABEL_FOR_SCRIPT&quot; &quot;script:PATH_TO_SCRIPT&quot;'"/>
+                                <p:commandButton value="setTaskProperty"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:setTaskProperty &quot;tasktitle:TASK_TITLE&quot; property:metadata_readimages_writeimages_validate_exportdms_automatic_batch value:true_OR_false'"/>
+                                <p:commandButton value="tiffWriter"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:tiffWriter'"/>
+                                <p:commandButton value="exportDms"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:exportDms exportImages:false'"/>
+                                <p:commandButton value="copyData"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:addData key:[KEY] source[SOURCEKEY]'"/>
+                                <p:commandButton value="addData"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:addData key:[KEY] &quot;value:[VALUE]&quot;'"/>
+                                <p:commandButton value="deleteDataByKey"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:deleteData key:[KEY]'"/>
+                                <p:commandButton value="deleteDataByKey/Value"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:deleteData key:[KEY] &quot;value:[VALUE]&quot;'"/>
+                                <p:commandButton value="overwriteData"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:overwriteData key:[KEY] &quot;value[VALUE]&quot;'"/>
+                                <p:commandButton value="addDataToChildren"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:copyDataToChildren key:[KEY] &quot;value:[VALUE]&quot;'"/>
+                                <p:commandButton value="addDataToIssues"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:addData key:[KEY] &quot;value:[VALUE]&quot; type:PeriodicalIssue'"/>
+                                <p:commandButton value="generateImages"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:generateImages folders:all|jpgs/max,jpgs/thumbs,... images:missingOrDamaged|missing|all'"/>
+                                <p:commandButton value="searchForMedia"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:searchForMedia'"/>
+                                <p:commandButton value="importProcesses"
+                                                 update="executeScriptSelectedForm:selectionScriptFieldTextArea"
+                                                 onclick="document.getElementById('executeScriptSelectedForm:selectionScriptFieldTextArea').value='action:importProcesses indir:/path/to/directory/ project:#id template:#id [errors:/path/to/directory/]'"/>
+                            </div>
+
+                            <div>
+                                <p:outputLabel for="selectionScriptFieldTextArea"
+                                               value="#{msgs.script}"/>
+                                <p:inputTextarea id="selectionScriptFieldTextArea"
+                                                 value="#{ProcessForm.kitodoScriptSelection}"
+                                                 style="height: 65px; padding: 4px 8px;"
+                                                 styleClass="input editDialog"/>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogButtonWrapper">
+                        <p:commandButton action="#{ProcessForm.executeKitodoScriptSelection}"
+                                         id="save"
+                                         update="processesTabView:processesForm:processesTable,processCount"
+                                         oncomplete="PF('executeScriptSelectedDialog').hide();"
+                                         value="#{msgs.executeKitodoScript}"
+                                         styleClass="primary right">
+                        </p:commandButton>
+                        <p:commandButton value="#{msgs.cancel}"
+                                         immediate="true"
+                                         icon="fa fa-times fa-lg"
+                                         iconPos="right"
+                                         styleClass="secondary right"
+                                         onclick="PF('executeScriptSelectedDialog').hide();">
+                        </p:commandButton>
+                    </h:panelGroup>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+    </p:dialog>
+</ui:composition>

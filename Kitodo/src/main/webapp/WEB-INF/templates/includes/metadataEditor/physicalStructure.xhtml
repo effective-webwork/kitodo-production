@@ -1,0 +1,186 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    <p:outputPanel id="physicalStructureHeader">
+        <p:selectOneMenu styleClass="physicalStructureTitle" value="#{DataEditorForm.physicalViewMode}">
+            <f:selectItem itemLabel="Typ" itemValue="Typ"/>
+            <f:selectItem itemLabel="Typ_Order" itemValue="Typ_Order"/>
+            <f:selectItem itemLabel="Typ_ID" itemValue="Typ_ID"/>
+            <f:selectItem itemLabel="Voll" itemValue="Voll"/>
+            <p:ajax event="change" partialSubmit="true" update="physicalTree"/>
+        </p:selectOneMenu>
+    </p:outputPanel>
+    <div class="scroll-up-area"></div>
+    <div class="scroll-wrapper">
+        <p:tree id="physicalTree"
+                rendered="#{DataEditorForm.structurePanel.separateMedia}"
+                value="#{DataEditorForm.structurePanel.physicalTree}"
+                var="physicalNode"
+                styleClass="focusable"
+                selectionMode="single"
+                selection="#{DataEditorForm.structurePanel.selectedPhysicalNode}"
+                draggable="#{false}"
+                droppable="#{false}"
+                dragdropScope="physicalTree"
+                onNodeClick="metadataEditor.physicalTree.onNodeClick(node,event)">
+            <p:ajax event="select"
+                    listener="#{DataEditorForm.structurePanel.treePhysicalSelect}"
+                    oncomplete="scrollToSelectedTreeNode('physicalStructure');
+                                scrollToSelectedThumbnail();
+                                scrollToSelectedPaginationRow();
+                                initializeImage();
+                                metadataEditor.gallery.mediaView.update();
+                                expandMetadata('physical-metadata-tab');"
+                    update="galleryHeadingWrapper
+                            imagePreviewForm:mediaDetail
+                            imagePreviewForm:mediaPartialList
+                            paginationControls
+                            metadataAccordion:physicalMetadataWrapperPanel"/>
+            <p:ajax event="contextMenu"
+                    listener="#{DataEditorForm.structurePanel.treePhysicalSelect}"
+                    onstart="$('#contextMenuPhysicalTree .ui-menuitem').addClass('ui-state-disabled')"
+                    oncomplete="initializeImage();scrollToSelectedTreeNode('physicalStructure');scrollToSelectedThumbnail();metadataEditor.gallery.mediaView.update();PF('contextMenuPhysicalTree').show(currentEvent)"
+                    update="@(.stripe)
+                            @(.thumbnail)
+                            galleryHeadingWrapper
+                            imagePreviewForm:mediaDetail
+                            imagePreviewForm:mediaPartialList
+                            contextMenuPhysicalTree
+                            logicalTree
+                            metadataAccordion:physicalMetadataWrapperPanel"/>
+            <p:ajax event="dragdrop"
+                    disabled="#{not SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
+                    listener="#{DataEditorForm.structurePanel.onDragDrop}"
+                    update="physicalTree
+                            metadataAccordion:physicalMetadataWrapperPanel"/>
+            <p:ajax event="collapse"
+                    listener="#{DataEditorForm.structurePanel.onNodeCollapse}"/>
+            <p:ajax event="expand"
+                    listener="#{DataEditorForm.structurePanel.onNodeExpand}"/>
+            <p:treeNode type="#{StructurePanel.PHYS_STRUCTURE_NODE_TYPE}"
+                        expandedIcon="ui-icon-folder-expanded"
+                        collapsedIcon="ui-icon-folder-collapsed">
+                <!--@elvariable id="physicalElementType" type="java.lang.String"-->
+                <ui:param name="physicalElementType" value="#{physicalNode.label}"/>
+                <h:outputText value="#{empty physicalElementType ? msgs['dataEditor.withoutType'] : physicalElementType}"
+                              style="#{physicalNode.undefined ? 'background-color: gold' : ''}"
+                              a:data-order="#{physicalNode.order}"/>
+                <h:outputText value="_#{physicalNode.orderLabel}"
+                              rendered="#{physicalNode.orderLabel ne null and (DataEditorForm.physicalViewMode.equals('Typ_Order') or DataEditorForm.physicalViewMode.equals('Voll'))}"/>
+                <h:outputText value="_#{DataEditorForm.getElementId(physicalNode)}"
+                              rendered="#{(DataEditorForm.physicalViewMode.equals('Typ_ID') or DataEditorForm.physicalViewMode.equals('Voll')) and DataEditorForm.getElementId(physicalNode) ne ''}"/>
+                <h:outputText value=" 🔗" rendered="#{physicalNode.linked}"/>
+                <h:outputText value=" ⚠️" rendered="#{physicalNode.undefined}"
+                              style="background-color: gold;"
+                              title="#{msgs['dataEditor.undefinedStructure']}"/>
+            </p:treeNode>
+            <p:treeNode type="#{StructurePanel.MEDIA_NODE_TYPE}"
+                        icon="ui-icon-document">
+                <h:outputText
+                        value="#{physicalNode.label}"
+                        title="#{physicalNode.label}"
+                        a:data-order="#{physicalNode.order}"/>
+                <h:outputText value="_#{physicalNode.orderLabel}"
+                              rendered="#{physicalNode.orderLabel ne null and (DataEditorForm.physicalViewMode.equals('Typ_Order') or DataEditorForm.physicalViewMode.equals('Voll'))}"/>
+                <h:outputText value="_#{DataEditorForm.getElementId(physicalNode)}"
+                              rendered="#{(DataEditorForm.physicalViewMode.equals('Typ_ID') or DataEditorForm.physicalViewMode.equals('Voll')) and DataEditorForm.getElementId(physicalNode) ne ''}"/>
+                <h:outputText value=" 🔗" rendered="#{physicalNode.linked}"/>
+            </p:treeNode>
+            <p:treeNode type="#{StructurePanel.MEDIA_PARTIAL_NODE_TYPE}"
+                        icon="ui-icon-media-partial">
+                <h:outputText
+                        value="#{physicalNode.label}"
+                        title="#{physicalNode.label}"
+                        a:data-order="#{physicalNode.order}"/>
+                <h:outputText value="_#{physicalNode.orderLabel}"
+                              rendered="#{physicalNode.orderLabel ne null and (DataEditorForm.physicalViewMode.equals('Typ_Order') or DataEditorForm.physicalViewMode.equals('Voll'))}"/>
+                <h:outputText value="_#{DataEditorForm.getElementId(physicalNode)}"
+                              rendered="#{(DataEditorForm.physicalViewMode.equals('Typ_ID') or DataEditorForm.physicalViewMode.equals('Voll')) and DataEditorForm.getElementId(physicalNode) ne ''}"/>
+                <h:outputText value=" 🔗" rendered="#{physicalNode.linked}"/>
+            </p:treeNode>
+        </p:tree>
+        <p:contextMenu for="physicalTree" id="contextMenuPhysicalTree" widgetVar="contextMenuPhysicalTree">
+            <p:menuitem value="#{msgs.addElement}"
+                        icon="fa fa-plus fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        process="@this"
+                        actionListener="#{DataEditorForm.addPhysicalDivisionDialog.prepare}"
+                        oncomplete="PF('dialogAddPhysicalDivision').show()"
+                        update="dialogAddPhysicalDivisionForm"/>
+            <p:menuitem value="#{msgs.assignToNextElement}"
+                        icon="fa fa-link fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        rendered="#{DataEditorForm.structurePanel.assignableSeveralTimes and not
+                            DataEditorForm.structurePanel.assignedSeveralTimes and DataEditorForm.selectedMedia.size() eq 1}"
+                        action="#{DataEditorForm.structurePanel.assign}"
+                        process="@this"
+                        oncomplete="$('#loadingScreen').hide()"
+                        update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+            <p:menuitem value="#{msgs.unassign}"
+                        icon="fa fa-chain-broken fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        rendered="#{DataEditorForm.structurePanel.assignedSeveralTimes and DataEditorForm.selectedMedia.size() == 1}"
+                        action="#{DataEditorForm.structurePanel.unassign}"
+                        process="@this"
+                        oncomplete="$('#loadingScreen').hide()"
+                        update="logicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                @(.structureElementDataList)
+                                imagePreviewForm:mediaContextMenu"/>
+            <p:menuitem value="#{msgs.removeElement}"
+                        rendered="#{SecurityAccessController.hasAuthorityToDeleteMedia() and DataEditorForm.structurePanel.selectedPhysicalNode.rowKey ne '0'}"
+                        icon="fa fa-trash fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        process="@this"
+                        action="#{DataEditorForm.deletePhysicalDivision()}"
+                        onclick="$('#loadingScreen').show()"
+                        oncomplete="$('#loadingScreen').hide()"
+                        update="numberOfScans
+                                physicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:physicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+            <p:menuitem value="#{msgs['dataEditor.resetPartialJob']}"
+                        icon="fa fa-undo fa-sm"
+                        styleClass="plain"
+                        disabled="#{readOnly}"
+                        action="#{DataEditorForm.structurePanel.resetSelectedPartialJob()}"
+                        onclick="$('#loadingScreen').show()"
+                        oncomplete="$('#loadingScreen').hide()"
+                        rendered="#{DataEditorForm.structurePanel.resettable}"
+                        update="logicalTree
+                                physicalTree
+                                paginationForm:paginationWrapperPanel
+                                metadataAccordion:logicalMetadataWrapperPanel
+                                metadataAccordion:physicalMetadataWrapperPanel
+                                galleryWrapperPanel"/>
+        </p:contextMenu>
+    </div>
+    <div class="scroll-down-area"></div>
+</ui:composition>

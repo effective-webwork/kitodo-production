@@ -1,0 +1,45 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="wrapper">
+        <section id="footer-content">
+            <h:form id="legal-menu">
+                <ul id="footer-meta-menu">
+                    <li>
+                        <p:commandLink type="button"
+                                       value="#{msgs.imprint}"
+                                       update=":imprintDialog"
+                                       oncomplete="PF('imprintDialog').show()"/>
+                    </li>
+                    <li>
+                        <p:commandLink type="button"
+                                       value="#{msgs.dataPrivacy}"
+                                       update=":dataPrivacyDialog"
+                                       oncomplete="PF('dataPrivacyDialog').show()"/>
+                    </li>
+                    <li>
+                        <p:commandLink type="button"
+                                       value="#{msgs.termsOfUse}"
+                                       update=":termsOfUseDialog"
+                                       oncomplete="PF('termsOfUseDialog').show()"/>
+                    </li>
+                </ul>
+                <p>Vecteur WMS <span>Version #{HelperForm.version}</span></p>
+                <p>Captum AG</p>
+            </h:form>
+        </section>
+    </div>
+</ui:composition>

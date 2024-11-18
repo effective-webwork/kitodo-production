@@ -1,0 +1,85 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog widgetVar="fileUploadDialog"
+              id="fileUpload"
+              width="578"
+              modal="true"
+              visible="#{CreateProcessForm.defaultConfigurationType eq 'FILE_UPLOAD'}"
+              appendTo="@(body)"
+              resizable="false">
+        <h3>#{msgs['newProcess.fileUpload.heading']}</h3>
+        <h:form id="fileUploadForm">
+            <p:panelGrid layout="grid" columns="2" cellpadding="10">
+                <p:row>
+                    <div>
+                        <p:outputLabel for="catalogueSelectMenu"
+                                       value="#{msgs['importConfig.configuration']}"/>
+                        <p:selectOneMenu id="catalogueSelectMenu"
+                                         autoWidth="false"
+                                         required="#{not empty param['catalogSearchForm:performCatalogSearch']}"
+                                         immediate="true"
+                                         value="#{CreateProcessForm.fileUploadDialog.importConfiguration}"
+                                         converter="#{importConfigurationConverter}">
+                            <f:selectItem itemValue="#{null}" itemLabel="-- #{msgs.selectCatalog} --" noSelectionOption="true"/>
+                            <f:selectItems value="#{CreateProcessForm.fileUploadDialog.importConfigurations}"
+                                           var="importconfig"
+                                           itemLabel="#{importconfig.title}"
+                                           itemValue="#{importconfig}"/>
+                            <p:ajax update="fileUploadForm"/>
+                        </p:selectOneMenu>
+                    </div>
+                </p:row>
+            </p:panelGrid>
+            <p:panelGrid rendered="#{CreateProcessForm.fileUploadDialog.importConfiguration ne null}">
+                <p:row>
+                    <div>
+                        <p:outputLabel for="additionalImport" value="#{msgs['newProcess.catalogueSearch.additionalImport']}"/>
+                        <p:selectBooleanCheckbox id="additionalImport" styleClass="switch input" value="#{CreateProcessForm.fileUploadDialog.additionalImport}" >
+                            <p:ajax event="change" update="fileUploadForm" />
+                        </p:selectBooleanCheckbox>
+                    </div>
+                    <div>
+                        <p:fileUpload rendered="#{CreateProcessForm.fileUploadDialog.importConfiguration ne null}"
+                                      listener="#{CreateProcessForm.fileUploadDialog.handleFileUpload}"
+                                      allowTypes="/(\.|\/)(xml)$/"
+                                      skinSimple="true"
+                                      oncomplete="PF('fileUploadDialog').hide();"
+                                      label="#{msgs.chooseFile}"
+                                      uploadLabel="#{msgs.fileUpload}"
+                                      cancelLabel="#{msgs.cancel}"
+                                      chooseIcon="fa fa-file-code-o fa-lg"
+                                      uploadIcon="fa fa-upload fa-lg"
+                                      cancelIcon="fa fa-times fa-lg"/>
+                    </div>
+                </p:row>
+            </p:panelGrid>
+            <h:panelGroup layout="block"
+                          id="fileUploadButton">
+                <p:commandButton id="close"
+                                 value="#{msgs.close}"
+                                 styleClass="secondary right"
+                                 icon="fa fa-times fa-lg"
+                                 iconPos="right"
+                                 onclick="PF('fileUploadDialog').hide();"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>

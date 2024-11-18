@@ -1,0 +1,311 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/base.xhtml"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+        xmlns:p="http://primefaces.org/ui">
+
+    <f:metadata>
+        <!--@elvariable id="id" type="java.lang.Integer"-->
+        <f:viewParam name="id"/>
+        <!--@elvariable id="referer" type="java.lang.String"-->
+        <f:viewParam name="referer"/>
+        <!--@elvariable id="templateTaskId" type="int"-->
+        <f:viewParam name="templateTaskId"/>
+        <f:viewAction action="#{DataEditorForm.open(id, referer, templateTaskId)}"/>
+        <f:viewAction action="#{CommentForm.setProcessById(id)}"/>
+        <f:viewAction action="#{DataEditorForm.initMetadataEditor()}"/>
+        <f:viewAction
+                action="#{DataEditorForm.structurePanel.setActiveTabs(DataEditorForm.structurePanel.separateMedia ? (DataEditorForm.containerStructurePanel.displayContainerStructure ? '0,1,2' : '0,1') : '0')}"/>
+        <f:importConstants type="org.kitodo.production.forms.dataeditor.StructurePanel" />
+    </f:metadata>
+    <ui:define name="content">
+
+        <h:form id="preserveMetadataForm">
+            <p:remoteCommand id="preserveMetadataCommand"
+                             name="preserveMetadata"
+                             actionListener="#{DataEditorForm.preserveMetadataPanel()}"/>
+        </h:form>
+
+        <!--@elvariable id="viewStructure" type="boolean"-->
+        <ui:param name="viewStructure" value="#{SecurityAccessController.hasAuthorityToViewProcessStructureData()}"/>
+        <!--@elvariable id="viewMetadata" type="boolean"-->
+        <ui:param name="viewMetadata" value="#{SecurityAccessController.hasAuthorityToViewProcessMetaData()}"/>
+        <!--@elvariable id="viewPagination" type="boolean"-->
+        <ui:param name="viewPagination" value="#{SecurityAccessController.hasAuthorityToViewProcessPagination()}"/>
+        <!--@elvariable id="viewImages" type="boolean"-->
+        <ui:param name="viewImages" value="#{SecurityAccessController.hasAuthorityToViewProcessImages()}"/>
+        <!--@elvariable id="commentsNumber" type="Integer"-->
+        <ui:param name="commentsNumber" value="#{CommentForm.getAllComments().size()}"/>
+
+        <p:panel id="metadataEditorContainer"
+                 rendered="#{empty DataEditorForm.getMetadataFileLoadingError()}"
+                 style="margin: auto 16px; padding: 0;">
+
+            <p:panel id="metadataEditor">
+                <!-- Header -->
+                <p:panel id="metadataEditorHeader">
+                    <ui:include src="/WEB-INF/templates/includes/metadataEditor/header.xhtml" />
+                </p:panel>
+
+                <span id="messagesWrapper">
+                    <p:messages id="error-messages"
+                                showIcon="false">
+                        <p:autoUpdate/>
+                    </p:messages>
+                    <span id="errorMessagesClose"
+                          onclick="$('#error-messages').slideUp(400, setHeight)">
+                        <i class="fa fa-times"/>
+                    </span>
+                </span>
+
+                <!-- Content -->
+                <div id="metadataEditorWrapper">
+
+                    <!-- First Column -->
+                    <h:panelGroup class="collapsibleWrapper #{viewStructure ? '' : 'collapsed'}"
+                                  id="firstColumnWrapper"
+                                  a:data-min-width="300">
+                        <ui:fragment rendered="#{viewStructure}">
+                            <button type="button"
+                                    onclick="toggleFirstColumn()"
+                                    class="columnExpandButton">
+                                <i class="fa fa-expand fa-lg"/>
+                                <i class="fa fa-compress fa-lg"/>
+                            </button>
+                        </ui:fragment>
+                        <div class="columnHeadingWrapper">
+                            <button id="firstSectionFirstColumnToggler" onclick="toggleFirstSectionFirstColumn()">
+                                <i class="fa fa-chevron-circle-up fa-lg"/>
+                            </button>
+                            <h:outputText styleClass="columnHeading" value="#{msgs.structureData}"/>
+                        </div>
+                        <p:panel id="firstColumnPanel">
+                            <div id="structurePanel" data-min-height="100">
+                                <h:form id="structureTreeForm" prependId="false">
+                                    <ui:include src="/WEB-INF/templates/includes/metadataEditor/structure.xhtml"/>
+                                </h:form>
+                            </div>
+                            <h:panelGroup id="verticalResizerFirstColumn"
+                                          layout="block"
+                                          styleClass="#{LoginForm.loggedUser.isShowPaginationByDefault() ? '' : 'disabled'}"/>
+                            <div class="columnHeadingWrapper">
+                                <ui:fragment rendered="#{viewMetadata and viewPagination}">
+                                    <p:commandButton id="secondSectionFirstColumnToggler"
+                                                     type="button"
+                                                     styleClass="#{LoginForm.loggedUser.isShowPaginationByDefault() ? '' : 'collapsed'}"
+                                                     icon="fa fa-chevron-circle-up fa-lg"
+                                                     onclick="toggleSecondSectionFirstColumn()"/>
+                                </ui:fragment>
+                                <h:outputText value="#{msgs.partialJobPrintDocket}"/>
+                            </div>
+                            <h:panelGroup id="paginationPanel"
+                                          a:data-min-height="100"
+                                          layout="block"
+                                          styleClass="#{viewMetadata and LoginForm.loggedUser.isShowPaginationByDefault() ? '' : 'collapsed'}">
+                                <h:form id="paginationControls" prependId="false">
+                                    <ui:include src="/WEB-INF/templates/includes/metadataEditor/paginationControls.xhtml" />
+                                </h:form>
+                                <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/pagination.xhtml"/>
+                            </h:panelGroup>
+                        </p:panel>
+                    </h:panelGroup>
+
+                    <!-- Element for resizing first and second column -->
+                    <h:panelGroup class="resizer" id="firstResizer"/>
+
+                    <!-- Second Column -->
+                    <h:panelGroup class="collapsibleWrapper"
+                                  id="secondColumnWrapper"
+                                  a:data-min-width="300">
+                        <button type="button"
+                                onclick="toggleSecondColumn()"
+                                class="columnExpandButton">
+                            <i class="fa fa-expand fa-lg"/>
+                            <i class="fa fa-compress fa-lg"/>
+                        </button>
+                        <div class="columnHeadingWrapper">
+                            <ui:fragment rendered="#{viewMetadata and viewPagination}">
+                                <button id="firstSectionSecondColumnToggler" onclick="toggleFirstSectionSecondColumn()">
+                                    <i class="fa fa-chevron-circle-up fa-lg"/>
+                                </button>
+                            </ui:fragment>
+                            <h:outputText styleClass="columnHeading" value="#{msgs.metadata}"/>
+                        </div>
+                        <p:panel id="secondColumnPanel">
+                            <div id="metadataPanel" data-min-height="100" class="#{viewMetadata ? '' : 'collapsed'}">
+                                <p:accordionPanel id="metadataAccordion"
+                                                  styleClass="#{DataEditorForm.structurePanel.separateMedia or DataEditorForm.containerStructurePanel.displayContainerStructure ? 'separateStructure' : ''}">
+                                    <p:tab title="Behältnisse Metadaten"
+                                           titleStyleClass="container-metadata-tab"
+                                           rendered="#{DataEditorForm.containerStructurePanel.displayContainerStructure}">
+                                        <ui:include src="/WEB-INF/templates/includes/metadataEditor/containerMetadata.xhtml" />
+                                    </p:tab>
+                                    <p:tab title="#{msgs.logical} #{msgs.metadata}"
+                                           titleStyleClass="logical-metadata-tab">
+                                        <ui:include src="/WEB-INF/templates/includes/metadataEditor/logicalMetadata.xhtml" />
+                                    </p:tab>
+                                    <p:tab title="#{msgs.physical} #{msgs.metadata}"
+                                           titleStyleClass="physical-metadata-tab"
+                                           rendered="#{DataEditorForm.structurePanel.separateMedia}">
+                                        <ui:include src="/WEB-INF/templates/includes/metadataEditor/physicalMetadata.xhtml" />
+                                    </p:tab>
+                                </p:accordionPanel>
+                            </div>
+
+                            <!-- Vertical resizer -->
+                            <h:panelGroup id="verticalResizerSecondColumn"
+                                          layout="block"
+                                          styleClass="#{LoginForm.loggedUser.isShowCommentsByDefault() ? '' : 'disabled'}"/>
+                            <div class="columnHeadingWrapper">
+                                <p:commandButton id="secondSectionSecondColumnToggler"
+                                                 type="button"
+                                                 styleClass="#{LoginForm.loggedUser.isShowCommentsByDefault() ? '' : 'collapsed'}"
+                                                 icon="fa fa-chevron-circle-up fa-lg"
+                                                 onclick="toggleSecondSectionSecondColumn()"/>
+                                <h:outputText value="#{msgs.comments}"/>
+                                <h:panelGroup id="commentsNumberWrapper">
+                                    <h:outputText
+                                            styleClass="counter-badge #{CommentForm.hasCorrectionComment(DataEditorForm.process.id) eq 2 ? 'new' : ''}"
+                                            value="#{commentsNumber}"
+                                            rendered="#{commentsNumber gt 0}"/>
+                                </h:panelGroup>
+                            </div>
+                            <h:panelGroup layout="block"
+                                          styleClass="#{LoginForm.loggedUser.isShowCommentsByDefault() ? '' : 'collapsed'}"
+                                          id="commentsPanel"
+                                          a:data-comment-number="#{commentsNumber}"
+                                          a:data-min-height="100">
+                                <ui:include src="/WEB-INF/templates/includes/comments/comments.xhtml"/>
+                            </h:panelGroup>
+                        </p:panel>
+                    </h:panelGroup>
+
+                    <!-- Element for resizing second and third column -->
+                    <h:panelGroup class="resizer" id="secondResizer"/>
+
+                    <!-- Third Column -->
+                    <h:panelGroup class="collapsibleWrapper #{viewImages ? '' : 'collapsed'}"
+                                  id="thirdColumnWrapper"
+                                  a:data-min-width="400">
+                        <ui:fragment rendered="#{viewImages}">
+                            <button type="button"
+                                    onclick="toggleThirdColumn()"
+                                    class="columnExpandButton">
+                                <i class="fa fa-expand fa-lg"/>
+                                <i class="fa fa-compress fa-lg"/>
+                            </button>
+                        </ui:fragment>
+
+                        <div class="columnHeadingWrapper">
+                            <h:panelGroup id="galleryHeadingWrapper">
+                                <ui:fragment rendered="#{DataEditorForm.galleryPanel.galleryViewMode eq 'list' or DataEditorForm.galleryPanel.galleryViewMode eq 'grid'}">
+                                    <h:outputText styleClass="columnHeading" value="#{msgs.gallery}"/>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{DataEditorForm.galleryPanel.galleryViewMode eq 'preview'}">
+                                    <ui:param name="selectedGalleryMediaContent"
+                                              value="#{DataEditorForm.galleryPanel.getGalleryMediaContent(DataEditorForm.galleryPanel.lastSelection.key)}"/>
+                                    <h:outputText styleClass="columnHeading icon-media-partial"
+                                                  rendered="#{selectedGalleryMediaContent.isMediaPartial()}"/>
+                                    <h:outputText styleClass="columnHeading"
+                                                  rendered="#{DataEditorForm.galleryPanel.hasMediaViewMimeTypePrefix('audio')}"
+                                                  value="#{msgs.audio}
+                                                  #{selectedGalleryMediaContent.shortId}"/>
+                                    <h:outputText styleClass="columnHeading"
+                                                  rendered="#{DataEditorForm.galleryPanel.hasMediaViewMimeTypePrefix('video')}"
+                                                  value="#{msgs.video}
+                                                  #{selectedGalleryMediaContent.shortId}"/>
+                                    <h:outputText styleClass="columnHeading"
+                                                  rendered="#{DataEditorForm.galleryPanel.hasMediaViewMimeTypePrefix('image')}"
+                                                  value="#{msgs.image}
+                                                 #{selectedGalleryMediaContent.shortId},
+                                                 #{msgs.page}
+                                                 #{selectedGalleryMediaContent.orderlabel}"/>
+                                    <h:outputText styleClass="columnHeading"
+                                                  rendered="#{DataEditorForm.galleryPanel.lastSelection eq null}"
+                                                  value="#{msgs.notSelected}"/>
+                                    <ui:param name="mediaPartial"
+                                              value="#{selectedGalleryMediaContent.getMediaPartial()}"/>
+                                    <h:outputText styleClass="columnHeading mediaPartialHeading"
+                                                  value="(#{msgs.start}:#{mediaPartial.begin}, #{msgs.duration}:#{mediaPartial.extent})"
+                                                  rendered="#{selectedGalleryMediaContent.isMediaPartial() and mediaPartial ne null}"
+                                                  a:data-media-partial-start="#{mediaPartial.begin}"
+                                                  a:data-media-partial-duration="#{mediaPartial.extent}"/>
+                                </ui:fragment>
+                            </h:panelGroup>
+                        </div>
+
+                        <p:panel id="thirdColumnPanel" style="height: calc(100% - 40px);">
+                            <div id="galleryPanel">
+                                <ui:include src="/WEB-INF/templates/includes/metadataEditor/gallery.xhtml" />
+                            </div>
+                        </p:panel>
+                    </h:panelGroup>
+                </div>
+            </p:panel>
+
+        </p:panel>
+
+    </ui:define>
+
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/addDocStrucType.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/addPhysicalDivision.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/addMetadata.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/changeDocStrucType.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/editPages.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/help.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/logicalStructureMenu.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/corruptDataWarning.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/comments/editCommentDialog.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/comments/newCommentDialog.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/uploadFile.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/metadataLocked.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/errorLoadingMetadataDialog.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/fileReferencesUpdatedDialog.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/dataEditorSettingSavingResult.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/renamingMediaResults.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/addMediaPartial.xhtml"/>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.processes}" url="processes.jsf" icon="fa fa-clipboard" rendered="#{request.getHeader('referer').contains('process')}" />
+        <p:menuitem value="#{msgs.tasks}" url="tasks.jsf" rendered="#{request.getHeader('referer').contains('currentTasksEdit')}" icon="fa fa-paperclip"/>
+        <p:menuitem value="#{msgs.taskDetails}" url="#{DataEditorForm.referringView}" rendered="#{request.getHeader('referer').contains('currentTasksEdit')}" icon="fa fa-paperclip"/>
+        <p:menuitem value="#{msgs.metadataEdit}" icon="fa fa-list-alt"/>
+    </ui:define>
+
+    <ui:define name="page-scripts">
+        <h:outputScript name="js/resize.js" target="body"/>
+        <h:outputScript name="js/scroll.js" target="body"/>
+        <h:outputScript name="js/metadata_editor.js" target="body"/>
+        <h:outputScript name="js/metadata_editor_unsaved_changes.js" target="head"/>
+        <h:outputScript name="js/metadataeditor_jquery-ui_fix.js" />
+        <h:outputScript name="js/pf_contextMenu_custom.js" target="body"/>
+        <h:outputScript>
+            PrimeFaces.widget.VerticalTree.prototype.bindKeyEvents = function () {
+                // Prevent PrimeFaces' default keyboard event handling for VerticalTrees.
+            };
+            $(document).ready(function () {
+                metadataEditor.shortcuts.listen(#{DataEditorForm.shortcuts});
+                metadataEditor.contextMenu.listen();
+            });
+        </h:outputScript>
+    </ui:define>
+
+</ui:composition>

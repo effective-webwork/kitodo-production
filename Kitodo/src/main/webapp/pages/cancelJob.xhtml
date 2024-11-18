@@ -1,0 +1,82 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <!--@elvariable id="id" type="java.lang.Integer"-->
+    <f:metadata>
+        <f:viewParam name="id"/>
+        <f:viewAction action="#{CancelJobForm.load(id)}" />
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h3><h:outputText value="#{CancelJobForm.process.title}"/></h3>
+        <p:commandButton id="cancelJob"
+                         widgetVar="cancelJob"
+                         value="#{msgs.cancelJob}"
+                         action="#{CancelJobForm.cancelJob}"
+                         icon="fa fa-ban fa-lg"
+                         onclick="setConfirmUnload(false);"
+                         iconPos="right"/>
+        <p:button id="cancel"
+                  value="#{msgs.cancel}"
+                  outcome="#{'processes'}"
+                  icon="fa fa-times fa-lg"
+                  iconPos="right"
+                  onclick="setConfirmUnload(false);"
+                  styleClass="secondary"/>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="tabs" cache="false">
+            <p:tab title="#{msgs.jobCancelation}" id="cancelJobTab">
+                <p:panelGrid id="cancelJobGrid" columns="2" cellpadding="10" layout="grid">
+                    <p:row>
+                        <div>
+                            <p:outputLabel for="cancelCode"
+                                           value="#{msgs.cancelReason}"/>
+                            <p:selectOneMenu id="cancelCode"
+                                             value="#{CancelJobForm.cancelCode}">
+                                <f:selectItems value="#{CancelJobForm.getCancelCodes()}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </p:row>
+                    <p:row>
+                        <div>
+                            <p:outputLabel for="cancellationMessage" value="#{msgs.cancelMessage}"/>
+                            <p:inputText id="cancellationMessage"
+                                         value="#{CancelJobForm.cancellationMessage}"
+                                         class="input"
+                                         maxlength="#{CancelJobForm.getCancellationMessageMaxLength()}"
+                                         counter="counter"
+                                         counterTemplate="Noch {0} Zeichen"
+                                         required="true"/>
+                            <h:outputText id="counter"/>
+                        </div>
+                    </p:row>
+                </p:panelGrid>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.processes}" url="processes.jsf" icon="fa fa-clipboard"/>
+        <p:menuitem value="#{msgs.cancelJob}" icon="fa fa-ban"/>
+    </ui:define>
+
+</ui:composition>

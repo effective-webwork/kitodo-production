@@ -1,0 +1,103 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition template="/WEB-INF/templates/base.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:sec="http://www.springframework.org/security/tags">
+    <f:metadata>
+        <f:viewAction action="#{LoginForm.redirectToDesktop()}"/>
+    </f:metadata>
+
+    <ui:define name="search">
+        <div class="wrapper">
+            <section id="portal-logo" class="login-screen">
+                <h:graphicImage name="images/kitodo-logo.svg" alt="Kitodo.Production" height="36" id="kitodo-logo"/>
+                <h:graphicImage name="images/kitodo-icon.svg" alt="Kitodo.Production" width="40" id="kitodo-icon"/>
+            </section>
+        </div>
+    </ui:define>
+
+    <ui:define name="breadcrumbs" />
+
+    <ui:define name="navigation" />
+
+    <ui:define name="content">
+        <div class="wrapper">
+            <section id="login-section">
+                <sec:authorize access="isAuthenticated()">
+                    <h:panelGrid columns="2" width="100%" style="margin-bottom:0;">
+                        <h:panelGroup>
+                            <h:outputText style="font-weight: normal;"
+                                          value="#{LoginForm.loggedUser.surname}, #{LoginForm.loggedUser.name}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <form action="${request.contextPath}/logout" method="post">
+                                <input id="logout" type="submit" value="#{msgs.logout}"/>
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            </form>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </sec:authorize>
+
+                <sec:authorize access="isAnonymous()">
+                    <h:outputScript name="js/login.js" target="body" />
+                    <h3>#{msgs.pleaseSignIn}</h3>
+                    <form action="${request.contextPath}/login" method="post">
+                        <span style="color: red; ">
+                            <h:outputText value="${SPRING_SECURITY_LAST_EXCEPTION.localizedMessage}"/>
+                        </span>
+                        <div>
+                            <label for="username">#{msgs.username}</label>
+                            <input id="username" name="username" autocomplete="username"/>
+                        </div>
+                        <div>
+                            <label for="password">#{msgs.password}</label>
+                            <input id="password" type="password" name="password"/>
+                        </div>
+                        <button id="login" aria-disabled="false"><span class="button-text">#{msgs.signIn}</span> <span class="ui-icon ui-c fa fa-sign-in fa-lg"/></button>
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    </form>
+
+                    <div class="login-note">
+                        #{msgs.loginNoteText}
+                    </div>
+
+                    <h:panelGroup rendered="#{LoginForm.loggedUser == null and LoginForm.alreadyLoggedIn}">
+                        <h:outputText value="#{msgs.alreadyLoggedIn}"/>
+                        <br/>
+                    </h:panelGroup>
+                </sec:authorize>
+            </section>
+
+            <section id="login-language-section">
+                <h:form id="login-languages-form">
+                    <ul>
+                        <p:repeat value="#{LanguageForm.supportedLocales}" var="language">
+                            <c:set var="languageKey" value="#{language['id']}"/>
+                            <li class="#{LanguageForm.getLanguage() eq languageKey ? 'active' : ''}">
+                                <p:commandLink value="#{language.displayLanguageSelf}"
+                                               onclick="setLanguageCookieAndReload('#{languageKey}')"/>
+                            </li>
+                        </p:repeat>
+                    </ul>
+                </h:form>
+            </section>
+        </div>
+    </ui:define>
+
+</ui:composition>

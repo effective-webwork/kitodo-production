@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<kitodoProjects>
+    <project name="Vecteur">
+        <createNewProcess>
+            <itemlist>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="sgntr_cd">Signatur
+                </item>
+                <item from="vorlage" isdoctype="dossier|inventory|document" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="vrzng_enht_titel">Titel
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="zt_raum_txt">Entstehungszeitraum
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="frhrs_aktnzchn">Früheres Aktenzeichen
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="aktnzchn">Aktenzeichen
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="zstz_mrkml">Zusatzkomponente
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="darin_txt">Darin
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="form">Form
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" ughbinding="true" docstruct="topstruct"
+                      metadata="archv_nr">Archivnummer
+                </item>
+                <item from="vorlage" isdoctype="dossier|document" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="vrzng_enht_id">ID AIS
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="bmrkng_knde">Bemerkung (Kunde)
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="bmrkng_bar">Bemerkung (BAR)
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="auftrg_id">Auftrags-ID
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="bstll_dtm">Bestelldatum
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="bstll_id">Bestelleinheits-ID
+                </item>
+                <item from="vorlage" isdoctype="dossier" ughbinding="true" docstruct="topstruct"
+                      metadata="benutzungskopie">Benutzungskopie
+                </item>
+                <item from="vorlage" isdoctype="deliverable" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="ablfr_nr">Ablieferungsnummer (=Jahr/Lauf-Nr.)
+                </item>
+                <item from="vorlage" isdoctype="deliverable" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="ablfr_prtnr_id">Abliefernde Stelle
+                </item>
+                <item from="vorlage" isdoctype="deliverable" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="akte_blbnr_prtnr_id">Aktenbildner Name
+                </item>
+                <item from="vorlage" isdoctype="inventory" required="true" ughbinding="true" docstruct="topstruct"
+                      metadata="sgntr_cd">Signatur
+                </item>
+                <item from="vorlage" isdoctype="container" ughbinding="true" docstruct="topstruct"
+                      metadata="bhltn_cd">Behältniscode
+                </item>
+                <item from="vorlage" isdoctype="container" ughbinding="true" docstruct="topstruct"
+                      metadata="gsft_obj_typ_nm">Behältnistyp
+                </item>
+                <item from="vorlage" isdoctype="container" ughbinding="true" docstruct="topstruct"
+                      metadata="bhltn_info_trgr_nm">Informationsträger
+                </item>
+                <item from="vorlage" isdoctype="container" ughbinding="true" docstruct="topstruct"
+                      metadata="stndrt">Standort
+                </item>
+                <item from="werk" required="true" isdoctype="multivolume" ughbinding="true" docstruct="firstchild"
+                      metadata="CatalogIDDigital">PPN digital f-Satz
+                </item>
+                <!-- other metadata for all -->
+                <item from="vorlage" isdoctype="monograph|multivolume|periodical" ughbinding="true"
+                      docstruct="topstruct" metadata="PlaceOfPublication">Erscheinungsort
+                </item>
+                <item from="vorlage" ughbinding="true" docstruct="topstruct"
+                      metadata="PublicationYear">Erscheinungsjahr
+                </item>
+                <item from="vorlage" ughbinding="true" docstruct="topstruct"
+                      metadata="PublisherName">Verlag
+                </item>
+                <item from="vorlage" ughbinding="true" docstruct="physSequence" metadata="shelfmarksource">Signatur</item>
+                <hide/>
+            </itemlist>
+            <opac use="false"/>
+            <templates use="true"/>
+            <defaultdoctype>dossier</defaultdoctype>
+            <metadatageneration use="true"/>
+        </createNewProcess>
+        <tifheader>
+            <dossier>
+                '|[[DOC_TYPE]]'+$Doctype+'|[[HAUPTTITEL]]'+TitleDocMain+'|[[AUTOREN/HERAUSGEBER]]'+Autoren+'|[[JAHR]]'+PublicationYear+'|[[ERSCHEINUNGSORT]]'+PlaceOfPublication+'|[[VERZ_STRCT]]'+TSL_ATS+'_'+CatalogIDDigital+'|'
+            </dossier>
+        </tifheader>
+        <dmsImport/>
+    </project>
+</kitodoProjects>

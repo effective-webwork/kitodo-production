@@ -1,0 +1,45 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <p:dataTable id="taskRuntimeTable"
+                 value="#{ProcessForm.lazyDTOModel}"
+                 var="process"
+                 lazy="true"
+                 paginator="true"
+                 sortBy="#{process.creationDate}"
+                 resizableColumns="true"
+                 liveResize="true"
+                 sortOrder="ascending"
+                 rows="#{LoginForm.loggedUser.tableSize}"
+                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                 paginatorPosition="bottom">
+        <p:column id="titleColumn"
+                  headerText="#{msgs.processTitle} (Auftrags-ID, Kitodo-ID)">
+            <h:outputText value="#{process.title} (#{StatisticBean.getViaducId(process)}, #{process.id})"
+                          title="#{process.title} (#{StatisticBean.getViaducId(process)}, #{process.id})"/>
+        </p:column>
+        <p:columns var="task"
+                   value="#{StatisticBean.getWorkflowTasks()}">
+            <f:facet name="header">
+                <h:outputText value="#{HelperForm.getTranslated(task)}"
+                              title="#{HelperForm.getTranslated(task)}"/>
+            </f:facet>
+            <h:outputText value="#{StatisticBean.getTaskRuntime(process, task)}"/>
+        </p:columns>
+    </p:dataTable>
+</ui:composition>

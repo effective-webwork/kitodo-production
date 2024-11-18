@@ -1,0 +1,116 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:jsf="http://xmlns.jcp.org/jsf"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <!--@elvariable id="isViewMode" type="boolean"-->
+    <p:panelGrid id="editDetailForm" columns="2" cellpadding="10" layout="grid">
+        <p:row>
+            <div>
+                <p:outputLabel for="title" value="#{msgs.templateTitle}"/>
+                <p:inputText id="title" placeholder="#{msgs.templateTitle}"
+                             value="#{TemplateForm.template.title}"
+                             title="#{TemplateForm.template.title}"
+                             class="input" disabled="#{isViewMode}"
+                             required="#{not empty param['editForm:save']}">
+                    <p:ajax event="blur"/>
+                </p:inputText>
+            </div>
+
+            <div>
+                <p:outputLabel for="project" value="#{msgs.projects}"/>
+                <p:selectManyCheckbox  id="project" value="#{TemplateForm.assignedProjects}" layout="grid" columns="1"
+                                       converter="#{projectConverter}" required="#{not empty param['editForm:save']}"
+                                       styleClass="input #{isViewMode ? 'disabled' : ''}" disabled="#{isViewMode}">
+                    <f:selectItems value="#{TemplateForm.projects}"
+                                   var="project"
+                                   itemLabel="#{project.title}"
+                                   itemValue="#{project}"
+                                   itemDisabled="#{TemplateForm.isUserNotAssignedToProject(project)}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectManyCheckbox >
+            </div>
+
+            <div>
+                <p:outputLabel for="active" value="#{msgs.active}"/>
+                <p:selectBooleanCheckbox id="active" styleClass="switch input" value="#{TemplateForm.template.active}"
+                                         title="#{TemplateForm.template.active}"
+                                         disabled="#{isViewMode}">
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectBooleanCheckbox>
+            </div>
+
+        </p:row>
+
+        <p:row>
+            <div>
+                <p:outputLabel for="ruleset" value="#{msgs.ruleset}"/>
+                <p:selectOneMenu id="ruleset" value="#{TemplateForm.template.ruleset}"
+                                 title="#{TemplateForm.template.ruleset}" converter="#{rulesetConverter}"
+                                 required="#{not empty param['editForm:save']}" disabled="#{isViewMode}">
+                    <f:selectItems value="#{TemplateForm.rulesets}"
+                                   var="ruleset"
+                                   itemValue="#{ruleset}"
+                                   itemLabel="#{ruleset.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div>
+                <p:outputLabel for="docket" value="#{msgs.docket}"/>
+                <p:selectOneMenu id="docket" value="#{TemplateForm.template.docket}"
+                                 title="#{TemplateForm.template.docket}" converter="#{docketConverter}"
+                                 required="#{not empty param['editForm:save']}" disabled="#{isViewMode}">
+                    <f:selectItems value="#{TemplateForm.dockets}"
+                                   var="docket"
+                                   itemValue="#{docket}"
+                                   itemLabel="#{docket.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div>
+                <p:outputLabel for="workflow" value="#{msgs.workflow}"/>
+                <p:selectOneMenu id="workflow" value="#{TemplateForm.template.workflow}"
+                                 title="#{TemplateForm.template.workflow}" disabled="#{isViewMode}"
+                                 converter="#{workflowConverter}"
+                                 required="#{not empty param['editForm:save']}">
+                    <f:selectItems value="#{TemplateForm.workflows}"
+                                   var="workflow"
+                                   itemValue="#{workflow}"
+                                   itemLabel="#{workflow.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div jsf:rendered="#{SecurityAccessController.hasAuthorityToAssignOcrdWorkflow()}">
+                <p:outputLabel for="ocrdWorkflow" value="#{msgs.ocrdWorkflow}"/>
+                <p:selectOneMenu id="ocrdWorkflow" value="#{TemplateForm.ocrdWorkflow}"
+                                 disabled="#{isViewMode}"
+                                 converter="#{ocrdWorkflowConverter}">
+                    <f:selectItem itemValue="#{null}"
+                                  itemLabel="#{msgs.notSelected}"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{TemplateForm.ocrdWorkflows}"
+                                   var="ocrdWorkflow"
+                                   itemValue="#{ocrdWorkflow}"
+                                   itemLabel="#{ocrdWorkflow.value}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+        </p:row>
+    </p:panelGrid>
+</ui:composition>

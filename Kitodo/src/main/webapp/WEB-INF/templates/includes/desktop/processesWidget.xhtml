@@ -1,0 +1,123 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dataTable id="processTable"
+                 value="#{DesktopForm.processes}"
+                 scrollable="true"
+                 styleClass="default-layout"
+                 var="process">
+        <p:column headerText="#{msgs.id}"
+                  width="70"
+                  styleClass="numeric">
+            <h:outputText title="#{process.id}"
+                          value="#{process.id}"/>
+        </p:column>
+        <p:column headerText="#{msgs.title}">
+            <h:outputText title="#{process.title}"
+                          value="#{process.title}"/>
+        </p:column>
+        <p:column headerText="#{msgs.status}">
+            <ui:include src="/WEB-INF/templates/includes/processes/progressColumn.xhtml"/>
+        </p:column>
+
+        <p:column styleClass="comment-column"
+                  width="85"
+                  headerText="#{msgs.comments}">
+            <h:panelGroup id="commentIcon">
+                <h:panelGroup styleClass="fa
+                    #{DesktopForm.hasCorrectionTask(process.id) gt 0 ? 'fa-exclamation-circle correction' : 'fa-comment'}
+                    #{DesktopForm.hasCorrectionTask(process.id) eq 1 ? 'corrected' : ''}"
+                              rendered="#{process.hasComments()}"/>
+            </h:panelGroup>
+            <p:tooltip for="commentIcon" styleClass="comments" trackMouse="true">
+                <ui:include src="/WEB-INF/templates/includes/base/commentTooltip.xhtml">
+                    <ui:param name="comments" value="#{commentTooltipView.getComments(process)}"/>
+                </ui:include>
+            </p:tooltip>
+
+        </p:column>
+
+        <p:column headerText="#{msgs.project}">
+            <h:outputText title="#{process.project.title}"
+                          value="#{process.project.title}"/>
+        </p:column>
+        <p:column headerText="#{msgs.actions}" styleClass="actionsColumn">
+            <h:form id="actionForm">
+                <h:link id="editProcess"
+                        outcome="/pages/processEdit"
+                        styleClass="action"
+                        title="#{msgs.edit}"
+                        rendered="#{SecurityAccessController.hasAuthorityToEditProcess()}">
+                    <i class="fa fa-pencil-square-o fa-lg"/>
+                    <f:param name="id" value="#{process.id}"/>
+                    <f:param name="referer" value="desktop"/>
+                </h:link>
+
+                <!-- open metadata editor -->
+                <h:panelGroup styleClass="action"
+                              title="#{MetadataLock.isLocked(process.id) ? msgs['blocked'].concat(MetadataLock.getLockUser(process.id).fullName) : msgs['metadataEdit']}">
+                    <h:link id="editMetadata"
+                            outcome="metadataEditor"
+                            disabled="#{MetadataLock.isLocked(process.id)}"
+                            styleClass="#{MetadataLock.isLocked(process.id) ? 'ui-state-disabled' : ''}"
+                            rendered="#{SecurityAccessController.hasAuthorityToOpenMetadataEditor()}">
+                        <h:outputText><i class="fa fa-list-alt"/></h:outputText>
+                        <f:param name="id" value="#{process.id}"/>
+                        <f:param name="referer" value="desktop"/>
+                    </h:link>
+                </h:panelGroup>
+
+                <p:commandLink id="download"
+                               action="#{DesktopForm.downloadToHome(process.id)}"
+                               styleClass="action"
+                               title="#{msgs.linkHomeDirectory}"
+                               rendered="#{SecurityAccessController.hasAuthorityToEditProcessImages()}">
+                    <h:outputText><i class="fa fa-download"/></h:outputText>
+                    <!-- TODO: add separate message in case it already exists and alert -->
+                </p:commandLink>
+
+                <p:commandLink id="exportMets"
+                               action="#{DesktopForm.exportMets(process.id)}"
+                               styleClass="action"
+                               title="#{msgs.exportMets}"
+                               rendered="#{SecurityAccessController.hasAuthorityToExportProcess()}">
+                    <h:outputText><i class="fa fa-file-code-o"/></h:outputText>
+                </p:commandLink>
+
+                <h:panelGroup styleClass="action"
+                              title="#{process.hasChildren() ? msgs.processNotDeletableWithChildren : msgs.delete}">
+                    <p:commandLink id="deleteProcess"
+                                   action="#{DesktopForm.deleteProcess(process.id)}"
+                                   title="#{ process.hasChildren() ? msgs.processNotDeletableWithChildren : msgs.delete}"
+                                   rendered="#{SecurityAccessController.hasAuthorityToDeleteProcess()}"
+                                   disabled="#{process.hasChildren()}"
+                                   update="processTable taskTable statisticsTable">
+                        <h:outputText><i class="fa fa-trash-o"/></h:outputText>
+                        <p:confirm header="#{msgs.confirmDelete}"
+                                   message="#{DesktopForm.formatString('confirmDeleteProcess', process.title)}"
+                                   icon="ui-icon-alert"/>
+                    </p:commandLink>
+                </h:panelGroup>
+            </h:form>
+        </p:column>
+    </p:dataTable>
+
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/processes/deleteChildrenDialog.xhtml"/>
+    </ui:define>
+</ui:composition>

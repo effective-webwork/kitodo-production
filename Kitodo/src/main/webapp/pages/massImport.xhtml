@@ -1,0 +1,82 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <!--@elvariable id="templateId" type="java.lang.Integer"-->
+        <f:viewParam name="templateId"/>
+        <!--@elvariable id="projectId" type="java.lang.Integer"-->
+        <f:viewParam name="projectId"/>
+        <f:viewAction action="#{MassImportForm.prepareMassImport(templateId, projectId)}"/>
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h3 id="headerText">
+            <h:outputText value="#{msgs.massImport} (#{msgs.template}: '#{MassImportForm.templateTitle}')"
+                          styleClass="shortable" />
+        </h3>
+        <p:button id="cancel"
+                  value="#{msgs.cancel}"
+                  onclick="setConfirmUnload(false);"
+                  outcome="projects"
+                  icon="fa fa-times fa-lg"
+                  iconPos="right"
+                  styleClass="secondary"/>
+        <p:commandButton id="importButton"
+                         value="#{msgs.massImport}"
+                         disabled="#{empty MassImportForm.records or not MassImportForm.getRulesetConfigurationForOpacImportComplete()}"
+                         actionListener="#{MassImportForm.prepare()}"
+                         action="#{MassImportForm.startMassImport()}"
+                         icon="fa fa-download fa-lg"
+                         iconPos="right"
+                         onclick="setConfirmUnload(false);PF('massImportProgressDialog').show();PF('massImportProgressBar').start();"
+                         update="notifications sticky-notifications :massImportProgressForm">
+            <p:resetInput target=":massImportProgressForm"/>
+        </p:commandButton>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView activeIndex="#{ProjectForm.activeTabIndex}"
+                   prependId="false"
+                   id="projectsTabView"
+                   widgetVar="projectsTabView">
+            <p:ajax event="tabChange" listener="#{MassImportForm.onTabChange}"/>
+            <p:tab title="#{msgs.massImport}"
+                   id="massImportTab"
+                   rendered="#{SecurityAccessController.hasAuthorityToAddProcess()}">
+                <ui:include src="/WEB-INF/templates/includes/massImport/massImportTab.xhtml"/>
+            </p:tab>
+
+        </p:tabView>
+        <p:ajaxStatus onstart="$('#loadingScreen').show()" oncomplete="$('#loadingScreen').hide()"/>
+    </ui:define>
+
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/massImport/dialogs/addMetadata.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/massImport/dialogs/massImportProgress.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/massImport/dialogs/massImportResults.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/massImport/dialogs/configError.xhtml"/>
+        <ui:include src="/WEB-INF/templates/includes/recordIdentifierMissingDialog.xhtml"/>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.massImport}" icon="fa fa-stack-overflow"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,275 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:panelGrid id="metsParamaterForm" columns="2" cellpadding="10" layout="grid">
+        <p:row>
+            <div>
+                <p:outputLabel for="metsRightsOwner" value="#{msgs.metsRightsOwner}" />
+                <p:inputText id="metsRightsOwner" placeholder="#{msgs.metsRightsOwner}" styleClass="input-with-button" value="#{ProjectForm.project.metsRightsOwner}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsRightsOwnerButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsRightsOwnerButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsRightsOwner', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsRightsOwner}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsRightsOwnerUrl" value="#{msgs.metsRightsOwnerSite}" />
+                <p:inputText id="metsRightsOwnerUrl" placeholder="#{msgs.metsRightsOwnerSite}" styleClass="input-with-button" value="#{ProjectForm.project.metsRightsOwnerSite}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsRightsOwnerUrlButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsRightsOwnerUrlButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsRightsOwnerUrl', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsRightsOwnerSite}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsDigiprovReference" value="#{msgs.metsDigiprovReference}" />
+                <p:inputText id="metsDigiprovReference" placeholder="#{msgs.metsDigiprovReference}" styleClass="input-with-button" value="#{ProjectForm.project.metsDigiprovReference}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsDigiprovReferenceButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsDigiprovReferenceButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsDigiprovReference', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsDigiprovReference}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsPointerPath" value="#{msgs.metsPointerPath}" />
+                <p:inputText id="metsPointerPath" placeholder="#{msgs.metsPointerPath}" styleClass="input-with-button" value="#{ProjectForm.project.metsPointerPath}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsPointerPathButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsPointerPathButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsPointerPath', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsPointerPath}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsPurl" value="#{msgs.metsPurl}" />
+                <p:inputText id="metsPurl" placeholder="#{msgs.metsPurl}" styleClass="input-with-button" value="#{ProjectForm.project.metsPurl}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsPurlButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsPurlButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsPurl', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsPurl}"/>
+            </div>
+        </p:row>
+        <p:row>
+            <div>
+                <p:outputLabel for="metsRightsOwnerLogo" value="#{msgs.metsRightsOwnerLogo}" />
+                <p:inputText id="metsRightsOwnerLogo" placeholder="#{msgs.metsRightsOwnerLogo}" styleClass="input-with-button" value="#{ProjectForm.project.metsRightsOwnerLogo}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsRightsOwnerLogoButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsRightsOwnerLogoButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsRightsOwnerLogo', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsRightsOwnerLogo}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsRightsOwnerContact" value="#{msgs.metsRightsOwnerMail}" />
+                <p:inputText id="metsRightsOwnerContact" placeholder="#{msgs.metsRightsOwnerMail}" styleClass="input-with-button" value="#{ProjectForm.project.metsRightsOwnerMail}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsRightsOwnerContactButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsRightsOwnerContactButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsRightsOwnerContact', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsRightsOwnerMail}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsDigiprovPresentation" value="#{msgs.metsDigiprovPresentation}" />
+                <p:inputText id="metsDigiprovPresentation" placeholder="#{msgs.metsDigiprovPresentation}" styleClass="input-with-button" value="#{ProjectForm.project.metsDigiprovPresentation}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsDigiprovPresentationButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsDigiprovPresentationButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsDigiprovPresentation', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsDigiprovPresentation}"/>
+            </div>
+            <div>
+                <p:outputLabel for="metsContentId" value="#{msgs.metsContentIDs}" />
+                <p:inputText id="metsContentId" placeholder="#{msgs.metsContentIDs}" styleClass="input-with-button" value="#{ProjectForm.project.metsContentIDs}"
+                             disabled="#{ProjectForm.locked}">
+                    <p:ajax event="blur"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                    <p:ajax event="keyup" update="editForm:projectTabView:copyMetsContentIdButton"/>
+                </p:inputText>
+                <p:commandButton id="copyMetsContentIdButton" type="button" icon="fa fa-copy" onclick="copyToClipboard('editForm:projectTabView:metsContentId', '#{msgs.stringCopiedSuccess}', '#{msgs.stringCopiedError}')" disabled="#{empty ProjectForm.project.metsContentIDs}"/>
+            </div>
+        </p:row>
+    </p:panelGrid>
+    <!-- mets file groups -->
+    <p:panel id="mets-file-groups" styleClass="mets-file-groups">
+        <p:dataTable id="folderTable" var="folder" value="#{ProjectForm.folderList}"
+                     disabled="#{ProjectForm.locked}">
+            <p:column headerText="#{msgs.metsfilegroups}">
+                <h:outputText value="#{folder.path}, #{folder.fileGroup}" />
+            </p:column>
+            <p:column>
+                <!-- edit button -->
+                <p:commandLink oncomplete="PF('editFolderDialog').show()"
+                               id="edit"
+                               styleClass="buttonset plain"
+                               update="@(.editDialog)"
+                               disabled="#{ProjectForm.locked}"
+                               immediate="true">
+                    <i class="fa fa-pencil-square-o fa-lg"/>
+                    <f:setPropertyActionListener target="#{ProjectForm.myFolder}" value="#{folder}"/>
+                </p:commandLink>
+                <!-- delete button -->
+                <p:commandLink action="#{ProjectForm.deleteFolder()}"
+                               update="editForm"
+                               title="#{msgs.fileGroupDelete}"
+                               oncomplete="toggleSave()"
+                               styleClass="buttonset plain"
+                               disabled="#{ProjectForm.locked}"
+                               immediate="true">
+                    <h:outputText><i class="fa fa-trash fa-lg"/></h:outputText>
+                    <f:setPropertyActionListener target="#{ProjectForm.myFolder}" value="#{folder}"/>
+                    <p:confirm header="#{msgs.confirmDelete}"
+                               message="#{msgs.shouldItemBeRemoved}"/>
+                </p:commandLink>
+            </p:column>
+        </p:dataTable>
+        <!-- add button -->
+        <p:commandButton actionListener="#{ProjectForm.addFolder()}"
+                         update="@(.editDialog)"
+                         oncomplete="PF('editFolderDialog').show();toggleSave()"
+                         value="#{msgs.fileGroupAdd}"
+                         styleClass="callto"
+                         icon="fa fa-plus-circle fa-lg"
+                         iconPos="right"
+                         disabled="#{ProjectForm.locked}"
+                         immediate="true">
+            <f:setPropertyActionListener target="#{ProjectForm.stayOnCurrentPage}" value="/pages/projectEditMetsPopup"/>
+        </p:commandButton>
+    </p:panel>
+
+    <p:separator/>
+
+    <div class="horizontal-separator"></div>
+
+    <p:panelGrid columns="1" layout="grid">
+        <p:row>
+            <h4><h:outputText value="#{msgs.folderUse}"/></h4>
+        </p:row>
+        <p:row>
+            <!-- folder for preview -->
+            <p:outputLabel for="preview" value="#{msgs['folderUse.preview']}"/>
+            <p:selectOneMenu id="preview" value="#{ProjectForm.preview}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.preview.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row>
+            <!-- folder for media view -->
+            <p:outputLabel for="mediaView" value="#{msgs['folderUse.mediaView']}"/>
+            <p:selectOneMenu id="mediaView" value="#{ProjectForm.mediaView}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.mediaView.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row rendered="#{ProjectForm.hasAudioFolder()}">
+            <!-- folder for audio preview -->
+            <p:outputLabel for="audioPreview" value="#{msgs['folderUse.audioPreview']}"/>
+            <p:selectOneMenu id="audioPreview" value="#{ProjectForm.audioPreview}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.audioPreview.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row rendered="#{ProjectForm.hasAudioFolder()}">
+            <!-- folder for audio media view -->
+            <p:outputLabel for="audioMediaView" value="#{msgs['folderUse.audioMediaView']}"/>
+            <p:selectOneMenu id="audioMediaView" value="#{ProjectForm.audioMediaView}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.audioMediaView.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row rendered="#{ProjectForm.hasAudioFolder()}">
+            <p:outputLabel for="audioMediaViewWaveform" value="#{msgs['folderUse.audioMediaViewWaveform']}"/>
+            <p:selectBooleanCheckbox id="audioMediaViewWaveform" styleClass="switch input"
+                                     value="#{ProjectForm.audioMediaViewWaveform}" disabled="#{ProjectForm.locked}">
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectBooleanCheckbox>
+        </p:row>
+        <p:row rendered="#{ProjectForm.hasVideoFolder()}">
+            <!-- folder for video preview -->
+            <p:outputLabel for="videoPreview" value="#{msgs['folderUse.videoPreview']}"/>
+            <p:selectOneMenu id="videoPreview" value="#{ProjectForm.videoPreview}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.videoPreview.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row rendered="#{ProjectForm.hasVideoFolder()}">
+            <!-- folder for video media view -->
+            <p:outputLabel for="videoMediaView" value="#{msgs['folderUse.videoMediaView']}"/>
+            <p:selectOneMenu id="videoMediaView" value="#{ProjectForm.videoMediaView}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.videoMediaView.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+        <p:row>
+            <!-- source folder for content generation -->
+            <p:outputLabel for="generatorSource" value="#{msgs['folderUse.generatorSource']}"/>
+            <p:selectOneMenu id="generatorSource" value="#{ProjectForm.generatorSource}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['folderUse.generatorSource.disabled']}" itemValue="#{null}"
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{ProjectForm.selectableFolders}"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+    </p:panelGrid>
+
+    <div class="horizontal-separator"></div>
+
+    <p:panelGrid columns="1" layout="grid">
+        <p:row>
+            <h4>#{msgs['preview.headline']}</h4>
+        </p:row>
+        <p:row>
+            <p:outputLabel for="previewHoverMode" value="#{msgs['previewHoverMode']}"/>
+            <p:selectOneMenu id="previewHoverMode" value="#{ProjectForm.previewHoverMode}"
+                             disabled="#{ProjectForm.locked}">
+                <f:selectItem itemLabel="#{msgs['previewHoverMode.OVERLAY']}" itemValue="OVERLAY"/>
+                <f:selectItem itemLabel="#{msgs['previewHoverMode.TOOLTIP_PREVIEW']}"
+                              itemValue="TOOLTIP_PREVIEW"/>
+                <f:selectItem itemLabel="#{msgs['previewHoverMode.TOOLTIP_MEDIAVIEW']}" itemValue="TOOLTIP_MEDIAVIEW"/>
+                <p:ajax event="change" oncomplete="toggleSave()"/>
+            </p:selectOneMenu>
+        </p:row>
+    </p:panelGrid>
+
+</ui:composition>

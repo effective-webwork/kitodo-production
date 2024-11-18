@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DigitalisierungsAuftrag xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Ablieferung>
+        <Ablieferungsnummer>1967/149</Ablieferungsnummer>
+        <AblieferndeStelle>Bundesverwaltung (Bern)</AblieferndeStelle>
+        <AktenbildnerName>Handelsabteilung (k. A.)</AktenbildnerName>
+    </Ablieferung>
+    <OrdnungsSystem>
+        <Signatur>E7110*</Signatur>
+        <Name>Handelsabteilung: Zentrale Ablage (1916-1979)</Name>
+        <Stufe>Teilbestand</Stufe>
+        <UntergeordnetesOrdnungsSystem>
+            <Signatur>E7110#3</Signatur>
+            <Name>Schweizerische Zollgesetzgebung und Zollpraxis</Name>
+            <Stufe>Serie</Stufe>
+            <UntergeordnetesOrdnungsSystem>
+                <Signatur>E7110#36</Signatur>
+                <Name>Einfuhrverbote / Einfuhrbeschränkungen</Name>
+                <Stufe>Serie</Stufe>
+                <UntergeordnetesOrdnungsSystem>
+                    <Signatur>E7110#36.07</Signatur>
+                    <Name>Textilien, Konfektion, Gewebe etc.</Name>
+                    <Stufe>Serie</Stufe>
+                </UntergeordnetesOrdnungsSystem>
+            </UntergeordnetesOrdnungsSystem>
+        </UntergeordnetesOrdnungsSystem>
+    </OrdnungsSystem>
+    <Dossier>
+        <Signatur>E7110#1967/149#101*</Signatur>
+        <Titel>Gummi- und Kautschukwaren, gummierte Stoffe</Titel>
+        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+        <Stufe>Dossier</Stufe>
+        <Aktenzeichen>36.0706</Aktenzeichen>
+        <VerzEinheitId>2325675</VerzEinheitId>
+        <Behaeltnisse>
+            <Behaeltnis>
+                <BehaeltnisCode>1967/149_15</BehaeltnisCode>
+                <BehaeltnisTyp>Bändelmappen</BehaeltnisTyp>
+                <InformationsTraeger>Papier</InformationsTraeger>
+                <Standort>1.1.168.04.05</Standort>
+                <EnthalteneVerzEinheiten>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#101*</Signatur>
+                        <Titel>Gummi- und Kautschukwaren, gummierte Stoffe</Titel>
+                        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+                        <Aktenzeichen>36.0706</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#102*</Signatur>
+                        <Titel>Wirk- und Strickwaren, Strümpfe, Socken</Titel>
+                        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+                        <Aktenzeichen>36.0707</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#103*</Signatur>
+                        <Titel>Kunstseide</Titel>
+                        <Entstehungszeitraum>1937</Entstehungszeitraum>
+                        <Aktenzeichen>36.0708</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#104*</Signatur>
+                        <Titel>Seidengewebe</Titel>
+                        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+                        <Aktenzeichen>36.0709</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#105*</Signatur>
+                        <Titel>Asiatische Seidengewebe</Titel>
+                        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+                        <Aktenzeichen>36.0710</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#106*</Signatur>
+                        <Titel>Wollgarne</Titel>
+                        <Entstehungszeitraum>1936-1938</Entstehungszeitraum>
+                        <Aktenzeichen>36.0711</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#107*</Signatur>
+                        <Titel>Pelzkonfektion</Titel>
+                        <Entstehungszeitraum>1936-1937</Entstehungszeitraum>
+                        <Aktenzeichen>36.0712</Aktenzeichen>
+                    </VerzEinheit>
+                    <VerzEinheit>
+                        <Signatur>E7110#1967/149#108*</Signatur>
+                        <Titel>Schirme, Schirmstoffe, Spazierstöcke</Titel>
+                        <Entstehungszeitraum>1936</Entstehungszeitraum>
+                        <Aktenzeichen>36.0713</Aktenzeichen>
+                    </VerzEinheit>
+                </EnthalteneVerzEinheiten>
+            </Behaeltnis>
+        </Behaeltnisse>
+        <InSchutzfrist>false</InSchutzfrist>
+    </Dossier>
+    <Auftragsdaten>
+        <BemerkungenKunde />
+        <BemerkungenBar />
+        <AuftragsId>49</AuftragsId>
+        <Bestelldatum>2018-08-29T10:28:38.787</Bestelldatum>
+        <BestelleinheitId>2325675</BestelleinheitId>
+        <Benutzungskopie>false</Benutzungskopie>
+    </Auftragsdaten>
+</DigitalisierungsAuftrag>

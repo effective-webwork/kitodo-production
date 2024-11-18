@@ -1,0 +1,166 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog widgetVar="confirmResetTasksDialog"
+              id="confirmResetTasksDialog"
+              global="true"
+              showEffect="fade"
+              hideEffect="fade"
+              styleClass="confirm-delete"
+              modal="true"
+              width="600px"
+              appendTo="@(body)"
+              resizable="false">
+        <h:panelGroup>
+            <h3>#{msgs.confirmDelete}</h3>
+            <div class="select-note ui-messages-error">
+                #{UserForm.formatString('confirmDeleteUserWithTasks', UserForm.userObject.fullName)}
+            </div>
+        </h:panelGroup>
+        <h:panelGroup>
+            <h:form>
+                <p:commandButton
+                        id="yesButton"
+                        value="#{msgs.yes}"
+                        action="#{UserForm.resetTasksAndDeleteUser}"
+                        oncomplete="PF('confirmResetTasksDialog').hide();"
+                        styleClass="ui-confirmdialog-yes primary right"
+                        style="margin-right: 10px"
+                        icon="fa fa-check fa-lg"
+                        iconPos="right"
+                        update="usersTabView:usersTable"/>
+                <p:commandButton
+                        id="cancelButton"
+                        value="#{msgs.cancel}"
+                        onclick="PF('confirmResetTasksDialog').hide();"
+                        type="button"
+                        styleClass="ui-confirmdialog-no secondary right"
+                        style="margin-right: 10px"
+                        iconPos="right"
+                        icon="fa fa-times fa-lg"/>
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+
+    <!--@elvariable id="item" type="org.kitodo.production.dto.UserDTO"-->
+    <p:dataTable var="item"
+                 id="usersTable"
+                 widgetVar="usersTable"
+                 styleClass="default-layout"
+                 value="#{UserForm.lazyDTOModel}"
+                 first="#{UserForm.firstRow}"
+                 lazy="true"
+                 paginator="true"
+                 resizableColumns="true"
+                 liveResize="true"
+                 rowStyleClass="#{item.active ? '' : 'deactivated'}"
+                 sortBy="#{item.surname}"
+                 rows="#{LoginForm.loggedUser.tableSize}"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {JumpToPageInput} {NextPageLink} {LastPageLink}"
+                 currentPageReportTemplate="#{msgs.currentPageReportTemplate}"
+                 paginatorPosition="bottom">
+        <p:ajax event="page"
+                listener="#{UserForm.onPageChange}"/>
+        <p:column headerText="#{msgs.username}"
+                  sortBy="#{item.surname}"
+                  rendered="#{UserForm.showColumn('user.username')}">
+            <h:outputText value="#{item.surname}, #{item.name}"
+                          title="#{item.surname}, #{item.name}"/>
+        </p:column>
+        <p:column headerText="#{msgs.location}"
+                  sortBy="#{item.location}"
+                  rendered="#{UserForm.showColumn('user.location')}">
+            <h:outputText title="#{item.location}"
+                          value="#{item.location}"/>
+        </p:column>
+        <p:column headerText="#{msgs.roles}"
+                  rendered="#{UserForm.showColumn('user.roles')}">
+            <h:outputText value="#{UserForm.getRoleTitles(item.roles)}"
+                          title="#{UserForm.getRoleTitles(item.roles)}"/>
+        </p:column>
+        <p:column headerText="#{msgs.clients}"
+                  rendered="#{UserForm.showColumn('user.clients')}">
+            <h:outputText value="#{UserForm.getClientNames(item.clients)}"
+                          title="#{UserForm.getClientNames(item.clients)}"/>
+        </p:column>
+        <p:column headerText="#{msgs.projects}"
+                  rendered="#{UserForm.showColumn('user.projects')}">
+            <h:outputText value="#{UserForm.getProjectTitles(item.projects)}"
+                          title="#{UserForm.getProjectTitles(item.projects)}"/>
+        </p:column>
+        <p:column headerText="#{msgs.loggedIn}"
+                  rendered="#{UserForm.showColumn('user.loggedIn')}"
+                  styleClass="checkboxColumn">
+            <ui:fragment rendered="#{UserForm.checkUserLoggedIn(item)}">
+                <h:outputText title="#{msgs.active}">
+                    <i class="fa fa-check-square-o fa-lg checkbox-checked"/>
+                </h:outputText>
+            </ui:fragment>
+        </p:column>
+        <p:column headerText="#{msgs.actions}"
+                  resizable="false"
+                  width="70"
+                  styleClass="actionsColumn">
+            <h:form id="actionForm">
+                <h:link id="viewUser"
+                        outcome="userEdit"
+                        styleClass="action"
+                        title="#{msgs.view}"
+                        rendered="#{SecurityAccessController.hasAuthorityToViewUser() and not SecurityAccessController.hasAuthorityToEditUser()}">
+                    <f:param name="id" value="#{item.id}"/>
+                    <i class="fa fa-eye fa-lg"/>
+                </h:link>
+
+                <h:link id="editUser"
+                        outcome="userEdit"
+                        styleClass="action"
+                        title="#{msgs.edit}"
+                        rendered="#{SecurityAccessController.hasAuthorityToEditUser()}">
+                    <f:param name="id" value="#{item.id}"/>
+                    <i class="fa fa-pencil-square-o fa-lg"/>
+                </h:link>
+
+                <h:panelGroup styleClass="action"
+                              title="#{empty UserForm.getTasksInProgress(item) ? msgs.userWithoutTasks : msgs.unassignTasks}">
+                    <p:commandLink id="unassignTasks"
+                                   action="#{UserForm.resetTasksToOpen(item)}"
+                                   styleClass="#{empty UserForm.getTasksInProgress(item) ? 'ui-state-disabled' : ''}"
+                                   disabled="#{empty UserForm.getTasksInProgress(item)}"
+                                   update="@this"
+                                   rendered="#{SecurityAccessController.hasAuthorityToUnassignTasks()}">
+                        <h:outputText><i class="fa fa-user-times"/></h:outputText>
+                        <p:confirm message=" #{msgs.confirmUnassignTasks}" header="#{msgs.confirmRelease}"/>
+                    </p:commandLink>
+                </h:panelGroup>
+
+                <p:commandLink id="deleteUser"
+                               action="#{UserForm.checkAndDelete}"
+                               styleClass="action"
+                               rendered="#{SecurityAccessController.hasAuthorityToDeleteUser()}"
+                               update="usersTabView:usersTable">
+                    <h:outputText><i class="fa fa-trash-o"/></h:outputText>
+                    <f:setPropertyActionListener value="#{item.id}" target="#{UserForm.userById}"/>
+                    <p:confirm header="#{msgs.confirmDelete}"
+                               message="#{UserForm.formatString('confirmDeleteUser', item.fullName)}"
+                               icon="ui-icon-alert"/>
+                </p:commandLink>
+            </h:form>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

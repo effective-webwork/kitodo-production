@@ -1,0 +1,131 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:jsf="http://xmlns.jcp.org/jsf"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:o="http://omnifaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <!--@elvariable id="isViewMode" type="boolean"-->
+    <p:panelGrid id="editDetailForm" columns="2" cellpadding="10" layout="grid">
+        <p:row>
+            <div>
+                <p:outputLabel for="title" value="#{msgs.processTitle}"/>
+                <p:inputText id="title" placeholder="#{msgs.processTitle}"
+                             value="#{ProcessForm.newProcessTitle}"
+                             class="input" disabled="#{isViewMode}"
+                             required="#{empty param['editForm:saveButtonToggler'] and
+                                         empty param['editForm:tabs:addTemplateProperty'] and
+                                         empty param['editForm:tabs:addWorkpieceProperty'] and
+                                         empty param['editForm:tabs:createNewProperty']}">
+                    <p:ajax event="blur"/>
+                </p:inputText>
+            </div>
+
+            <div>
+                <p:outputLabel for="project" value="#{msgs.project}"/>
+                <p:selectOneMenu id="project" value="#{ProcessForm.process.project}" converter="#{projectConverter}"
+                                 disabled="#{isViewMode}"
+                                 required="#{empty param['editForm:saveButtonToggler'] and
+                                             empty param['editForm:tabs:addTemplateProperty'] and
+                                             empty param['editForm:tabs:addWorkpieceProperty'] and
+                                             empty param['editForm:tabs:createNewProperty']}">
+                    <f:selectItems value="#{ProcessForm.projects}"
+                                   var="project"
+                                   itemValue="#{project}"
+                                   itemLabel="#{project.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div>
+                <p:outputLabel for="priority"
+                               value="#{msgs.priority}"/>
+                <!--@elvariable id="ProcessPriority" type="org.kitodo.data.database.enums.ProcessPriority"-->
+                <o:importConstants type="org.kitodo.data.database.enums.ProcessPriority" />
+                <p:selectOneMenu id="priority"
+                                 value="#{ProcessForm.process.priority}"
+                                 disabled="#{isViewMode}">
+                    <f:selectItems value="#{ProcessPriority}"
+                                   var="processPriority"
+                                   itemValue="#{processPriority}"
+                                   itemLabel="#{msgs[processPriority.priorityString]}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+        </p:row>
+
+        <p:row>
+            <div>
+                <p:outputLabel for="ruleset" value="#{msgs.ruleset}"/>
+                <p:selectOneMenu id="ruleset" value="#{ProcessForm.process.ruleset}" converter="#{rulesetConverter}"
+                                 disabled="#{isViewMode}"
+                                 required="#{empty param['editForm:saveButtonToggler'] and
+                                             empty param['editForm:tabs:addTemplateProperty'] and
+                                             empty param['editForm:tabs:addWorkpieceProperty'] and
+                                             empty param['editForm:tabs:createNewProperty']}">
+                    <f:selectItems value="#{ProcessForm.rulesets}"
+                                   var="ruleset"
+                                   itemValue="#{ruleset}"
+                                   itemLabel="#{ruleset.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div>
+                <p:outputLabel for="docket" value="#{msgs.docket}"/>
+                <p:selectOneMenu id="docket" value="#{ProcessForm.process.docket}" converter="#{docketConverter}"
+                                 disabled="#{isViewMode}"
+                                 required="#{empty param['editForm:saveButtonToggler'] and
+                                             empty param['editForm:tabs:addTemplateProperty'] and
+                                             empty param['editForm:tabs:addWorkpieceProperty'] and
+                                             empty param['editForm:tabs:createNewProperty']}">
+                    <f:selectItems value="#{ProcessForm.dockets}"
+                                   var="docket"
+                                   itemValue="#{docket}"
+                                   itemLabel="#{docket.title}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+
+            <div jsf:rendered="#{SecurityAccessController.hasAuthorityToAssignOcrdWorkflow()}">
+                <p:outputLabel for="ocrdWorkflow" value="#{msgs.ocrdWorkflow}"/>
+                <p:selectOneMenu id="ocrdWorkflow" value="#{ProcessForm.ocrdWorkflow}"
+                                 disabled="#{isViewMode}"
+                                 converter="#{ocrdWorkflowConverter}">
+                    <f:selectItem itemValue="#{null}"
+                                  itemLabel="#{not empty ProcessForm.ocrdWorkflowOfTemplate ? msgs['processConfig.fromTemplate'].concat(' (').concat(ProcessForm.ocrdWorkflowOfTemplate.value).concat(')') : msgs['notSelected']}"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{ProcessForm.ocrdWorkflows}"
+                                   var="ocrdWorkflow"
+                                   itemValue="#{ocrdWorkflow}"
+                                   itemLabel="#{ocrdWorkflow.value}"/>
+                    <p:ajax event="change" oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
+            </div>
+        </p:row>
+
+        <p:row>
+            <div>
+                <p:outputLabel for="templateSwitch" value="#{msgs.processTemplate}"/>
+                <p:selectBooleanCheckbox styleClass="switch input"
+                                         disabled="#{isViewMode}"
+                                         id="templateSwitch"
+                                         onchange="toggleSave()"
+                                         value="#{ProcessForm.process.inChoiceListShown}"/>
+            </div>
+        </p:row>
+    </p:panelGrid>
+</ui:composition>

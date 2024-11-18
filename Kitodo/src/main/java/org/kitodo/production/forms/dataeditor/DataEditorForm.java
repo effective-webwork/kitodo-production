@@ -1,0 +1,1447 @@
+/*
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ */
+
+package org.kitodo.production.forms.dataeditor;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale.LanguageRange;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import javax.annotation.PreDestroy;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.kitodo.api.Metadata;
+import org.kitodo.api.MetadataEntry;
+import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
+import org.kitodo.api.dataformat.LogicalDivision;
+import org.kitodo.api.dataformat.PhysicalDivision;
+import org.kitodo.api.dataformat.View;
+import org.kitodo.api.dataformat.Workpiece;
+import org.kitodo.api.validation.State;
+import org.kitodo.api.validation.ValidationResult;
+import org.kitodo.config.ConfigCore;
+import org.kitodo.data.database.beans.DataEditorSetting;
+import org.kitodo.data.database.beans.Process;
+import org.kitodo.data.database.beans.Project;
+import org.kitodo.data.database.beans.User;
+import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.exceptions.InvalidImagesException;
+import org.kitodo.exceptions.InvalidMetadataValueException;
+import org.kitodo.exceptions.MediaNotFoundException;
+import org.kitodo.exceptions.NoSuchMetadataFieldException;
+import org.kitodo.production.enums.ObjectType;
+import org.kitodo.production.forms.createprocess.ProcessDetail;
+import org.kitodo.production.helper.AuditingLogger;
+import org.kitodo.production.helper.Helper;
+import org.kitodo.production.interfaces.MetadataTreeTableInterface;
+import org.kitodo.production.interfaces.RulesetSetupInterface;
+import org.kitodo.production.metadata.MetadataLock;
+import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.dataeditor.DataEditorService;
+import org.kitodo.production.services.relayserver.services.ContainerStructurePanel;
+import org.kitodo.production.services.relayserver.services.JobService;
+import org.omnifaces.cdi.ViewScoped;
+import org.primefaces.PrimeFaces;
+import org.primefaces.model.TreeNode;
+
+@Named("DataEditorForm")
+@ViewScoped
+public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupInterface, Serializable {
+
+    private static final Logger logger = LogManager.getLogger(DataEditorForm.class);
+
+    /**
+     * A filter on the rule set depending on the workflow step. So far this is
+     * not configurable anywhere and is therefore on “edit”.
+     */
+    private final String acquisitionStage;
+
+    /**
+     * Backing bean for the add doc struc type dialog.
+     */
+    private final AddDocStrucTypeDialog addDocStrucTypeDialog;
+
+    /**
+     * Dialog for adding metadata.
+     */
+    private final AddMetadataDialog addMetadataDialog;
+
+    /**
+     * Backing bean for the add PhysicalDivision dialog.
+     */
+    private final AddPhysicalDivisionDialog addPhysicalDivisionDialog;
+
+    /**
+     * Backing bean for the change doc struc type dialog.
+     */
+    private final ChangeDocStrucTypeDialog changeDocStrucTypeDialog;
+
+    /**
+     * Backing bean for the edit pages dialog.
+     */
+    private final EditPagesDialog editPagesDialog;
+
+    private final UploadFileDialog uploadFileDialog;
+    /**
+     * Backing bean for the gallery panel.
+     */
+    private final GalleryPanel galleryPanel;
+
+    /**
+     * The current process children.
+     */
+    private final Set<Process> currentChildren = new HashSet<>();
+
+    /**
+     * The path to the main file, to save it later.
+     */
+    private URI mainFileUri;
+
+    /**
+     * Backing bean for the metadata panel.
+     */
+    private final MetadataPanel metadataPanel;
+
+    /**
+     * Backing bean for the pagination panel.
+     */
+    private final PaginationPanel paginationPanel;
+
+    /**
+     * The language preference list of the editing user for displaying the
+     * metadata labels. We cache this because it’s used thousands of times and
+     * otherwise the access would always go through the search engine, which
+     * would delay page creation.
+     */
+    private List<LanguageRange> priorityList;
+
+    /**
+     * Process whose workpiece is under edit.
+     */
+    private Process process;
+
+    private String referringView = "desktop";
+
+    /**
+     * The ruleset that the file is based on.
+     */
+    private RulesetManagementInterface ruleset;
+
+    /**
+     * Backing bean for the structure panel.
+     */
+    private final StructurePanel structurePanel;
+
+    private final ContainerStructurePanel containerStructurePanel;
+
+    /**
+     * User sitting in front of the editor.
+     */
+    private User user;
+
+    /**
+     * The file content.
+     */
+    private Workpiece workpiece;
+
+    /**
+     * String indicating which view mode has been selected for the logical tree.
+     */
+    private String structureViewMode = "Typ";
+    private String physicalViewMode = "Typ";
+    private String containersViewMode = "Typ";
+
+
+    /**
+     * Original state of workpiece. Used to check whether any unsaved changes exist when leaving the editor.
+     */
+    private Workpiece workpieceOriginalState;
+
+    /**
+     * This List of Pairs stores all selected physical elements and the logical elements in which the physical element was selected.
+     * It is necessary to store the logical elements as well, because a physical element can be assigned to multiple logical elements.
+     */
+    private List<Pair<PhysicalDivision, LogicalDivision>> selectedMedia;
+
+    /**
+     * The id of the template's task corresponding to the current task that is under edit.
+     * This is used for saving and loading the metadata editor settings.
+     * The current task, the corresponding template task id and the settings are only available
+     * if the user opened the editor from a task.
+     */
+    private int templateTaskId;
+
+    private DataEditorSetting dataEditorSetting;
+
+    private static final String DESKTOP_LINK = "/pages/desktop.jsf";
+
+    private List<PhysicalDivision> unsavedDeletedMedia = new ArrayList<>();
+
+    private List<PhysicalDivision> unsavedUploadedMedia = new ArrayList<>();
+
+    private boolean folderConfigurationComplete = false;
+
+    private int numberOfScans = 0;
+    private String errorMessage;
+
+    @Inject
+    private MediaProvider mediaProvider;
+    private boolean mediaUpdated = false;
+
+    private DualHashBidiMap<URI, URI> filenameMapping = new DualHashBidiMap<>();
+
+    private int numberOfNewMappings = 0;
+
+    private String renamingError = "";
+    private String metadataFileLoadingError = "";
+
+    @Inject
+    private StructurePanelSettings structurePanelSettings;
+
+    /**
+     * Public constructor.
+     */
+    public DataEditorForm() {
+        this.structurePanel = new StructurePanel(this);
+        this.metadataPanel = new MetadataPanel(this);
+        this.galleryPanel = new GalleryPanel(this);
+        this.paginationPanel = new PaginationPanel(this);
+        this.containerStructurePanel = new ContainerStructurePanel(this);
+        this.addDocStrucTypeDialog = new AddDocStrucTypeDialog(this);
+        this.addMetadataDialog = new AddMetadataDialog(this);
+        this.addPhysicalDivisionDialog = new AddPhysicalDivisionDialog(this);
+        this.changeDocStrucTypeDialog = new ChangeDocStrucTypeDialog(this);
+        this.editPagesDialog = new EditPagesDialog(this);
+        this.uploadFileDialog = new UploadFileDialog(this);
+        acquisitionStage = "edit";
+    }
+
+    /**
+     * Checks if the process is correctly set. Otherwise, redirect to desktop,
+     * because metadata editor doesn't work without a process.
+     */
+    public void initMetadataEditor() {
+        if (Objects.isNull(process)) {
+            try {
+                Helper.setErrorMessage("noProcessSelected");
+                FacesContext context = FacesContext.getCurrentInstance();
+                String path = context.getExternalContext().getRequestContextPath() + DESKTOP_LINK;
+                context.getExternalContext().redirect(path);
+            } catch (IOException e) {
+                Helper.setErrorMessage("noProcessSelected");
+            }
+        } else {
+            if (mediaUpdated) {
+                PrimeFaces.current().executeScript("PF('fileReferencesUpdatedDialog').show();");
+            }
+        }
+    }
+
+    /**
+     * Open the metadata file of the process with the given ID in the metadata editor.
+     *
+     * @param processID
+     *            ID of the process that is opened
+     * @param referringView
+     *            JSF page the user came from
+     */
+    public void open(String processID, String referringView, String taskId) {
+        try {
+            this.referringView = referringView;
+            this.process = ServiceManager.getProcessService().getById(Integer.parseInt(processID));
+            this.currentChildren.addAll(process.getChildren());
+            this.user = ServiceManager.getUserService().getCurrentUser();
+            loadStructurePanelSettings();
+            this.checkProjectFolderConfiguration();
+            if (StringUtils.isNotBlank(taskId) && StringUtils.isNumeric(taskId)) {
+                this.templateTaskId = Integer.parseInt(taskId);
+            }
+            this.loadDataEditorSettings();
+            errorMessage = "";
+
+            User blockedUser = MetadataLock.getLockUser(process.getId());
+            if (Objects.nonNull(blockedUser) && !blockedUser.equals(this.user)) {
+                errorMessage = Helper.getTranslation("blocked");
+            }
+            String metadataLanguage = user.getMetadataLanguage();
+            priorityList = LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage);
+            ruleset = ServiceManager.getRulesetService().openRuleset(process.getRuleset());
+            try {
+                mediaUpdated = openMetsFile();
+            } catch (MediaNotFoundException e) {
+                mediaUpdated = false;
+                Helper.setWarnMessage(e.getMessage());
+            }
+            if (!workpiece.getId().equals(process.getId().toString())) {
+                errorMessage = Helper.getTranslation("metadataConfusion", String.valueOf(process.getId()),
+                        workpiece.getId());
+            }
+            selectedMedia = new LinkedList<>();
+            unsavedUploadedMedia = new ArrayList<>();
+            init();
+            if (Objects.isNull(errorMessage) || errorMessage.isEmpty()) {
+                MetadataLock.setLocked(process.getId(), user);
+            } else {
+                PrimeFaces.current().executeScript("PF('metadataLockedDialog').show();");
+            }
+        } catch (FileNotFoundException e) {
+            metadataFileLoadingError = e.getLocalizedMessage();
+        } catch (IOException | DAOException | InvalidImagesException | NoSuchElementException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+        }
+    }
+
+    private void checkProjectFolderConfiguration() {
+        if (Objects.nonNull(this.process)) {
+            Project project = this.process.getProject();
+            if (Objects.nonNull(project)) {
+                this.folderConfigurationComplete = Objects.nonNull(project.getGeneratorSource())
+                        && Objects.nonNull(project.getMediaView()) && Objects.nonNull(project.getPreview());
+            } else {
+                this.folderConfigurationComplete = false;
+            }
+        } else {
+            this.folderConfigurationComplete = false;
+        }
+    }
+
+    private void loadDataEditorSettings() {
+        if (templateTaskId > 0) {
+            dataEditorSetting = ServiceManager.getDataEditorSettingService().loadDataEditorSetting(user.getId(),
+                    templateTaskId);
+            if (Objects.isNull(dataEditorSetting)) {
+                dataEditorSetting = new DataEditorSetting();
+                dataEditorSetting.setUserId(user.getId());
+                dataEditorSetting.setTaskId(templateTaskId);
+            }
+        } else {
+            dataEditorSetting = null;
+        }
+    }
+
+    /**
+     * Opens the METS file.
+     *
+     * @throws IOException
+     *             if filesystem I/O fails
+     */
+    private boolean openMetsFile() throws IOException, InvalidImagesException, MediaNotFoundException {
+        mainFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        workpiece = ServiceManager.getMetsService().loadWorkpiece(mainFileUri);
+        workpieceOriginalState = ServiceManager.getMetsService().loadWorkpiece(mainFileUri);
+        if (Objects.isNull(workpiece.getId())) {
+            logger.warn("Workpiece has no ID. Cannot verify workpiece ID. Setting workpiece ID.");
+            workpiece.setId(process.getId().toString());
+        }
+        metadataFileLoadingError = "";
+        return ServiceManager.getFileService().searchForMedia(process, workpiece);
+    }
+
+    private void init() {
+        final long begin = System.nanoTime();
+
+        List<PhysicalDivision> severalAssignments = new LinkedList<>();
+        initSeveralAssignments(workpiece.getPhysicalStructure(), severalAssignments);
+        structurePanel.getSeveralAssignments().addAll(severalAssignments);
+
+        structurePanel.clearTemporaryImageLists();
+
+        structurePanel.show();
+        structurePanel.loadStoredPartialJobs();
+        structurePanel.getSelectedLogicalNode().setSelected(true);
+        structurePanel.getSelectedPhysicalNode().setSelected(true);
+        metadataPanel.showLogical(getSelectedStructure());
+        metadataPanel.showPhysical(getSelectedPhysicalDivision());
+        galleryPanel.setGalleryViewMode(GalleryViewMode.getByName(user.getDefaultGalleryViewMode()).name());
+        galleryPanel.show();
+        paginationPanel.show();
+        containerStructurePanel.show();
+
+        editPagesDialog.prepare();
+        updateNumberOfScans();
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Initializing editor beans took {} ms",
+                TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - begin));
+        }
+    }
+
+    /**
+     * Clears all remaining content from the data editor form.
+     *
+     * @return the referring view, to return there
+     */
+    public String closeAndReturn() {
+        if (referringView.contains("?")) {
+            return referringView + "&faces-redirect=true";
+        } else {
+            return referringView + "?faces-redirect=true";
+        }
+    }
+
+    /**
+     * Close method called before destroying ViewScoped DataEditorForm bean instance. Cleans up various properties
+     * and releases metadata lock of current process if current user equals user of metadata lock.
+     */
+    @PreDestroy
+    public void close() {
+        preserveStructurePanelSettings();
+        deleteNotSavedUploadedMedia();
+        unsavedDeletedMedia.clear();
+        if (Objects.nonNull(workpiece)) {
+            ServiceManager.getFileService().revertRenaming(filenameMapping.inverseBidiMap(), workpiece);
+        }
+        metadataPanel.clear();
+        structurePanel.clear();
+        workpiece = null;
+        workpieceOriginalState = null;
+        mainFileUri = null;
+        ruleset = null;
+        currentChildren.clear();
+        if (Objects.nonNull(selectedMedia)) {
+            selectedMedia.clear();
+        }
+        if (!FacesContext.getCurrentInstance().isPostback()) {
+            mediaProvider.resetMediaResolverForProcess(process.getId());
+        }
+        // do not unlock process if this locked process was opened by a different user opening editor
+        // directly via URL bookmark and 'preDestroy' method was being triggered redirecting him to desktop page
+        if (this.user.equals(MetadataLock.getLockUser(process.getId()))) {
+            MetadataLock.setFree(process.getId());
+        }
+        process = null;
+        user = null;
+        mediaUpdated = false;
+    }
+
+    private void deleteUnsavedDeletedMedia() {
+        URI uri = Paths.get(ConfigCore.getKitodoDataDirectory(),
+                ServiceManager.getProcessService().getProcessDataDirectory(this.process).getPath()).toUri();
+        for (PhysicalDivision physicalDivision : this.unsavedDeletedMedia) {
+            for (URI fileURI : physicalDivision.getMediaFiles().values()) {
+                try {
+                    ServiceManager.getFileService().delete(uri.resolve(fileURI));
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Get unsavedDeletedMedia.
+     *
+     * @return value of unsavedDeletedMedia
+     */
+    public List<PhysicalDivision> getUnsavedDeletedMedia() {
+        return unsavedDeletedMedia;
+    }
+
+    private void deleteNotSavedUploadedMedia() {
+        URI uri = Paths.get(ConfigCore.getKitodoDataDirectory(),
+                ServiceManager.getProcessService().getProcessDataDirectory(this.process).getPath()).toUri();
+        for (PhysicalDivision mediaUnit : this.unsavedUploadedMedia) {
+            for (URI fileURI : mediaUnit.getMediaFiles().values()) {
+                this.filenameMapping = ServiceManager.getFileService()
+                        .removeUnsavedUploadMediaUriFromFileMapping(fileURI, this.filenameMapping);
+                try {
+                    ServiceManager.getFileService().delete(uri.resolve(fileURI));
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+        this.unsavedUploadedMedia.clear();
+    }
+
+    /**
+     * Validate the structure and metadata.
+     *
+     * @return whether the validation was successful or not
+     */
+    public boolean validate() {
+        try {
+            ValidationResult validationResult = ServiceManager.getMetadataValidationService().validate(workpiece,
+                ruleset);
+            State state = validationResult.getState();
+            switch (state) {
+                case ERROR:
+                    Helper.setErrorMessage(Helper.getTranslation("dataEditor.validation.state.error"));
+                    for (String message : validationResult.getResultMessages()) {
+                        Helper.setErrorMessage(message);
+                    }
+                    return false;
+                case WARNING:
+                    Helper.setWarnMessage(Helper.getTranslation("dataEditor.validation.state.warning"));
+                    for (String message : validationResult.getResultMessages()) {
+                        Helper.setWarnMessage(message);
+                    }
+                    return true;
+                default:
+                    Helper.setMessage(Helper.getTranslation("dataEditor.validation.state.success"));
+                    for (String message : validationResult.getResultMessages()) {
+                        Helper.setMessage(message);
+                    }
+                    return true;
+            }
+        } catch (DAOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+            return false;
+        }
+    }
+
+    /**
+     * Save the structure and metadata.
+     */
+    public void save() {
+        save(false);
+    }
+
+    private String save(boolean close) {
+        try {
+            metadataPanel.preserve();
+            structurePanel.preserve();
+            // reset "image filename renaming map" so nothing is reverted after saving!
+            filenameMapping = new DualHashBidiMap<>();
+            ServiceManager.getProcessService().updateChildrenFromLogicalStructure(process, workpiece.getLogicalStructure());
+            ServiceManager.getFileService().createBackupFile(process);
+            try (OutputStream out = ServiceManager.getFileService().write(mainFileUri)) {
+                ServiceManager.getMetsService().save(workpiece, out);
+                ServiceManager.getProcessService().saveToIndex(process,false);
+                for (URI imagePath : structurePanel.getRemovedImagePaths()) {
+                    if (!StringUtils.startsWith(imagePath.toString(), "file:") && !StringUtils.startsWith(imagePath.toString(), process.getId().toString())) {
+                        imagePath = new URI(process.getId() + File.separator + imagePath.toString());
+                    }
+                    ServiceManager.getFileService().delete(imagePath);
+                }
+                for (Map.Entry<PhysicalDivision, LinkedList<URI>> entry : structurePanel.getResetImagePaths().entrySet()) {
+                    JobService.restorePartialJob(process, entry.getKey(), entry.getValue());
+                }
+                structurePanel.clearTemporaryImageLists();
+                logger.info(AuditingLogger.createMetadataSaveLogEntry(this.getProcess()));
+                unsavedUploadedMedia.clear();
+                deleteUnsavedDeletedMedia();
+                if (close) {
+                    return closeAndReturn();
+                } else {
+                    PrimeFaces.current().executeScript("PF('notifications').renderMessage({'summary':'"
+                            + Helper.getTranslation("metadataSaved") + "','severity':'info'})");
+                    workpieceOriginalState = ServiceManager.getMetsService().loadWorkpiece(mainFileUri);
+                    PrimeFaces.current().executeScript("setUnsavedChanges(false);");
+                }
+            } catch (IOException e) {
+                Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+                e.printStackTrace();
+            }
+            openMetsFile();  // TODO still necessary?
+        } catch (Exception e) {
+            Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+        }
+        structurePanel.show(true); // TODO still necessary?
+        structurePanel.loadStoredPartialJobs(); // TODO still necessary?
+        structurePanel.treePhysicalSelect(null); // TODO still necessary?
+        PrimeFaces.current().executeScript("PF('sticky-notifications').removeAll();");
+        PrimeFaces.current().ajax().update("notifications");
+        return null;
+    }
+
+    /**
+     * Save the structure and metadata.
+     *
+     * @return navigation target
+     */
+    public String saveAndExit() {
+        return save(true);
+    }
+
+    private void initSeveralAssignments(PhysicalDivision physicalDivision, List<PhysicalDivision> severalAssignments) {
+        if (physicalDivision.getLogicalDivisions().size() > 1) {
+            severalAssignments.add(physicalDivision);
+        }
+        for (PhysicalDivision child : physicalDivision.getChildren()) {
+            initSeveralAssignments(child, severalAssignments);
+        }
+    }
+
+    /**
+     * Deletes the selected outline point from the logical outline. This method
+     * is called by PrimeFaces to inform the application that the user has
+     * clicked on the shortcut menu entry to clear the outline point.
+     */
+    public void deleteStructure() {
+        structurePanel.deleteSelectedStructure();
+    }
+
+    /**
+     * Deletes the selected physical division from the media list. The associated files
+     * on the drive are not deleted. The next time the editor is started, files
+     * that are not yet in the media list will be inserted there again. This
+     * method is called by PrimeFaces to inform the application that the user
+     * clicked on the context menu entry to delete the physical division.
+     */
+    public void deletePhysicalDivision() {
+        structurePanel.deleteSelectedPhysicalDivision();
+        updateNumberOfScans();
+    }
+
+    @Override
+    public String getAcquisitionStage() {
+        return acquisitionStage;
+    }
+
+    /**
+     * Get unsavedUploadedMedia.
+     *
+     * @return value of unsavedUploadedMedia
+     */
+    public List<PhysicalDivision> getUnsavedUploadedMedia() {
+        return unsavedUploadedMedia;
+    }
+
+    /**
+     * Returns the backing bean for the add doc struc type dialog. This function
+     * is used by PrimeFaces to access the elements of the add doc struc type
+     * dialog.
+     *
+     * @return the backing bean for the add doc struc type dialog
+     */
+    public AddDocStrucTypeDialog getAddDocStrucTypeDialog() {
+        return addDocStrucTypeDialog;
+    }
+
+    /**
+     * Get addMetadataDialog.
+     *
+     * @return value of addMetadataDialog
+     */
+    public AddMetadataDialog getAddMetadataDialog() {
+        return addMetadataDialog;
+    }
+
+    /**
+     * Returns the backing bean for the add media dialog. This function is used
+     * by PrimeFaces to access the elements of the add media dialog.
+     *
+     * @return the backing bean for the add media dialog
+     */
+    public AddPhysicalDivisionDialog getAddPhysicalDivisionDialog() {
+        return addPhysicalDivisionDialog;
+    }
+
+    /**
+     * Returns the backing bean for the change doc struc type dialog. This
+     * function is used by PrimeFaces to access the elements of the change doc
+     * struc type dialog.
+     *
+     * @return the backing bean for the change doc struc type dialog
+     */
+    public ChangeDocStrucTypeDialog getChangeDocStrucTypeDialog() {
+        return changeDocStrucTypeDialog;
+    }
+
+    /**
+     * Returns the backing bean for the edit pages dialog. This function is used
+     * by PrimeFaces to access the elements of the edit pages dialog.
+     *
+     * @return the backing bean for the edit pages dialog
+     */
+    public EditPagesDialog getEditPagesDialog() {
+        return editPagesDialog;
+    }
+
+    /**
+     * Returns the backing bean for the gallery panel. This function is used by
+     * PrimeFaces to access the elements of the gallery panel.
+     *
+     * @return the backing bean for the gallery panel
+     */
+    public GalleryPanel getGalleryPanel() {
+        return galleryPanel;
+    }
+
+    public ContainerStructurePanel getContainerStructurePanel() {
+        return containerStructurePanel;
+    }
+
+    Set<Process> getCurrentChildren() {
+        return currentChildren;
+    }
+
+    /**
+     * Returns the backing bean for the metadata panel. This function is used
+     * by PrimeFaces to access the elements of the metadata panel.
+     *
+     * @return the backing bean for the metadata panel
+     */
+    public MetadataPanel getMetadataPanel() {
+        return metadataPanel;
+    }
+
+    /**
+     * Returns the backing bean for the pagination panel. This function is used
+     * by PrimeFaces to access the elements of the pagination panel.
+     *
+     * @return the backing bean for the pagination panel
+     */
+    public PaginationPanel getPaginationPanel() {
+        return paginationPanel;
+    }
+
+    @Override
+    public List<LanguageRange> getPriorityList() {
+        return priorityList;
+    }
+
+    /**
+     * Get process.
+     *
+     * @return value of process
+     */
+    public Process getProcess() {
+        return process;
+    }
+
+    /**
+     * Get process title.
+     *
+     * @return value of process title
+     */
+    public String getProcessTitle() {
+        return process.getTitle();
+    }
+
+    @Override
+    public RulesetManagementInterface getRulesetManagement() {
+        return ruleset;
+    }
+
+    public Optional<LogicalDivision> getSelectedStructure() {
+        return structurePanel.getSelectedStructure();
+    }
+
+    Optional<PhysicalDivision> getSelectedPhysicalDivision() {
+        return structurePanel.getSelectedPhysicalDivision();
+    }
+
+    /**
+     * Check if the passed LogicalDivision is part of the selection.
+     * @param structure LogicalDivision to be checked
+     * @return boolean representing selection status
+     */
+    public boolean isStripeSelected(LogicalDivision structure) {
+        Optional<LogicalDivision> selectedStructure = structurePanel.getSelectedStructure();
+        return selectedStructure.filter(logicalDivision -> Objects.equals(structure, logicalDivision)).isPresent();
+    }
+
+    /**
+     * Return structurePanel.
+     *
+     * @return structurePanel
+     */
+    public StructurePanel getStructurePanel() {
+        return structurePanel;
+    }
+
+    Workpiece getWorkpiece() {
+        return workpiece;
+    }
+
+    /**
+     * Get maxPartialJobId.
+     *
+     * @return value of maxPartialJobId
+     */
+    int getMaxPartialJobId() {
+        return this.structurePanel.countPartialJobs();
+    }
+
+    void refreshStructurePanel() {
+        structurePanel.show(true);
+        galleryPanel.updateStripes();
+    }
+
+    void setProcess(Process process) {
+        this.process = process;
+    }
+
+    /**
+     * Get selectedMedia.
+     *
+     * @return value of selectedMedia
+     */
+    public List<Pair<PhysicalDivision, LogicalDivision>> getSelectedMedia() {
+        return selectedMedia;
+    }
+
+    /**
+     * Checks and returns if consecutive physical divisions in one structure element are selected or not.
+     *
+     * <p>Note: This method is called potentially thousands of times when rendering large galleries.</p>
+     */
+    public boolean consecutivePagesSelected() {
+        if (selectedMedia.isEmpty()) {
+            return false;
+        }
+        int maxOrder = selectedMedia.stream().mapToInt(m -> m.getLeft().getOrder()).max().orElseThrow(NoSuchElementException::new);
+        int minOrder = selectedMedia.stream().mapToInt(m -> m.getLeft().getOrder()).min().orElseThrow(NoSuchElementException::new);
+
+        // Check whether the set of selected media all belong to the same logical division, otherwise the selection
+        // is not consecutive. However, do not use stream().distinct(), which will do pairwise comparisons, which is
+        // slow for large amounts of selected images. Instead, just check whether the first logical division matches
+        // all others in a simple loop.
+        boolean theSameLogicalDivisions = true;
+        LogicalDivision firstSelectedMediaLogicalDivision = null;
+        for (Pair<PhysicalDivision, LogicalDivision> pair : selectedMedia) {
+            if (Objects.isNull(firstSelectedMediaLogicalDivision)) {
+                firstSelectedMediaLogicalDivision = pair.getRight();
+            } else {
+                if (!Objects.equals(firstSelectedMediaLogicalDivision, pair.getRight())) {
+                    theSameLogicalDivisions = false;
+                    break;
+                }
+            }
+        }
+        return selectedMedia.size() - 1 == maxOrder - minOrder && theSameLogicalDivisions;
+    }
+
+    void setSelectedMedia(List<Pair<PhysicalDivision, LogicalDivision>> media) {
+        this.selectedMedia = media;
+    }
+
+    /**
+     * Check if the passed PhysicalDivision is selected.
+     * @param physicalDivision PhysicalDivision object to check for selection
+     * @param logicalDivision object to check whether the PhysicalDivision is selected as a child of this LogicalDivision.
+     *                                  A PhysicalDivision can be assigned to multiple logical divisionss but can be selected
+     *                                  in one of these LogicalDivisions.
+     * @return boolean whether the PhysicalDivision is selected at the specified position
+     */
+    public boolean isSelected(PhysicalDivision physicalDivision, LogicalDivision logicalDivision) {
+        if (Objects.nonNull(physicalDivision) && Objects.nonNull(logicalDivision)) {
+            if (physicalDivision.hasMediaPartial() && physicalDivision.getLogicalDivisions().size() == 1) {
+                return selectedMedia.contains(new ImmutablePair<>(physicalDivision, physicalDivision.getLogicalDivisions().get(0)));
+            }
+            return selectedMedia.contains(new ImmutablePair<>(physicalDivision, logicalDivision));
+        }
+        return false;
+    }
+
+    void switchStructure(Object treeNodeData, boolean updateGalleryAndPhysicalTree) throws NoSuchMetadataFieldException {
+        try {
+            metadataPanel.preserveLogical();
+        } catch (InvalidMetadataValueException e) {
+            logger.info(e.getLocalizedMessage(), e);
+        }
+
+        Optional<LogicalDivision> selectedStructure = structurePanel.getSelectedStructure();
+
+        metadataPanel.showLogical(selectedStructure);
+        if (treeNodeData instanceof StructureTreeNode) {
+            StructureTreeNode structureTreeNode = (StructureTreeNode) treeNodeData;
+            if (Objects.nonNull(structureTreeNode.getDataObject())) {
+                if (structureTreeNode.getDataObject() instanceof LogicalDivision
+                        && selectedStructure.isPresent()) {
+                    // Logical structure element selected
+                    if (structurePanel.isSeparateMedia()) {
+                        LogicalDivision structuralElement = selectedStructure.get();
+                        if (updateGalleryAndPhysicalTree) {
+                            if (structuralElement.getViews().isEmpty()) {
+                                updatePhysicalStructureTree(null);
+                                PrimeFaces.current().ajax().update("physicalTree");
+                            } else {
+                                ArrayList<View> views = new ArrayList<>(structuralElement.getViews());
+                                if (Objects.nonNull(views.get(0))) {
+                                    updatePhysicalStructureTree(views.get(0));
+                                    updateGallery(views.get(0));
+                                }
+                            }
+                        }
+                    } else {
+                        getSelectedMedia().clear();
+                    }
+                } else if (structureTreeNode.getDataObject() instanceof View) {
+                    View view = (View) structureTreeNode.getDataObject();
+                    if (view.getPhysicalDivision().hasMediaPartial()) {
+                        View mediaView = DataEditorService.getViewOfBaseMediaByMediaFiles(structurePanel.getLogicalTree().getChildren(),
+                                view.getPhysicalDivision().getMediaFiles());
+                        if (Objects.nonNull(mediaView)) {
+                            view = mediaView;
+                        }
+                    }
+
+                    metadataPanel.showPageInLogical(view.getPhysicalDivision());
+                    if (updateGalleryAndPhysicalTree) {
+                        updateGallery(view);
+                    }
+                    // no need to update physical tree because pages can only be clicked in logical tree if physical tree is hidden!
+                }
+            }
+        }
+        paginationPanel.preparePaginationSelectionSelectedItems();
+    }
+
+
+
+    void switchPhysicalDivision() throws NoSuchMetadataFieldException {
+        try {
+            metadataPanel.preservePhysical();
+        } catch (InvalidMetadataValueException e) {
+            logger.info(e.getLocalizedMessage(), e);
+        }
+
+        Optional<PhysicalDivision> selectedPhysicalDivision = structurePanel.getSelectedPhysicalDivision();
+
+        metadataPanel.showPhysical(selectedPhysicalDivision);
+        if (selectedPhysicalDivision.isPresent()) {
+            // update gallery
+            galleryPanel.updateSelection(selectedPhysicalDivision.get(), null);
+            // update logical tree
+            structurePanel.updateLogicalNodeSelection(workpiece.getLogicalStructure());
+            for (GalleryMediaContent galleryMediaContent : galleryPanel.getMedias()) {
+                if (Objects.nonNull(galleryMediaContent.getView())
+                        && Objects.equals(selectedPhysicalDivision.get(), galleryMediaContent.getView().getPhysicalDivision())) {
+                    structurePanel.updateLogicalNodeSelection(galleryMediaContent, null);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void updatePhysicalStructureTree(View view) {
+        GalleryMediaContent galleryMediaContent = this.galleryPanel.getGalleryMediaContent(view);
+        structurePanel.updatePhysicalNodeSelection(galleryMediaContent);
+    }
+
+    private void updateGallery(View view) {
+        PhysicalDivision physicalDivision = view.getPhysicalDivision();
+        if (Objects.nonNull(physicalDivision)) {
+            galleryPanel.updateSelection(physicalDivision, structurePanel.getPageStructure(view, workpiece.getLogicalStructure()));
+        }
+    }
+
+    public String getStructureViewMode() {
+        return structureViewMode;
+    }
+
+    public void setStructureViewMode(String structureViewMode) {
+        this.structureViewMode = structureViewMode;
+    }
+
+    /**
+     * Get containersViewMode.
+     *
+     * @return value of containersViewMode
+     */
+    public String getContainersViewMode() {
+        return containersViewMode;
+    }
+
+    /**
+     * Set containersViewMode.
+     *
+     * @param containersViewMode as java.lang.String
+     */
+    public void setContainersViewMode(String containersViewMode) {
+        this.containersViewMode = containersViewMode;
+    }
+
+    public String getSignature(Object object) {
+        if (object instanceof StructureTreeNode) {
+            StructureTreeNode structureTreeNode = (StructureTreeNode) object;
+            if (structureTreeNode.getDataObject() instanceof LogicalDivision) {
+                LogicalDivision structure = (LogicalDivision) structureTreeNode.getDataObject();
+                for (Metadata metadata : structure.getMetadata()) {
+                    if (metadata.getKey().equals("sgntr_cd") && metadata instanceof MetadataEntry) {
+                        return ((MetadataEntry) metadata).getValue();
+                    }
+                }
+            }
+        }
+        return "Keine Signatur";
+    }
+
+    public String getElementId(Object object) {
+        if (object instanceof StructureTreeNode) {
+            StructureTreeNode structureTreeNode = (StructureTreeNode) object;
+            if (structureTreeNode.getDataObject() instanceof LogicalDivision) {
+                LogicalDivision structure = (LogicalDivision) structureTreeNode.getDataObject();
+                return structure.getId();
+            } else if(structureTreeNode.getDataObject() instanceof PhysicalDivision) {
+                PhysicalDivision physicalDivision = (PhysicalDivision) structureTreeNode.getDataObject();
+                return physicalDivision.getDivId();
+            }
+        }
+        return "";
+    }
+
+
+    public String getAllMetadata(Object object) {
+        String signature = "Keine Signatur";
+        String title = "Kein Titel";
+        String aktn = "Kein Aktenzeichen";
+        String behaeltnis = "Kein Behaeltnis";
+        String period = "Kein Zeitraum";
+        if (object instanceof StructureTreeNode) {
+            StructureTreeNode structureTreeNode = (StructureTreeNode) object;
+            if (structureTreeNode.getDataObject() instanceof LogicalDivision) {
+                LogicalDivision structure = (LogicalDivision) structureTreeNode.getDataObject();
+                for (Metadata metadata : structure.getMetadata()) {
+                    if (metadata instanceof MetadataEntry) {
+                        switch (metadata.getKey()) {
+                            case "sgntr_cd":
+                                signature = ((MetadataEntry) metadata).getValue();
+                                break;
+                            case "vrzng_enht_titel":
+                                title = ((MetadataEntry) metadata).getValue();
+                                break;
+                            case "aktnzchn":
+                                aktn = ((MetadataEntry) metadata).getValue();
+                                break;
+                            case "zt_raum_txt":
+                                period = ((MetadataEntry) metadata).getValue();
+                                break;
+                            case "bhltn_cd":
+                                behaeltnis = ((MetadataEntry) metadata).getValue();
+                                break;
+                        }
+                    }
+                }
+            }
+
+        }
+        return ("_" + signature)
+                + "_" + title
+                + "_" + period
+                + "_" + aktn
+                + "_" + behaeltnis;
+    }
+
+    /**
+     * Get physicalViewMode.
+     *
+     * @return value of physicalViewMode
+     */
+    public String getPhysicalViewMode() {
+        return physicalViewMode;
+    }
+
+    /**
+     * Set physicalViewMode.
+     *
+     * @param physicalViewMode as java.lang.String
+     */
+    public void setPhysicalViewMode(String physicalViewMode) {
+        this.physicalViewMode = physicalViewMode;
+    }
+
+    /**
+     * Determine fallback task of process with given ID 'processID' and return the tasks ID.
+     *
+     * @param processID
+     *          ID of process for which the fallback task is determined
+     * @return ID of the fallback task for process with given ID 'processID'
+     */
+    public int getFallbackTaskID(int processID) {
+        try {
+            Process process = ServiceManager.getProcessService().getById(processID);
+            if (!process.getTasks().isEmpty()) {
+                return process.getTasks().get(0).getId();
+            }
+            return -1;
+        } catch (DAOException e) {
+            Helper.setErrorMessage("errorLoadingOne", new Object[] {ObjectType.PROCESS.getTranslationSingular(),
+                processID}, logger, e);
+            return -1;
+        }
+    }
+
+    void assignView(LogicalDivision logicalDivision, View view, Integer index) {
+        if (Objects.nonNull(index) && index >= 0 && index < logicalDivision.getViews().size()) {
+            logicalDivision.getViews().add(index, view);
+        } else {
+            logicalDivision.getViews().add(view);
+        }
+        view.getPhysicalDivision().getLogicalDivisions().add(logicalDivision);
+    }
+
+    void unassignView(LogicalDivision logicalDivision, View view, boolean removeLast) {
+        // if View was moved within one element, we need to distinguish two possible directions it could have been moved
+        if (removeLast) {
+            logicalDivision.getViews().removeLastOccurrence(view);
+        } else {
+            logicalDivision.getViews().removeFirstOccurrence(view);
+        }
+        view.getPhysicalDivision().getLogicalDivisions().remove(logicalDivision);
+    }
+
+    /**
+     * Retrieve and return 'title' value of given Object 'dataObject' if Object is instance of
+     * 'LogicalDivision' and if it does have a title. Uses a configurable list of metadata keys to determine
+     * which metadata keys should be considered.
+     * Return empty string otherwise.
+     *
+     * @param dataObject
+     *          StructureTreeNode containing the LogicalDivision whose title is returned
+     * @return 'title' value of the LogicalDivision contained in the given StructureTreeNode 'treeNode'
+     */
+    public String getStructureElementTitle(Object dataObject) {
+        String title = "";
+        if (dataObject instanceof LogicalDivision) {
+            LogicalDivision logicalDivision = ((LogicalDivision) dataObject);
+            title = DataEditorService.getTitleValue(logicalDivision, structurePanel.getTitleMetadata());
+            if (StringUtils.isBlank(title)) {
+                title = logicalDivision.getLabel();
+                if (StringUtils.isBlank(title)) {
+                    title = " - ";
+                }
+            }
+        }
+        return title;
+    }
+
+    /**
+     * Get referringView.
+     *
+     * @return value of referringView
+     */
+    public String getReferringView() {
+        return referringView;
+    }
+
+    /**
+     * Check and return whether the given ProcessDetail 'processDetail' is contained in the current list of addable
+     * metadata types in the addDocStrucTypeDialog.
+     *
+     * @param treeNode treeNode to be added
+     * @return whether the given ProcessDetail can be added or not
+     */
+    public boolean canBeAdded(TreeNode treeNode) {
+        if (Objects.isNull(treeNode.getParent().getParent())) {
+            if (Objects.nonNull(metadataPanel.getSelectedMetadataTreeNode()) || Objects.isNull(addMetadataDialog.getAddableMetadata())) {
+                this.addMetadataDialog.prepareAddableMetadataForStructure(treeNode.getParent().getChildren());
+            }
+        } else if (!Objects.equals(metadataPanel.getSelectedMetadataTreeNode(), treeNode.getParent())
+                || Objects.isNull(addMetadataDialog.getAddableMetadata())) {
+            prepareAddableMetadataForGroup(treeNode.getParent());
+        }
+        if (Objects.nonNull(addMetadataDialog.getAddableMetadata())) {
+            return addMetadataDialog.getAddableMetadata().stream()
+                    .map(SelectItem::getValue).collect(Collectors.toList()).contains(((ProcessDetail) treeNode.getData()).getMetadataID());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canBeDeleted(ProcessDetail processDetail) {
+        return processDetail.getOccurrences() > 1 && processDetail.getOccurrences() > processDetail.getMinOccurs()
+                || (!processDetail.isRequired() && !this.ruleset.isAlwaysShowingForKey(processDetail.getMetadataID()));
+    }
+
+    /**
+     * Load and return VIADUC job ID of given process.
+     * @param process Process whose VIADUC ID is returned
+     * @return VIADUC ID of given process
+     */
+    public String getViaducId(Process process) {
+        return JobService.getViaducId(process);
+    }
+
+    /**
+     * Check for changes in workpiece.
+     */
+    public void checkForChanges() {
+        if (Objects.nonNull(PrimeFaces.current())) {
+            boolean unsavedChanges = !this.workpiece.equals(workpieceOriginalState);
+            PrimeFaces.current().executeScript("setUnsavedChanges(" + unsavedChanges + ");");
+        }
+    }
+
+    /**
+     * Get the shortcuts for the current user.
+     *
+     * @return shortcuts as java.lang.String
+     */
+    public String getShortcuts() {
+        try {
+            return ServiceManager.getUserService().getShortcuts(user.getId());
+        } catch (DAOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+            return "{}";
+        }
+    }
+
+    /**
+     * Get the shortcuts for the current user and parse them as a SortedMap.
+     * Used for displaying the shortcuts in an ordered list.
+     * @return shortcuts as java.util.SortedMap
+     */
+    public SortedMap<String, String> getShortcutsAsObject() {
+        String shortcuts = getShortcuts();
+        if (StringUtils.isNotBlank(shortcuts)) {
+            try {
+            return ServiceManager.getUserService().mapShortcuts(new ObjectMapper().readValue(shortcuts,
+                    new TypeReference<TreeMap<String, String>>() {}));
+            } catch (IOException e) {
+                Helper.setErrorMessage("Could not parse shortcuts loaded from user with id " + user.getId() + "!", logger, e);
+            }
+        }
+        return new TreeMap<>();
+    }
+
+    /**
+     * Get templateTaskId.
+     *
+     * @return value of templateTaskId
+     */
+    public int getTemplateTaskId() {
+        return templateTaskId;
+    }
+
+    /**
+     * Get dataEditorSetting.
+     *
+     * @return value of dataEditorSetting
+     */
+    public DataEditorSetting getDataEditorSetting() {
+        return dataEditorSetting;
+    }
+
+    /**
+     * Set dataEditorSetting.
+     *
+     * @param dataEditorSetting as org.kitodo.data.database.beans.DataEditorSetting
+     */
+    public void setDataEditorSetting(DataEditorSetting dataEditorSetting) {
+        this.dataEditorSetting = dataEditorSetting;
+    }
+
+    /**
+     * Gets numberOfScans.
+     *
+     * @return value of numberOfScans
+     */
+    public int getNumberOfScans() {
+        return numberOfScans;
+    }
+
+    /**
+     * Sets numberOfScans.
+     *
+     */
+    public void updateNumberOfScans() {
+        this.numberOfScans = workpiece.getNumberOfAllPhysicalDivisionChildrenFilteredByTypes(PhysicalDivision.TYPES);
+    }
+
+
+    /**
+     * Save current metadata editor layout.
+     */
+    public void saveDataEditorSetting() {
+        if (Objects.nonNull(dataEditorSetting) && dataEditorSetting.getTaskId() > 0) {
+            try {
+                ServiceManager.getDataEditorSettingService().saveToDatabase(dataEditorSetting);
+                PrimeFaces.current().executeScript("PF('dataEditorSavingResultDialog').show();");
+            } catch (DAOException e) {
+                Helper.setErrorMessage("errorSaving", new Object[] {ObjectType.USER.getTranslationSingular() }, logger, e);
+            }
+        } else {
+            logger.error("Could not save DataEditorSettings with userId {} and templateTaskId {}", user.getId(),
+                templateTaskId);
+        }
+    }
+
+    /**
+     * Get uploadFileDialog.
+     *
+     * @return value of uploadFileDialog
+     */
+    public UploadFileDialog getUploadFileDialog() {
+        return uploadFileDialog;
+    }
+
+    /**
+     * Get folderConfigurationComplete.
+     *
+     * @return value of folderConfigurationComplete
+     */
+    public boolean isFolderConfigurationComplete() {
+        return folderConfigurationComplete;
+    }
+
+    /**
+     * Preserve changes in the metadata panel.
+     */
+    public void preserveMetadataPanel() {
+        try {
+            metadataPanel.preserve();
+        } catch (InvalidMetadataValueException | NoSuchMetadataFieldException e) {
+            logger.info(e.getMessage());
+        }
+    }
+
+    /**
+     * Check and return whether given TreeNode contains ProcessFieldedMetadata and if any further metadata can
+     * be added to it or not.
+     *
+     * @return whether given TreeNode contains ProcessFieldedMetadata and if any further metadata can be added to it
+     */
+    public boolean metadataAddableToGroup(TreeNode metadataNode) {
+        return metadataPanel.metadataAddableToGroup(metadataNode);
+    }
+
+    /**
+     * Prepare addable metadata for metadata group.
+     */
+    public void prepareAddableMetadataForGroup(TreeNode treeNode) {
+        addMetadataDialog.prepareAddableMetadataForGroup(treeNode);
+    }
+
+    /**
+     * Get errorMessage.
+     *
+     * @return value of errorMessage
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * Get mediaProvider.
+     *
+     * @return value of mediaProvider
+     */
+    public MediaProvider getMediaProvider() {
+        return mediaProvider;
+    }
+
+    /**
+     * Get mediaUpdated.
+     *
+     * @return value of mediaUpdated
+     */
+    public boolean isMediaUpdated() {
+        return mediaUpdated;
+    }
+
+    /**
+     * Set mediaUpdated.
+     *
+     * @param mediaUpdated as boolean
+     */
+    public void setMediaUpdated(boolean mediaUpdated) {
+        this.mediaUpdated = mediaUpdated;
+    }
+
+    /**
+     * Rename media files of current process according to their corresponding physical divisions ORDER attribute.
+     */
+    public void renameMediaFiles() {
+        renamingError = "";
+        try {
+            numberOfNewMappings = ServiceManager.getFileService().renameMediaFiles(process, workpiece, filenameMapping);
+        } catch (IOException | URISyntaxException e) {
+            renamingError = e.getMessage();
+        }
+        showPanels();
+        if (StringUtils.isBlank(renamingError)) {
+            PrimeFaces.current().executeScript("PF('renamingMediaSuccessDialog').show();");
+        } else {
+            PrimeFaces.current().executeScript("PF('renamingMediaErrorDialog').show();");
+        }
+    }
+
+    /**
+     * Get renamingError.
+     * @return renamingError
+     */
+    public String getRenamingError() {
+        return renamingError;
+    }
+
+    /**
+     * Return renaming success message containing number of renamed media files and configured sub-folders.
+     * @return renaming success message
+     */
+    public String getRenamingSuccessMessage() {
+        return Helper.getTranslation("dataEditor.renamingMediaText", String.valueOf(numberOfNewMappings),
+                String.valueOf(process.getProject().getFolders().size()));
+    }
+
+    private void showPanels() {
+        galleryPanel.show();
+        paginationPanel.show();
+        structurePanel.show();
+    }
+
+    /**
+     * Get metadata file loading error.
+     * @return metadata file loading error
+     */
+    public String getMetadataFileLoadingError() {
+        return metadataFileLoadingError;
+    }
+
+    private void loadStructurePanelSettings() {
+        if (Objects.nonNull(structurePanelSettings.getShowPageRangeInLogicalTree())) {
+            structurePanel.setShowPageRangeInLogicalTree(structurePanelSettings.getShowPageRangeInLogicalTree());
+        }
+        if (Objects.nonNull(structurePanelSettings.getShowHierarchyLevel())) {
+            structurePanel.setShowHierarchyLevel(structurePanelSettings.getShowHierarchyLevel());
+        }
+        if (Objects.nonNull(structurePanelSettings.getStructureViewMode())) {
+            setStructureViewMode(structurePanelSettings.getStructureViewMode());
+        }
+        if (Objects.nonNull(structurePanelSettings.getPhysicalViewMode())) {
+            setPhysicalViewMode(structurePanelSettings.getPhysicalViewMode());
+        }
+        if (Objects.nonNull(structurePanelSettings.getContainersViewMode())) {
+            setContainersViewMode(structurePanelSettings.getContainersViewMode());
+        }
+    }
+
+    private void preserveStructurePanelSettings() {
+        structurePanelSettings.setPhysicalViewMode(getPhysicalViewMode());
+        structurePanelSettings.setStructureViewMode(getStructureViewMode());
+        structurePanelSettings.setContainersViewMode(getContainersViewMode());
+        structurePanelSettings.setShowHierarchyLevel(structurePanel.isShowHierarchyLevel());
+        structurePanelSettings.setShowPageRangeInLogicalTree(structurePanel.isShowPageRangeInLogicalTree());
+    }
+}

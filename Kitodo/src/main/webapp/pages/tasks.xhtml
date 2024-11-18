@@ -1,0 +1,85 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseListView.xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:o="http://omnifaces.org/ui">
+    <f:metadata>
+        <!--@elvariable id="keepPagination" type="java.lang.Boolean"-->
+        <f:viewParam name="keepPagination"/>
+        <f:viewAction action="#{CurrentTaskForm.resetPaginator(keepPagination)}"/>
+        <!--@elvariable id="projecttitle" type="java.lang.String"-->
+        <f:viewParam name="projecttitle"/>
+        <o:viewAction action="#{CurrentTaskForm.changeFilter('project:' += projecttitle)}"
+                      if="#{not empty projecttitle}"
+                      update="parsedFiltersForm:parsedFilters"/>
+    </f:metadata>
+
+    <ui:define name="contentHeader">
+        <h3>#{msgs.tasks}</h3>
+
+        <!-- Filters -->
+        <h:panelGroup id="filterMenuWrapper">
+            <ui:include src="/WEB-INF/templates/includes/tasks/filterMenu.xhtml"/>
+        </h:panelGroup>
+
+        <p:commandButton icon="fa fa-question-circle"
+                         onclick="PF('filterHelpDialog').show()"
+                         title="Help"
+                         type="button"
+                         style="margin-left: 16px;"
+                         styleClass="secondary"/>
+
+        <p:button id="search" value="#{msgs.extendedSearch}"
+                  icon="fa fa-search" iconPos="right"
+                  outcome="extendedSearch"/>
+
+        <h:form id="configureColumnsForm"
+                rendered="#{SecurityAccessController.hasAuthorityToConfigureColumns()}">
+            <p:selectCheckboxMenu styleClass="configure-columns-button secondary"
+                                  label=""
+                                  converter="#{listColumnConverter}"
+                                  title="#{msgs.configureColumns}"
+                                  style="float: right; margin-right: 0;"
+                                  value="#{CurrentTaskForm.selectedColumns}">
+                <f:selectItems value="#{CurrentTaskForm.columns}" />
+                <p:ajax listener="#{CurrentTaskForm.saveSelectedColumns()}"
+                        update="tasksTabView"/>
+            </p:selectCheckboxMenu>
+        </h:form>      
+        
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="tasksTabView">
+            <p:tab id="tasksTab" title="#{msgs.taskList}">
+                <ui:include src="/WEB-INF/templates/includes/tasks/taskList.xhtml"/>
+            </p:tab>
+        </p:tabView>
+        <p:ajaxStatus onstart="$('#loadingScreen').show()" oncomplete="$('#loadingScreen').hide()"/>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.tasks}" icon="fa fa-paperclip"/>
+    </ui:define>
+
+    <ui:define name="dialog">
+        <ui:include src="/WEB-INF/templates/includes/base/filterHelpDialog.xhtml"/>
+    </ui:define>
+
+</ui:composition>

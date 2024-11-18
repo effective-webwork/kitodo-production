@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+  *
+  * This file is part of the Kitodo project.
+  *
+  * It is licensed under GNU General Public License version 3 or later.
+  *
+  * For the full copyright and license information, please read the
+  * GPL3-License.txt file that was distributed with this source code.
+  -->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialogEditPages"
+              modal="true"
+              resizable="false"
+              dynamic="true"
+              width="480px"
+              showHeader="false"
+              widgetVar="dialogEditPages">
+        <h3>#{msgs.pageAllocation}</h3>
+        <h:form id="dialogEditPagesForm">
+
+            <p:messages id="messagesSetFirstAndLastPage" closable="true"/>
+            <p:panelGrid columns="1" layout="grid">
+                <p:row>
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogFieldWrapper">
+                        <div>
+                            <p:outputLabel for="selectFirstPage"
+                                           value="#{msgs.firstPage}:"/>
+                            <p:selectOneMenu id="selectFirstPage"
+                                             value="#{DataEditorForm.editPagesDialog.selectFirstPageSelectedItem}"
+                                             filter="true"
+                                             filterMatchMode="startsWith">
+                                <f:selectItems value="#{DataEditorForm.editPagesDialog.selectPageItems}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div>
+                            <p:outputLabel for="selectLastPage"
+                                           value="#{msgs.lastPage}:"/>
+                            <p:selectOneMenu id="selectLastPage"
+                                             value="#{DataEditorForm.editPagesDialog.selectLastPageSelectedItem}"
+                                             filter="true"
+                                             filterMatchMode="startsWith">
+                                <f:selectItems value="#{DataEditorForm.editPagesDialog.selectPageItems}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogButtonWrapper">
+                        <p:commandButton id="setPageStartAndEndBtn"
+                                         value="#{msgs.pageAssign}"
+                                         styleClass="secondary"
+                                         style="margin-left: var(--default-double-size);"
+                                         action="#{DataEditorForm.editPagesDialog.setPageStartAndEnd}"
+                                         update="structureTreeForm,paginationSubSelection"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogFieldWrapper">
+                        <div>
+                            <p:panelGrid columns="3" columnClasses="alignTop45wide,buttonColumn,alignTop45wide">
+                                <h:panelGroup>
+                                    <h:outputText value="#{msgs.allPages}"/>
+                                    <p:selectManyMenu id="paginationSelection"
+                                                      value="#{DataEditorForm.editPagesDialog.paginationSelectionSelectedItems}">
+                                        <f:selectItems value="#{DataEditorForm.editPagesDialog.paginationSelectionItems}"/>
+                                    </p:selectManyMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:panelGrid columns="1">
+                                        <p:commandButton id="addPageBtn"
+                                                         action="#{DataEditorForm.editPagesDialog.addPage}"
+                                                         icon="fa fa-arrow-right"
+                                                         update="structureTreeForm,paginationSubSelection"/>
+                                        <p:commandButton id="removePageBtn"
+                                                         action="#{DataEditorForm.editPagesDialog.removePage}"
+                                                         icon="fa fa-arrow-left"
+                                                         update="structureTreeForm,paginationSubSelection"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputText value="#{msgs.relatedPages}"/>
+                                    <p:selectManyMenu id="paginationSubSelection"
+                                                      value="#{DataEditorForm.editPagesDialog.paginationSubSelectionSelectedItems}">
+                                        <f:selectItems value="#{DataEditorForm.editPagesDialog.paginationSubSelectionItems}"/>
+                                        <p:ajax update="structureTreeForm"/>
+                                    </p:selectManyMenu>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="dialogButtonWrapper">
+                        <p:commandButton id="ok"
+                                         value="#{msgs.ok}"
+                                         styleClass="primary right"
+                                         onclick="PF('dialogEditPages').hide();"
+                                         icon="fa fa-check fa-lg"
+                                         iconPos="right"/>
+                        <p:commandButton id="cancel"
+                                         value="#{msgs.cancel}"
+                                         styleClass="secondary right"
+                                         onclick="PF('dialogEditPages').hide();"
+                                         icon="fa fa-times fa-lg"
+                                         iconPos="right"/>
+                    </h:panelGroup>
+                </p:row>
+
+            </p:panelGrid>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

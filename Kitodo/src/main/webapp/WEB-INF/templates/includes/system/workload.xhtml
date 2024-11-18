@@ -1,0 +1,46 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:f="http://java.sun.com/jsf/core">
+    <p:panel>
+        <p:panel id="workloadDisplay"
+                 style="background: linear-gradient(
+                        to right,
+                        var(--blue),
+                        var(--blue) #{workloadForm.getWorkload()/workloadForm.getCapacity()*100}%,
+                        var(--cloudy-gray) #{workloadForm.getWorkload()/workloadForm.getCapacity()*100}%);
+                        display: block;
+                        max-width: 500px;
+                        width: 100%;">
+            <h:outputText id="workloadPercentage"
+                          value="#{workloadForm.getWorkload() / workloadForm.getCapacity() * 100}">
+                <f:convertNumber maxFractionDigits="2"/>
+            </h:outputText>%
+        </p:panel>
+
+        <h:form id="recalculateWorkload">
+            <p:commandButton icon="fa fa-repeat fa-lg"
+                             styleClass="plain"
+                             title="#{msgs.reload}"
+                             action="#{workloadForm.calculateWorkload()}">
+            </p:commandButton>
+        </h:form>
+
+        <h:outputText value="#{msgs.capacity}:"/> <h:outputText value="#{workloadForm.capacity}"/><br/>
+        <h:outputText value="#{msgs.workload}:"/> <h:outputText value="#{workloadForm.workload}"/>
+    </p:panel>
+</ui:composition>

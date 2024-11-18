@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DigitalisierungsAuftrag xmlns="http://schemas.datacontract.org/2004/07/CMI.Contract.Common"
+						 xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Ablieferung>
+		<AblieferndeStelle>Eidgenössische Alkoholverwaltung (Bern 9)</AblieferndeStelle>
+		<Ablieferungsnummer>1997/196</Ablieferungsnummer>
+		<AktenbildnerName>Eidgenössische Alkoholverwaltung (k. A.)</AktenbildnerName>
+	</Ablieferung>
+	<Auftragsdaten>
+		<AuftragsId>1000</AuftragsId>
+		<BemerkungenBar/>
+		<BemerkungenKunde>Aufrag: 3 Dokumente</BemerkungenKunde>
+		<Benutzungskopie>false</Benutzungskopie>
+		<Bestelldatum>2018-11-30T12:16:12.12</Bestelldatum>
+		<BestelleinheitId>4110312</BestelleinheitId>
+	</Auftragsdaten>
+	<Dossier>
+		<Aktenzeichen>91.80.2</Aktenzeichen>
+		<Archivnummer i:nil="true"/>
+		<Behaeltnisse>
+			<BehaeltnisType>
+				<BehaeltnisCode>1997/196_55</BehaeltnisCode>
+				<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+				<EnthalteneVerzEinheiten>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27#1*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+				</EnthalteneVerzEinheiten>
+				<InformationsTraeger>Comopt</InformationsTraeger>
+				<Standort>1.1.351.06.09</Standort>
+			</BehaeltnisType>
+			<BehaeltnisType>
+				<BehaeltnisCode>1997/196_56</BehaeltnisCode>
+				<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+				<EnthalteneVerzEinheiten>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27#1*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+				</EnthalteneVerzEinheiten>
+				<InformationsTraeger>Comopt</InformationsTraeger>
+				<Standort>1.1.351.06.09</Standort>
+			</BehaeltnisType>
+			<BehaeltnisType>
+				<BehaeltnisCode>1997/196_57</BehaeltnisCode>
+				<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+				<EnthalteneVerzEinheiten>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27#2*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+				</EnthalteneVerzEinheiten>
+				<InformationsTraeger>Comopt</InformationsTraeger>
+				<Standort>1.1.351.06.09</Standort>
+			</BehaeltnisType>
+			<BehaeltnisType>
+				<BehaeltnisCode>1997/196_58</BehaeltnisCode>
+				<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+				<EnthalteneVerzEinheiten>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27#3*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+				</EnthalteneVerzEinheiten>
+				<InformationsTraeger>Comopt</InformationsTraeger>
+				<Standort>1.1.351.06.09</Standort>
+			</BehaeltnisType>
+			<BehaeltnisType>
+				<BehaeltnisCode>1997/196_59</BehaeltnisCode>
+				<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+				<EnthalteneVerzEinheiten>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+					<VerzEinheitKurzType>
+						<Aktenzeichen>91.80.2</Aktenzeichen>
+						<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+						<Signatur>E6400C#1997/196#27#3*</Signatur>
+						<Titel>Das Obst-Musical (dialekt)</Titel>
+					</VerzEinheitKurzType>
+				</EnthalteneVerzEinheiten>
+				<InformationsTraeger>Comopt</InformationsTraeger>
+				<Standort>1.1.351.06.09</Standort>
+			</BehaeltnisType>
+		</Behaeltnisse>
+		<Darin>Inhalt: singende, sprechende Früchte;
+
+			Produktion: Dr. H. Zickendraht, Zürich;
+			Idee, Gestaltung, Bild, Text und Musik: Hans Zickendraht;
+			Auftraggeber: Schweiz. Zentralstelle für häusliche und bäuerliche Obst-Verwertung, Affoltern a.Albis
+		</Darin>
+		<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+		<Form>Film</Form>
+		<FrueheresAktenzeichen i:nil="true"/>
+		<Signatur>E6400C#1997/196#27*</Signatur>
+		<Stufe>Dossier</Stufe>
+		<Titel>Das Obst-Musical (dialekt)</Titel>
+		<UntergeordneteVerzEinheiten>
+			<VerzEinheitType>
+				<Aktenzeichen>91.80.2</Aktenzeichen>
+				<Archivnummer i:nil="true"/>
+				<Behaeltnisse>
+					<BehaeltnisType>
+						<BehaeltnisCode>1997/196_58</BehaeltnisCode>
+						<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+						<EnthalteneVerzEinheiten i:nil="true"/>
+						<InformationsTraeger>Comopt</InformationsTraeger>
+						<Standort>1.1.351.06.09</Standort>
+					</BehaeltnisType>
+					<BehaeltnisType>
+						<BehaeltnisCode>1997/196_59</BehaeltnisCode>
+						<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+						<EnthalteneVerzEinheiten i:nil="true"/>
+						<InformationsTraeger>Comopt</InformationsTraeger>
+						<Standort>1.1.351.06.09</Standort>
+					</BehaeltnisType>
+				</Behaeltnisse>
+				<Darin>Inhalt:
+					singende, sprechende Früchte;
+					längere Version als E6400C#1997/196#27#1*; zusätzliche Szenen (am Anfang des Films: singende
+					Kartoffeln/ Bilder zum Thema "Kartoffel", Gerichte etc.);
+
+					Produktion: Dr. H. Zickendraht, Zürich;
+					Idee, Gestaltung, Bild, Text und Musik: Hans Zickendraht;
+					Auftraggeber: Schweiz. Zentralstelle für häusliche und bäuerliche Obst-Verwertung, Affoltern a.Albis
+				</Darin>
+				<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+				<Form>Film</Form>
+				<FrueheresAktenzeichen i:nil="true"/>
+				<Signatur>E6400C#1997/196#27#3*</Signatur>
+				<Stufe>Dokument</Stufe>
+				<Titel>Das Obst-Musical (dialekt)</Titel>
+				<UntergeordneteVerzEinheiten i:nil="true"/>
+				<VerzEinheitId>4419830</VerzEinheitId>
+				<Zusatzkomponente i:nil="true"/>
+			</VerzEinheitType>
+			<VerzEinheitType>
+				<Aktenzeichen>91.80.2</Aktenzeichen>
+				<Archivnummer i:nil="true"/>
+				<Behaeltnisse>
+					<BehaeltnisType>
+						<BehaeltnisCode>1997/196_57</BehaeltnisCode>
+						<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+						<EnthalteneVerzEinheiten i:nil="true"/>
+						<InformationsTraeger>Comopt</InformationsTraeger>
+						<Standort>1.1.351.06.09</Standort>
+					</BehaeltnisType>
+				</Behaeltnisse>
+				<Darin>Inhalt:
+					singende, sprechende Früchte;
+					längere Version als E6400C#1997/196#27#1*; zusätzliche Szenen;
+
+					Produktion: Dr. H. Zickendraht, Zürich;
+					Idee, Gestaltung, Bild, Text und Musik: Hans Zickendraht;
+					Auftraggeber: Schweiz. Zentralstelle für häusliche und bäuerliche Obst-Verwertung, Affoltern a.Albis
+				</Darin>
+				<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+				<Form>Film</Form>
+				<FrueheresAktenzeichen i:nil="true"/>
+				<Signatur>E6400C#1997/196#27#2*</Signatur>
+				<Stufe>Dokument</Stufe>
+				<Titel>Das Obst-Musical (dialekt)</Titel>
+				<UntergeordneteVerzEinheiten i:nil="true"/>
+				<VerzEinheitId>4419829</VerzEinheitId>
+				<Zusatzkomponente i:nil="true"/>
+			</VerzEinheitType>
+			<VerzEinheitType>
+				<Aktenzeichen>91.80.2</Aktenzeichen>
+				<Archivnummer i:nil="true"/>
+				<Behaeltnisse>
+					<BehaeltnisType>
+						<BehaeltnisCode>1997/196_55</BehaeltnisCode>
+						<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+						<EnthalteneVerzEinheiten i:nil="true"/>
+						<InformationsTraeger>Comopt</InformationsTraeger>
+						<Standort>1.1.351.06.09</Standort>
+					</BehaeltnisType>
+					<BehaeltnisType>
+						<BehaeltnisCode>1997/196_56</BehaeltnisCode>
+						<BehaeltnisTyp>Metallschachtel</BehaeltnisTyp>
+						<EnthalteneVerzEinheiten i:nil="true"/>
+						<InformationsTraeger>Comopt</InformationsTraeger>
+						<Standort>1.1.351.06.09</Standort>
+					</BehaeltnisType>
+				</Behaeltnisse>
+				<Darin>Inhalt: singende, sprechende Früchte;
+
+					Produktion: Dr. H. Zickendraht, Zürich;
+					Idee, Gestaltung, Bild, Text und Musik: Hans Zickendraht;
+					Auftraggeber: Schweiz. Zentralstelle für häusliche und bäuerliche Obst-Verwertung, Affoltern a.Albis
+				</Darin>
+				<Entstehungszeitraum>1972-1972</Entstehungszeitraum>
+				<Form>Film</Form>
+				<FrueheresAktenzeichen i:nil="true"/>
+				<Signatur>E6400C#1997/196#27#1*</Signatur>
+				<Stufe>Dokument</Stufe>
+				<Titel>Das Obst-Musical (dialekt)</Titel>
+				<UntergeordneteVerzEinheiten i:nil="true"/>
+				<VerzEinheitId>4419828</VerzEinheitId>
+				<Zusatzkomponente i:nil="true"/>
+			</VerzEinheitType>
+		</UntergeordneteVerzEinheiten>
+		<VerzEinheitId>4110312</VerzEinheitId>
+		<Zusatzkomponente i:nil="true"/>
+	</Dossier>
+	<OrdnungsSystem>
+		<Name>Eidgenössische Alkoholverwaltung: Zentrale Ablage (1956-2017 )</Name>
+		<Signatur>E6400C*</Signatur>
+		<Stufe>Teilbestand</Stufe>
+		<UntergeordnetesOrdnungsSystem>
+			<Name>Information - Statistik - Dokumentation - Alkoholgegnerbewegung - Diverses, Internationale Organisationen - Kongresse - Studienreisen - Ausland</Name>
+			<Signatur>E6400C#9</Signatur>
+			<Stufe>Serie</Stufe>
+			<UntergeordnetesOrdnungsSystem>
+				<Name>Ausstellungen, Vorträge und Vorführungen, Filmwesen</Name>
+				<Signatur>E6400C#91</Signatur>
+				<Stufe>Serie</Stufe>
+				<UntergeordnetesOrdnungsSystem>
+					<Name>Filmwesen</Name>
+					<Signatur>E6400C#91.8</Signatur>
+					<Stufe>Serie</Stufe>
+					<UntergeordnetesOrdnungsSystem>
+						<Name>Allgemeines</Name>
+						<Signatur>E6400C#91.80</Signatur>
+						<Stufe>Serie</Stufe>
+						<UntergeordnetesOrdnungsSystem>
+							<Name>Filme</Name>
+							<Signatur>E6400C#91.80.2</Signatur>
+							<Stufe>Serie</Stufe>
+							<UntergeordnetesOrdnungsSystem i:nil="true"/>
+						</UntergeordnetesOrdnungsSystem>
+					</UntergeordnetesOrdnungsSystem>
+				</UntergeordnetesOrdnungsSystem>
+			</UntergeordnetesOrdnungsSystem>
+		</UntergeordnetesOrdnungsSystem>
+	</OrdnungsSystem>
+</DigitalisierungsAuftrag>

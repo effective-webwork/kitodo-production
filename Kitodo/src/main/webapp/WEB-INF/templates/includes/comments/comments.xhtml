@@ -1,0 +1,130 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <p:panel id="commentWrapperPanel" styleClass="wrapperPanel">
+        <h:panelGrid columns="2">
+            <h:column id="commentsColumn">
+                <h:form id="commentsBox">
+                    <!-- Existing comments -->
+                    <p:dataTable id="commentsGrid" value="#{CommentForm.getAllComments()}" var="item" rowIndexVar="rowIdx">
+                        <p:column style="width: 100%;">
+                            <h:outputText styleClass="comment-correction fa fa-exclamation-circle #{(item.corrected) ? 'correction corrected' : 'correction'}"
+                                          rendered="#{item.type eq 'ERROR'}"/>
+
+                            <h:outputText value="#{item.author ne null ? item.author.fullName : 'System'}"
+                                          styleClass="comment-author"/>
+                            <h:outputText value="#{item.creationDate}"
+                                          styleClass="comment-date">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                            <h:outputText value="#{item.messageFormatted}"
+                                          escape="false"
+                                          styleClass="comment-message"/>
+                            <p:commandButton
+                                    rendered="#{(item.type eq 'ERROR') and (!item.corrected)}"
+                                    icon="fa fa-check"
+                                    update="@form"
+                                    styleClass="secondary right"
+                                    immediate="true"
+                                    title="#{msgs['dataEditor.comment.markCorrectionCommentAsSolved']}"
+                                    action="#{CommentForm.solveProblem(item)}">
+                            </p:commandButton>
+                            <p:commandButton id="editButton"
+                                   action="#{CommentForm.setEditedComment(item)}"
+                                   oncomplete="PF('editCommentDialog').show()"
+                                   icon="fa fa-edit"
+                                   styleClass="secondary right"
+                                   title="#{msgs.commentEdit}"
+                                   rendered="#{item.type ne 'ERROR' and rowIdx == 0}"
+                                   disabled="#{item.author.id != LoginForm.loggedUser.id}"
+                                   immediate="true"
+                                   update=":editCommentForm">
+                                <p:resetInput target=":editCommentForm"/>
+                            </p:commandButton>
+                            <p:commandButton
+                                    rendered="#{item.type ne 'ERROR' and rowIdx == 0}"
+                                    disabled="#{item.author.id != LoginForm.loggedUser.id}"
+                                    icon="fa fa-trash"
+                                    update="#{request.requestURI.contains('metadataEditor') ? 'commentsBox:commentsGrid commentsNumberWrapper' : 'tasksTabView:commentsBox:commentsGrid tasksTabView:commentsNumberWrapper'}"
+                                    styleClass="secondary right"
+                                    immediate="true"
+                                    title="#{msgs.commentDelete}"
+                                    action="#{CommentForm.removeComment(item)}">
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:commandButton id="newButton"
+                                     action="#{CommentForm.newComment(false)}"
+                                     oncomplete="PF('newCommentDialog').show()"
+                                     icon="fa fa-comment fa-lg"
+                                     styleClass="secondary"
+                                     title="#{msgs.newElement}"
+                                     iconPos="right"
+                                     immediate="true"
+                                     value="#{msgs.comment}"
+                                     update=":newCommentForm">
+                        <p:resetInput target=":newCommentForm"/>
+                    </p:commandButton>
+                    <p:ajaxStatus onstart="$('#loadingScreen').show()" oncomplete="$('#loadingScreen').hide()"/>
+                </h:form>
+            </h:column>
+            <h:column id="reportingColumn"
+                      rendered="#{request.requestURI.contains('currentTasksEdit')}">
+                <h:form id="reportingForm">
+                    <h:panelGroup layout="block"
+                                  id="reportingFields"
+                                  styleClass="reporting select-box">
+                        <div>
+                            <p:selectBooleanCheckbox id="structuralError"
+                                                     title="#{msgs.structuralError}"
+                                                     styleClass="reporting-checkbox"
+                                                     immediate="true"
+                                                     value="#{CommentForm.structuralError}">
+                                <p:ajax event="change" immediate="true"/>
+                            </p:selectBooleanCheckbox>
+                            <p:outputLabel for="structuralError" value="#{msgs.structuralError}"/>
+                        </div>
+
+                        <div>
+                            <p:selectBooleanCheckbox id="missingInformation"
+                                                     title="#{msgs.missingInformation}"
+                                                     styleClass="reporting-checkbox"
+                                                     immediate="true"
+                                                     value="#{CommentForm.missingInformation}">
+                                <p:ajax event="change" immediate="true"/>
+                            </p:selectBooleanCheckbox>
+                            <p:outputLabel for="missingInformation" value="#{msgs.missingInformation}"/>
+                        </div>
+
+                        <div>
+                            <p:selectBooleanCheckbox id="reimport"
+                                                     title="#{msgs.reimport}"
+                                                     immediate="true"
+                                                     styleClass="reporting-checkbox"
+                                                     value="#{CommentForm.reimport}">
+                                <p:ajax event="change" immediate="true"/>
+                            </p:selectBooleanCheckbox>
+                            <p:outputLabel for="reimport" value="#{msgs.reimport}"/>
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </h:column>
+        </h:panelGrid>
+    </p:panel>
+</ui:composition>

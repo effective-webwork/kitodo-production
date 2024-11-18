@@ -1,0 +1,84 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dataTable id="projectTable"
+                 value="#{DesktopForm.projects}"
+                 scrollable="true"
+                 sortBy="#{project.title}"
+                 styleClass="default-layout"
+                 var="project">
+        <p:column headerText="#{msgs.title}">
+            <h:outputText title="#{project.title}"
+                          value="#{project.title}"/>
+        </p:column>
+        <p:column headerText="#{msgs.metsRightsOwner}">
+            <h:outputText title="#{project.metsRightsOwner}"
+                          value="#{project.metsRightsOwner}"/>
+        </p:column>
+        <p:column headerText="#{msgs.actions}" styleClass="actionsColumn">
+            <h:form id="projectActionForm">
+                <h:panelGroup styleClass="action"
+                              title="#{project.templates.size() gt 0 ? msgs['createNewProcess'] : msgs['noTemplatesConfigured']}">
+                    <p:commandLink id="createProcessFromTemplate"
+                                   action="#{SelectTemplateDialogView.createProcessForProject()}"
+                                   disabled="#{project.templates.size() lt 1}"
+                                   rendered="#{SecurityAccessController.hasAuthorityToAddProcess()}">
+                        <f:setPropertyActionListener target="#{SelectTemplateDialogView.selectedTemplateId}" value="0"/>
+                        <f:setPropertyActionListener target="#{SelectTemplateDialogView.project}" value="#{project}"/>
+                        <h:outputText><i class="fa fa-plus-square fa-lg"/></h:outputText>
+                    </p:commandLink>
+                </h:panelGroup>
+                <h:link styleClass="action"
+                        rendered="#{SecurityAccessController.hasAuthorityToEditProject()}"
+                        outcome="projectEdit" title="#{msgs.edit}">
+                    <f:param name="id" value="#{project.id}" />
+                    <f:param name="referer" value="desktop"/>
+                    <h:outputText><i class="fa fa-pencil-square-o fa-lg"/></h:outputText>
+                </h:link>
+                <h:link styleClass="action"
+                        rendered="#{SecurityAccessController.hasAuthorityToViewTaskList()}"
+                        outcome="tasks?tabIndex=0"
+                        title="#{msgs.showProjectTasks}">
+                    <f:param name="projecttitle" value="#{project.title}"/>
+                    <h:outputText><i class="fa fa-paperclip fa-lg"/></h:outputText>
+                </h:link>
+                <h:link styleClass="action"
+                        rendered="#{SecurityAccessController.hasAuthorityToViewProcessList()}"
+                        outcome="processes?tabIndex=0"
+                        title="#{msgs.showProjectProcesses}">
+                    <f:param name="projecttitle" value="#{project.title}"/>
+                    <h:outputText><i class="fa fa-clipboard fa-lg"/></h:outputText>
+                </h:link>
+                <h:panelGroup styleClass="action"
+                              title="#{project.hasProcesses() ? msgs.cannotDeleteProject : msgs.delete}">
+                    <p:commandLink id="deleteProject"
+                                   action="#{DesktopForm.deleteProject(project.id)}"
+                                   update="projectTable"
+                                   rendered="#{SecurityAccessController.hasAuthorityToDeleteProject()}"
+                                   disabled="#{project.hasProcesses()}">
+                        <h:outputText><i class="fa fa-trash-o"/></h:outputText>
+                        <p:confirm header="#{msgs.confirmDelete}"
+                                   message="#{DesktopForm.formatString('confirmDeleteProject', project.title)}"
+                                   icon="ui-icon-alert"/>
+                    </p:commandLink>
+                </h:panelGroup>
+            </h:form>
+        </p:column>
+    </p:dataTable>
+    <ui:include src="/WEB-INF/templates/includes/processFromTemplate/dialogs/selectTemplate.xhtml"/>
+</ui:composition>

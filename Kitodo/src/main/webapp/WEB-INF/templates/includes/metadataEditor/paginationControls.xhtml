@@ -1,0 +1,62 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <!--@elvariable id="readOnly" type="boolean"-->
+    <ui:param name="readOnly" value="#{SecurityAccessController.hasAuthorityToViewProcessStructureData() and not SecurityAccessController.hasAuthorityToEditProcessStructureData()}"/>
+
+    <ui:fragment id="actionButtons">
+        <p:remoteCommand name="showStructure"
+                         update="structureAccordion, metadataAccordion"
+                         action="#{DataEditorForm.structurePanel.show()}"/>
+        <!-- not used in "Pilotbetrieb"
+        <p:commandButton id="pagingButton"
+                         value="#{msgs.pagination}"
+                         title="#{msgs.pagination}"
+                         actionListener="#{DataEditorForm.paginationPanel.show()}"
+                         oncomplete="PF('paginationDialog').show();"
+                         process="@this"
+                         update="paginationForm"
+                         styleClass="secondary #{readOnly ? 'disabled' : ''}"
+                         disabled="#{readOnly}"
+                         icon="fa fa-list-ol fa-sm"
+                         iconPos="right"/>
+                         -->
+        <h:panelGroup id="downloadDocketWrapper"
+                      title="#{DataEditorForm.structurePanel.existingPartialJobSelected() ? msgs.partialJobPrintDocket : msgs.partialJobUnableToPrintDocket}">
+            <p:commandLink id="downloadDocket"
+                             disabled="#{(DataEditorForm.structurePanel.selectedPhysicalNode.data.dataObject.type ne 'partialJob') or (not DataEditorForm.structurePanel.existingPartialJobSelected())}"
+                             action="#{DataEditorForm.structurePanel.downloadPartialJobDocket()}"
+                             target="_blank"
+                             value="#{msgs.partialJobPrintDocket}"
+                             styleClass="secondary"
+                             ajax="false"/>
+        </h:panelGroup>
+        <p:commandButton id="downloadMultipleDocketsMenuTrigger"
+                         icon="fa fa-chevron-down"
+                         type="button"/>
+        <ui:include src="/WEB-INF/templates/includes/metadataEditor/dialogs/downloadMultipleDockets.xhtml"/>
+        <p:commandButton id="downloadPartialJobsList"
+                         disabled="#{DataEditorForm.structurePanel.numberOfPartialJobs lt 1}"
+                         action="#{DataEditorForm.structurePanel.downloadPartialJobList}"
+                         value="#{msgs.printPartialJobsList}"
+                         styleClass="secondary"
+                         ajax="false"/>
+    </ui:fragment>
+
+</ui:composition>

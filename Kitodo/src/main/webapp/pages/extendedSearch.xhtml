@@ -1,0 +1,188 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:o="http://omnifaces.org/ui">
+    <ui:define name="contentHeader">
+        <h3>#{msgs.extendedSearch}</h3>
+
+        <p:commandButton id="submitTaskSearch"
+                         value="#{msgs.searchForTask}"
+                         action="#{SearchForm.filterTasks}"
+                         onclick="setConfirmUnload(false)"
+                         icon="fa fa-search"
+                         iconPos="right"
+                         styleClass="right"
+                         update="searchTabView"
+                         rendered="#{SecurityAccessController.hasAuthorityToViewTaskList()}"/>
+        <p:commandButton id="submitProcessSearch"
+                         value="#{msgs.searchForVolume}"
+                         action="#{SearchForm.filterProcesses}"
+                         onclick="setConfirmUnload(false)"
+                         icon="fa fa-search"
+                         iconPos="right"
+                         styleClass="right"
+                         update="searchTabView"
+                         rendered="#{SecurityAccessController.hasAuthorityToViewProcessList()}"/>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="searchTabView">
+            <p:tab id="searchTab" title="#{msgs.details}">
+                <p:panelGrid id="processSearch-grid">
+                    <!-- process title -->
+                    <p:row>
+                        <p:column><p:outputLabel for="processtitle" value="#{msgs.processTitle}"/></p:column>
+                        <p:column>
+                            <p:selectOneMenu value="#{SearchForm.processOperand}">
+                                <f:selectItems value="#{SearchForm.operands}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column colspan="2" >
+                            <p:inputText id="processtitle"
+                                         value="#{SearchForm.processTitle}"
+                                         styleClass="extended-search-input-field"/>
+                        </p:column>
+                    </p:row>
+                    <!--projects -->
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="projekt" value="#{msgs.projects}"/></p:column>
+                        <p:column>
+                            <p:selectOneMenu id="projekt"
+                                             value="#{SearchForm.projectOperand}">
+                                <f:selectItems value="#{SearchForm.operands}"/>
+                            </p:selectOneMenu></p:column>
+                        <p:column colspan="2">
+                            <p:selectOneMenu id="processProject" value="#{SearchForm.project}">
+                                <f:selectItem itemValue="#{null}" itemLabel="#{msgs.notSelected}" noSelectionOption="true"/>
+                                <f:selectItems id="pcid11" value="#{SearchForm.projects}"
+                                               var="project" itemLabel="#{project}"
+                                               itemValue="#{project}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    <!--properties -->
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="processProperty" value="#{msgs.processProperties}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu value="#{SearchForm.processPropertyOperand}">
+                                <f:selectItems value="#{SearchForm.operands}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="processPropertyTitle"
+                                             label="#{msgs.value}"
+                                             value="#{SearchForm.processPropertyTitle}">
+                                <f:selectItem itemValue="#{null}" itemLabel="#{msgs.notSelected}" noSelectionOption="true"/>
+                                <f:selectItems value="#{SearchForm.processPropertyTitles}"
+                                               var="proc" itemLabel="#{proc}"
+                                               itemValue="#{proc}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <p:inputText id="processProperty"
+                                         value="#{SearchForm.processPropertyValue}"
+                                         styleClass="extended-search-input-field"/>
+                        </p:column>
+                    </p:row>
+                    <!--steps -->
+                    <p:row>
+                        <p:column><p:outputLabel for="taskName" value="#{msgs.task}"/></p:column>
+                        <p:column>
+                            <p:selectOneMenu value="#{SearchForm.stepOperand}">
+                                <f:selectItems value="#{SearchForm.operands}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="taskStatus"
+                                             label="#{msgs.taskStatus}"
+                                             value="#{SearchForm.status}"
+                                             requiredMessage="Bitte geben Sie sowohl den Aufgabenstatus als auch -titel an">
+                            	<f:selectItem itemValue="#{null}" itemLabel="#{msgs.notSelected}" noSelectionOption="true"/>
+                                <f:selectItem itemValue="#{SearchForm.taskCurrentString}"
+                                              itemLabel="#{HelperForm.getTranslated('statusOpen')} / #{HelperForm.getTranslated('statusInProcessing')}"/>
+                                <f:selectItems value="#{SearchForm.stepstatus}" var="stepstatus"
+                                               itemLabel="#{HelperForm.getTranslated(stepstatus.title)}" itemValue="#{SearchForm.getFilterString(stepstatus.searchString)}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="taskName"
+                                             value="#{SearchForm.stepname}"
+                                             requiredMessage="Bitte geben Sie sowohl den Aufgabenstatus als auch -titel an">
+                                <f:selectItem itemValue="#{null}" itemLabel="#{msgs.notSelected}" noSelectionOption="true"/>
+                                <f:selectItems value="#{SearchForm.stepTitles}" var="stepTitles" itemLabel="#{stepTitles}"
+                                               itemValue="#{stepTitles}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    <!--user -->
+                    <p:row rendered="#{HelperForm.userStepDoneSearchEnabled}">
+                        <p:column rendered="#{HelperForm.userStepDoneSearchEnabled}">
+                            <p:outputLabel value="#{msgs.stepDoneByUser}"/>
+                        </p:column>
+                        <p:column rendered="#{HelperForm.userStepDoneSearchEnabled}">
+                            <p:selectOneMenu value="#{SearchForm.stepdoneuser}">
+                                <f:selectItems value="#{SearchForm.user}" var="user" itemLabel="#{user.fullName}" itemValue="#{user.login}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu value="#{SearchForm.stepdonetitle}">
+                                <f:selectItems value="#{SearchForm.stepTitles}" var="stepTitles" itemLabel="#{stepTitles}" itemValue="#{stepTitles}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    <!-- process id -->
+                    <p:row>
+                        <p:column><p:outputLabel value="Kitodo-ID"/></p:column>
+                        <p:column colspan="3">
+                            <p:inputText id="processID" value="#{SearchForm.idin}"
+                                         styleClass="extended-search-input-field"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{msgs.showInactiveProjects}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectBooleanCheckbox styleClass="switch" value="#{ProcessForm.showInactiveProjects}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <h:outputLabel value="#{msgs.showClosedProcesses}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectBooleanCheckbox styleClass="switch" value="#{ProcessForm.showClosedProcesses}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.processes}" url="processes.jsf" rendered="#{request.getHeader('referer').contains('process')}" icon="fa fa-clipboard"/>
+        <p:menuitem value="#{msgs.tasks}" url="tasks.jsf" rendered="#{request.getHeader('referer').contains('task')}" icon="fa fa-paperclip"/>
+        <p:menuitem value="#{msgs.extendedSearch}" icon="fa fa-search"/>
+    </ui:define>
+
+</ui:composition>

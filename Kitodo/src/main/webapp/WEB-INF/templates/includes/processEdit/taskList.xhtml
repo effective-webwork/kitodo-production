@@ -1,0 +1,249 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:o="http://omnifaces.org/ui"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <!--@elvariable id="item" type="org.kitodo.data.database.beans.Task"-->
+    <p:dataTable id="taskTable"
+                 var="item"
+                 styleClass="default-layout"
+                 value="#{ProcessForm.process.tasks}">
+
+        <!-- ordering -->
+        <p:column headerText="#{msgs.nr}"
+                  width="10"
+                  id="taskOrder">
+            <h:outputText value="#{item.ordering}"/>
+        </p:column>
+
+        <!-- title -->
+        <p:column headerText="#{msgs.task}"
+                  id="taskTitle">
+            <p:rowToggler />
+            <h:outputText value="#{HelperForm.getTranslated(item.title)}"/>
+        </p:column>
+
+        <!-- status -->
+        <p:column headerText="#{msgs.status}"
+                  width="70"
+                  id="taskStatus">
+            <p:panel id="statusColumn" styleClass="statusColumn">
+                <h:panelGroup class="task-status"
+                              title="#{ProcessForm.getTaskStatusTitle(item.processingStatus.title)}"
+                              style="background-color:
+                                #{item.processingStatus.title == 'statusDone' ? 'var(--green)' : ''}
+                                #{item.processingStatus.title == 'statusInProcessing' ? 'var(--light-green)' : ''}
+                                #{item.processingStatus.title == 'statusOpen' ? 'var(--light-orange)' : ''}
+                                #{item.processingStatus.title == 'statusLocked' ? 'var(--focused-orange)' : ''};"
+                />
+                <p:panel rendered="#{SecurityAccessController.hasAuthorityToEditTask()}">
+                    <!-- Set workflow state to previous step -->
+                    <p:commandButton action="#{ProcessForm.setTaskStatusDown}"
+                                     id="taskStatusDown"
+                                     title="#{msgs.statusDown}"
+                                     oncomplete="toggleSave()"
+                                     update="taskTable"
+                                     icon="fa fa-long-arrow-left"
+                                     styleClass="ui-button-small"
+                                     rendered="#{item.processingStatus.title eq 'statusOpen' or item.processingStatus.title eq 'statusInProcessing'}">
+                        <f:setPropertyActionListener target="#{ProcessForm.task}" value="#{item}"/>
+                    </p:commandButton>
+                    <!-- Set workflow state to next step -->
+                    <p:commandButton action="#{ProcessForm.setTaskStatusUp}"
+                                     id="taskStatusUp"
+                                     title="#{msgs.statusUp}"
+                                     oncomplete="toggleSave()"
+                                     update="taskTable"
+                                     icon="fa fa-long-arrow-right"
+                                     styleClass="ui-button-small"
+                                     rendered="#{item.processingStatus.title eq 'statusOpen' or item.processingStatus.title eq 'statusInProcessing'}">
+                        <f:setPropertyActionListener target="#{ProcessForm.task}" value="#{item}"/>
+                    </p:commandButton>
+                </p:panel>
+            </p:panel>
+        </p:column>
+
+        <p:column headerText="#{msgs['dataEditor.comment.role.editor']}"
+                  width="200"
+                  id="lastEditingUserColumn">
+            <h:outputText value="#{ProcessForm.getLastUsername(item.title)}"
+                          title="#{ProcessForm.getLastUsername(item.title)}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs['processingBegin']}"
+                  width="160"
+                  id="editingStartColumn">
+            <h:panelGroup rendered="#{ProcessForm.getLastStartedTimestamp(item.title) ne null}">
+                <h:outputText value="#{ProcessForm.getLastStartedTimestamp(item.title)}"
+                              title="#{ProcessForm.getLastStartedTimestamp(item.title)}">
+                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                </h:outputText>
+            </h:panelGroup>
+            <h:outputText value="-"
+                          rendered="#{ProcessForm.getLastStartedTimestamp(item.title) eq null}"/>
+        </p:column>
+
+        <p:column headerText="#{msgs['processingEnd']}"
+                  width="155"
+                  id="editingEndColumn">
+            <h:panelGroup rendered="#{ProcessForm.getLastFinishedTimestamp(item.title) ne null}">
+                <h:outputText value="#{ProcessForm.getLastFinishedTimestamp(item.title)}"
+                              title="#{ProcessForm.getLastFinishedTimestamp(item.title)}">
+                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                </h:outputText>
+            </h:panelGroup>
+            <h:outputText value="-"
+                          rendered="#{ProcessForm.getLastFinishedTimestamp(item.title) eq null}"/>
+        </p:column>
+
+        <!-- actions -->
+        <p:column rendered="#{isEditMode and SecurityAccessController.hasAnyAuthorityForClient('editTask, deleteTask')}"
+                  width="60"
+                  headerText="#{msgs.actions}" id="taskAction" styleClass="actionsColumn">
+            <h:link id="editTask"
+                    outcome="taskEdit"
+                    styleClass="action"
+                    rendered="#{SecurityAccessController.hasAuthorityToEditTask()}"
+                    title="#{msgs.taskDetails}">
+                <f:param name="id" value="#{item.id}"/>
+                <f:param name="referer" value="processEdit?id=#{item.process.id}"/>
+                <i class="fa fa-pencil-square-o fa-lg"/>
+            </h:link>
+            <p:commandLink id="deleteTask"
+                           rendered="#{SecurityAccessController.hasAuthorityToDeleteTask()}"
+                           styleClass="action"
+                           title="#{msgs.delete}"
+                           action="#{ProcessForm.removeTask}"
+                           immediate="true"
+                           oncomplete="toggleSave()"
+                           update="taskTable">
+                <h:outputText><i class="fa fa-trash-o fa-lg"/></h:outputText>
+                <f:setPropertyActionListener target="#{ProcessForm.task}" value="#{item}"/>
+                <p:confirm header="#{msgs.deleteTask}?"
+                           message="#{msgs.shouldItemBeRemoved}"
+                           icon="ui-icon-alert"/>
+            </p:commandLink>
+        </p:column>
+
+        <p:rowExpansion>
+            <div class="row-expansion-wrapper">
+                <p:panelGrid columns="2"
+                             style="width: 500px; display: inline-block;">
+                    <p:panelGrid columns="2"
+                                 styleClass="expansion-column"
+                                 columnClasses="label,value"
+                                 headerText="#{msgs.properties}">
+                        <h:outputText value="#{msgs.processTitle}: "
+                                      title="#{msgs.processTitle}"/>
+                        <h:outputText value="#{item.process.title}"
+                                      title="#{item.process.title}"/>
+
+                        <h:outputText value="#{msgs.correction}: "
+                                      title="#{msgs.correction}"/>
+                        <h:outputText value="#{item.correction}"
+                                      title="#{item.correction}"/>
+
+                        <h:outputText value="#{msgs.processingBegin}: "
+                                      title="#{msgs.processingBegin}"
+                                      rendered="#{item.processingBegin ne null and !HelperForm.anonymized}"/>
+                        <h:outputText value="#{ProcessForm.getFormattedDate(item.processingBegin)}"
+                                      title="#{ProcessForm.getFormattedDate(item.processingBegin)}"
+                                      rendered="#{item.processingBegin ne null and !HelperForm.anonymized}"/>
+
+                        <h:outputText value="#{msgs.lastEdited}: "
+                                      title="#{msgs.lastEdited}"
+                                      rendered="#{item.processingTime ne null and !HelperForm.anonymized}"/>
+                        <h:outputText value="#{ProcessForm.getFormattedDate(item.processingTime)}"
+                                      title="#{ProcessForm.getFormattedDate(item.processingTime)}"
+                                      rendered="#{item.processingTime ne null and !HelperForm.anonymized}"/>
+
+                        <h:outputText value="#{msgs.processingEnd}: "
+                                      title="#{msgs.processingEnd}"
+                                      rendered="#{item.processingEnd ne null and !HelperForm.anonymized}"/>
+                        <h:outputText value="#{ProcessForm.getFormattedDate(item.getProcessingEnd)}"
+                                      title="#{ProcessForm.getFormattedDate(item.getProcessingEnd)}"
+                                      rendered="#{item.processingEnd ne null and !HelperForm.anonymized}"/>
+
+                        <h:outputText value="#{msgs.lastUpdatedBy}: "
+                                      title="#{msgs.lastUpdatedBy}"
+                                      rendered="#{item.processingUser ne null and item.processingUser.id ne null and !HelperForm.anonymized}"/>
+                        <h:outputText value="#{item.processingUser.fullName}"
+                                      title="#{item.processingUser.fullName}"
+                                      rendered="#{item.processingUser ne null and item.processingUser.id ne null and !HelperForm.anonymized}"/>
+
+                        <h:outputText value="#{msgs.editType}: "
+                                      title="#{msgs.editType}"
+                                      rendered="#{item.editType ne null}"/>
+                        <h:outputText value="#{item.editType.title}"
+                                      title="#{item.editType.title}"
+                                      rendered="#{item.editType ne null}"/>
+
+                        <h:outputText value="#{msgs.automaticTask}: "
+                                      title="#{msgs.automaticTask}"
+                                      rendered="#{item.scriptPath ne null and item.scriptPath ne ''}"/>
+                        <h:outputText value="#{item.scriptPath}"
+                                      title="#{item.scriptPath}"
+                                      rendered="#{item.scriptPath ne null and item.scriptPath ne ''}"/>
+
+                    </p:panelGrid>
+                </p:panelGrid>
+
+                <p:panel style="display: inline-block; vertical-align: top;">
+                    <p:dataTable styleClass="previous-users"
+                                 value="#{ProcessForm.getPreviousTaskEvents(item.title)}"
+                                 var="taskEvent">
+                        <p:column width="200">
+                            <h:outputText value="#{taskEvent[ProcessForm.getUserString()]}"
+                                          title="#{taskEvent[ProcessForm.getUserString()]}"/>
+                        </p:column>
+
+                        <p:column width="160">
+                            <h:outputText rendered="#{taskEvent[ProcessForm.getStartedString()] ne null}"
+                                          value="#{taskEvent[ProcessForm.getStartedString()]}"
+                                          title="#{taskEvent[ProcessForm.getStartedString()]}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column width="155">
+                            <h:outputText rendered="#{taskEvent[ProcessForm.getFinishedString()] ne null}"
+                                          value="#{taskEvent[ProcessForm.getFinishedString()]}"
+                                          title="#{taskEvent[ProcessForm.getFinishedString()]}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panel>
+            </div>
+        </p:rowExpansion>
+
+    </p:dataTable>
+
+    <p:panelGrid columns="1">
+        <p:row>
+            <ui:fragment rendered="#{ProcessForm.process.template.workflow ne null and not empty ProcessForm.process.tasks}">
+                <h4><p:outputLabel value="#{msgs.workflow}: #{ProcessForm.process.template.workflow.title}"/></h4>
+                <h:link outcome="workflowEdit.jsf?id=#{ProcessForm.process.template.workflow.id}"
+                        title="#{ProcessForm.process.template.workflow.title}">
+                    <o:graphicImage value="#{ProcessForm.tasksDiagram}"
+                                    dataURI="true" />
+                </h:link>
+            </ui:fragment>
+        </p:row>
+    </p:panelGrid>
+</ui:composition>

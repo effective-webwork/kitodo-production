@@ -1,0 +1,96 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        template="/WEB-INF/templates/baseEditView.xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:viewParam name="id"/>
+        <f:viewAction action="#{RoleForm.load(id)}"/>
+    </f:metadata>
+
+    <!--@elvariable id="isEditMode" type="boolean"-->
+    <ui:param name="isEditMode"
+              value="#{RoleForm.role.id ne null and SecurityAccessController.hasAuthorityToEditRole()}"/>
+    <!--@elvariable id="isCreateMode" type="boolean"-->
+    <ui:param name="isCreateMode"
+              value="#{RoleForm.role.id eq null and SecurityAccessController.hasAuthorityToAddRole()}"/>
+    <!--@elvariable id="isViewMode" type="boolean"-->
+    <ui:param name="isViewMode"
+              value="#{not isEditMode and not isCreateMode and SecurityAccessController.hasAuthorityToViewRole()}"/>
+
+    <ui:define name="contentHeader">
+        <h:outputScript name="js/save.js" target="body" />
+        <h3 id="headerText">
+            <h:outputText value="#{msgs.editRole} (#{RoleForm.role.title})"
+                          styleClass="shortable"
+                          rendered="#{isEditMode}"/>
+            <h:outputText value="#{msgs.createNewRole}"
+                          styleClass="shortable"
+                          rendered="#{isCreateMode}"/>
+            <h:outputText value="#{msgs.viewRole} (#{RoleForm.role.title})"
+                          styleClass="shortable"
+                          rendered="#{isViewMode}"/>
+        </h3>
+        
+        <p:button id="cancel"
+                  value="#{msgs.cancel}"
+                  onclick="setConfirmUnload(false);"
+                  outcome="users?keepPagination=true"
+                  icon="fa fa-times fa-lg"
+                  iconPos="right"
+                  styleClass="secondary"/>
+
+        <p:commandButton id="saveButtonToggler"
+                  actionListener="#{RoleForm.setSaveDisabled(false)}"
+                  update="save"
+                  style="display:none;"/>
+
+        <p:commandButton id="save"
+                  widgetVar="save"
+                  rendered="#{isEditMode || isCreateMode}"
+                  value="#{msgs.save}"
+                  action="#{RoleForm.save}"
+                  icon="fa fa-floppy-o fa-lg"
+                  iconPos="right"
+                  onclick="setConfirmUnload(false);PF('notifications').renderMessage({
+                                 'summary':'#{msgs.roleSaving}',
+                                 'detail':'#{msgs.youWillBeRedirected}',
+                                 'severity':'info'});"
+
+                  update="notifications"
+                  disabled="#{RoleForm.saveDisabled}"/>
+    </ui:define>
+
+    <ui:define name="pageTabView">
+        <p:tabView id="roleTabView">
+            <p:tab id="roleTab" title="#{msgs.details}">
+                <ui:include src="/WEB-INF/templates/includes/roleEdit/details.xhtml">
+                    <ui:param name="isViewMode" value="#{isViewMode}" />
+                </ui:include>
+            </p:tab>
+        </p:tabView>
+    </ui:define>
+
+    <ui:define name="breadcrumbs">
+        <p:menuitem value="#{msgs.desktop}" url="desktop.jsf" icon="fa fa-home"/>
+        <p:menuitem value="#{msgs.users}" url="users.jsf" icon="fa fa-user"/>
+        <p:menuitem value="#{msgs.editRole}" rendered="#{isEditMode}" icon="fa fa-cubes"/>
+        <p:menuitem value="#{msgs.newRole}" rendered="#{isCreateMode}" icon="fa fa-cubes"/>
+        <p:menuitem value="#{msgs.viewRole}" rendered="#{isViewMode}" icon="fa fa-cubes"/>
+    </ui:define>
+
+</ui:composition>

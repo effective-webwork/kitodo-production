@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+<web-app version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
+
+    <display-name>Kitodo</display-name>
+
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.apache.myfaces.DETECT_JAVASCRIPT</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.apache.myfaces.AUTO_SCROLL</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.apache.myfaces.CONFIG_REFRESH_PERIOD</param-name>
+        <param-value>60</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</param-name>
+        <param-value>${myfaces.resourceMaxTimeExpires}</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.ENABLE_WEBSOCKET_ENDPOINT</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.WEBAPP_RESOURCES_DIRECTORY</param-name>
+        <param-value>/WEB-INF/resources</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>primefaces.FONT_AWESOME</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.FACELETS_LIBRARIES</param-name>
+        <param-value>/WEB-INF/springsecurity.taglib.xml</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>${jsf.projectStage}</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.FACELETS_BUFFER_SIZE</param-name>
+        <param-value>5242880</param-value>
+    </context-param>
+
+    <!-- Faces Servlet -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Faces Servlet Mapping -->
+
+    <!-- extension mapping -->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>
+
+    <session-config>
+        <session-timeout>0</session-timeout>
+    </session-config>
+
+    <!-- gzip filter compressing resources -->
+    <filter>
+        <filter-name>gzipResponseFilter</filter-name>
+        <filter-class>org.omnifaces.filter.GzipResponseFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>gzipResponseFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <!-- Welcome files -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsf</welcome-file>
+    </welcome-file-list>
+
+    <!-- Error pages -->
+    <error-page>
+        <error-code>500</error-code>
+        <location>/pages/error.jsf</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/pages/desktop.jsf</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/pages/error.jsf</location>
+    </error-page>
+
+    <servlet>
+        <servlet-name>jersey-servlet</servlet-name>
+        <servlet-class>
+            org.glassfish.jersey.servlet.ServletContainer
+        </servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>org.kitodo.production.services.relayserver.services</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>jersey-servlet</servlet-name>
+        <url-pattern>/viaduc/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- log4j2 for servlet 3.0 based web applications -->
+    <!-- configuration file to use -->
+    <context-param>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>WEB-INF/classes/log4j2.xml</param-value>
+    </context-param>
+    <!-- end of log4j2 -->
+
+    <!-- security related -->
+    <!-- see https://cwiki.apache.org/confluence/display/MYFACES2/Secure+Your+Application -->
+    <context-param>
+        <param-name>org.apache.myfaces.ALGORITHM</param-name>
+        <!-- default: DES -->
+        <param-value>AES_256</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.apache.myfaces.ALGORITHM.PARAMETERS</param-name>
+        <!-- default: ECB/PKCS5Padding -->
+        <param-value>GCM/NoPadding</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.apache.myfaces.MAC_ALGORITHM</param-name>
+        <!-- default: HmacSHA1 -->
+        <param-value>HMAC-SHA512</param-value>
+    </context-param>
+    <!-- security related end -->
+
+</web-app>

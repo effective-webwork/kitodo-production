@@ -1,0 +1,109 @@
+<!--
+ *
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ *
+-->
+
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+    <f:view locale="#{LanguageForm.locale}">
+        <p:dialog id="imprintDialog"
+                  styleClass="legal-dialog"
+                  widgetVar="imprintDialog"
+                  dynamic="true"
+                  width="640"
+                  height="480"
+                  showHeader="false"
+                  resizable="false"
+                  modal="true">
+            <h3>#{msgs.imprint}</h3>
+            <h:panelGroup layout="block"
+                          styleClass="dialogFieldWrapper">
+                <h:outputText id="imprintText"
+                              value="#{LegalTexts.imprintText}"
+                              escape="false"/>
+            </h:panelGroup>
+            <h:panelGroup layout="block"
+                          styleClass="dialogButtonWrapper">
+                <h:form id="closeImprintForm">
+                    <p:commandButton id="closeImprint"
+                                     value="#{msgs.close}"
+                                     icon="fa fa-times fa-lg"
+                                     iconPos="right"
+                                     immediate="true"
+                                     styleClass="secondary right"
+                                     onclick="PF('imprintDialog').hide();"/>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+        <p:dialog id="dataPrivacyDialog"
+                  styleClass="legal-dialog"
+                  widgetVar="dataPrivacyDialog"
+                  dynamic="true"
+                  width="640"
+                  height="480"
+                  showHeader="false"
+                  resizable="false"
+                  modal="true">
+            <h3>#{msgs.dataPrivacy}</h3>
+            <h:panelGroup layout="block"
+                          styleClass="dialogFieldWrapper">
+                <h:outputText id="dataPrivacyText"
+                              value="#{LegalTexts.dataPrivacyText}"
+                              escape="false"/>
+            </h:panelGroup>
+            <h:panelGroup layout="block"
+                          styleClass="dialogButtonWrapper">
+                <h:form id="closeDataPrivacyForm">
+                    <p:commandButton id="closeDataPrivacy"
+                                     value="#{msgs.close}"
+                                     icon="fa fa-times fa-lg"
+                                     iconPos="right"
+                                     immediate="true"
+                                     styleClass="secondary right"
+                                     onclick="PF('dataPrivacyDialog').hide();"/>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+        <p:dialog id="termsOfUseDialog"
+                  styleClass="legal-dialog"
+                  widgetVar="termsOfUseDialog"
+                  dynamic="true"
+                  width="640"
+                  height="480"
+                  showHeader="false"
+                  resizable="false"
+                  modal="true">
+            <h3>#{msgs.termsOfUse}</h3>
+            <h:panelGroup layout="block"
+                          styleClass="dialogFieldWrapper">
+                <h:outputText id="termsOfUseText"
+                              value="#{LegalTexts.termsOfUseText}"
+                              escape="false"/>
+            </h:panelGroup>
+            <h:panelGroup layout="block"
+                          styleClass="dialogButtonWrapper">
+                <h:form id="closeTermsOfUseForm">
+                    <p:commandButton id="closeTerms"
+                                     value="#{msgs.close}"
+                                     icon="fa fa-times fa-lg"
+                                     iconPos="right"
+                                     immediate="true"
+                                     styleClass="secondary right"
+                                     onclick="PF('termsOfUseDialog').hide();"/>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+    </f:view>
+</ui:composition>

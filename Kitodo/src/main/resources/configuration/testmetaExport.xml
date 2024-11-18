@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paket xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://bar.admin.ch/arelda/v4" xsi:type="paketSIP"
+       schemaVersion="4.0">
+    <paketTyp>SIP</paketTyp>
+    <inhaltsverzeichnis>
+        <ordner>
+            <name>header</name>
+            <originalName>header</originalName>
+            <ordner>
+                <name>xsd</name>
+                <originalName>xsd</originalName>
+                <datei id="_WdZYYExZEei3oJZosTYjHw">
+                    <name>ablieferung.xsd</name>
+                    <originalName>ablieferung.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>aa1f7ad13064e1643ac85478296165af</pruefsumme>
+                </datei>
+                <datei id="_Wdb0oExZEei3oJZosTYjHw">
+                    <name>archivischeNotiz.xsd</name>
+                    <originalName>archivischeNotiz.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>847911efbac472d0ecc6fe1e99873799</pruefsumme>
+                </datei>
+                <datei id="_Wde38ExZEei3oJZosTYjHw">
+                    <name>archivischerVorgang.xsd</name>
+                    <originalName>archivischerVorgang.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>4a237563fd2d40be9a9ecbf4c0bf946e</pruefsumme>
+                </datei>
+                <datei id="_WdhUMExZEei3oJZosTYjHw">
+                    <name>arelda.xsd</name>
+                    <originalName>arelda.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>f8454632e1ebf97e0aa8d9527ce2641f</pruefsumme>
+                </datei>
+                <datei id="_WdiiUExZEei3oJZosTYjHw">
+                    <name>base.xsd</name>
+                    <originalName>base.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>cb30854883c6d5640b0965dae5f34afd</pruefsumme>
+                </datei>
+                <datei id="_WdjwcExZEei3oJZosTYjHw">
+                    <name>datei.xsd</name>
+                    <originalName>datei.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>a4276f0c798ce6c497f0a03660ead0d9</pruefsumme>
+                </datei>
+                <datei id="_WdlloExZEei3oJZosTYjHw">
+                    <name>dokument.xsd</name>
+                    <originalName>dokument.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>721965e5224766040bf0bcd03978809e</pruefsumme>
+                </datei>
+                <datei id="_Wdna0ExZEei3oJZosTYjHw">
+                    <name>dossier.xsd</name>
+                    <originalName>dossier.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>f3f1141d95e92a291e84cfb30bb30e9a</pruefsumme>
+                </datei>
+                <datei id="_Wdoo8ExZEei3oJZosTYjHw">
+                    <name>ordner.xsd</name>
+                    <originalName>ordner.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>83e0f91d1a232c7bdd7416970844af1c</pruefsumme>
+                </datei>
+                <datei id="_WdqeIExZEei3oJZosTYjHw">
+                    <name>ordnungssystem.xsd</name>
+                    <originalName>ordnungssystem.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>4b64247b25362382d6c648ba8ff76ad6</pruefsumme>
+                </datei>
+                <datei id="_WdrsQExZEei3oJZosTYjHw">
+                    <name>ordnungssystemposition.xsd</name>
+                    <originalName>ordnungssystemposition.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>1e7f0a9b914c8baf1235740b133ec90e</pruefsumme>
+                </datei>
+                <datei id="_Wds6YExZEei3oJZosTYjHw">
+                    <name>paket.xsd</name>
+                    <originalName>paket.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>9920c66b7066f645390e922ba803aadb</pruefsumme>
+                </datei>
+                <datei id="_WduIgExZEei3oJZosTYjHw">
+                    <name>provenienz.xsd</name>
+                    <originalName>provenienz.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>2d6dbc4665cb5169d62549dbbc3f19a7</pruefsumme>
+                </datei>
+                <datei id="_Wdv9sExZEei3oJZosTYjHw">
+                    <name>zusatzDaten.xsd</name>
+                    <originalName>zusatzDaten.xsd</originalName>
+                    <pruefalgorithmus>MD5</pruefalgorithmus>
+                    <pruefsumme>a685887b7ad673ea2deac6f96cf3fb4f</pruefsumme>
+                </datei>
+            </ordner>
+        </ordner>
+        <ordner>
+        <name>content</name>
+        <originalName>content</originalName>
+        <ordner>
+            <name>d_0000001</name>
+            <originalName>d_0000001</originalName>
+            <datei id="_no68rnyUb21F3K8DygBin2">
+                <name>0000001_DIG.jp2</name>
+                <originalName>0000001_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>50671f8f98415269e01fdb793fd65783</pruefsumme>
+            </datei>
+            <datei id="_p8xrX8kTNas6I1zgpmkYsX">
+                <name>0000002_DIG.jp2</name>
+                <originalName>0000002_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>328022f275c111cc19410af52df3ac72</pruefsumme>
+            </datei>
+            <datei id="_FVDIvIJoywBv88K9QztHoa">
+                <name>0000003_DIG.jp2</name>
+                <originalName>0000003_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>b647594a0c5ac7760ec9397c83206031</pruefsumme>
+            </datei>
+            <datei id="_W6CGNR1Y7PKS2boPNcJim6">
+                <name>0000004_DIG.jp2</name>
+                <originalName>0000004_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>dcb99e7463a71c6d8de00e66c1139aed</pruefsumme>
+            </datei>
+            <datei id="_5X21VpWvokto8GGo52xayw">
+                <name>0000005_DIG.jp2</name>
+                <originalName>0000005_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>80c4e0eb80e899d626500f9293e02186</pruefsumme>
+            </datei>
+            <datei id="_kqFsUAmR8FyaBoOV5LBMkj">
+                <name>0000006_DIG.jp2</name>
+                <originalName>0000006_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>bbb61f764a473d602911b2b3fe6ca831</pruefsumme>
+            </datei>
+            <datei id="_jNdhJjgRvMHIwLwmVWIXmo">
+                <name>0000007_DIG.jp2</name>
+                <originalName>0000007_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>314e580158207147aeb84dc8eb2ef562</pruefsumme>
+            </datei>
+            <datei id="_0hFbZj6mYlMBH1Px1DurTm">
+                <name>0000008_DIG.jp2</name>
+                <originalName>0000008_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>475ce0b4720c6c641cdec46956c8a49c</pruefsumme>
+            </datei>
+            <datei id="_T31DjT0pDM75X6crJ6UIyf">
+                <name>0000009_DIG.jp2</name>
+                <originalName>0000009_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0ebeca300396678057712d66bea7eefe</pruefsumme>
+            </datei>
+            <datei id="_6vE4XheFn4UONMjWAnwsh9">
+                <name>0000010_DIG.jp2</name>
+                <originalName>0000010_DIG.jp2</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>35e43497e0e0c0d0304c3dea21ced716</pruefsumme>
+            </datei>
+            <datei id="_Cp5j45eglKsH4rfXXiz27j">
+                <name>0000001_PREMIS.xml</name>
+                <originalName>0000001_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_b4GUBLGxifpN1YIHg2RCK6">
+                <name>0000002_PREMIS.xml</name>
+                <originalName>0000002_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_SSFrmprLOSmcNAdj4SZymN">
+                <name>0000003_PREMIS.xml</name>
+                <originalName>0000003_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_br0HOPC6k5ZflyPTjbGWRX">
+                <name>0000004_PREMIS.xml</name>
+                <originalName>0000004_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_lYLIo689nVUF0Y1eabISrq">
+                <name>0000005_PREMIS.xml</name>
+                <originalName>0000005_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_DsYpUkt7sP5EGc6GkG7lRD">
+                <name>0000006_PREMIS.xml</name>
+                <originalName>0000006_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_Kg70cEBoN9q4Uct9lYPqnE">
+                <name>0000007_PREMIS.xml</name>
+                <originalName>0000007_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_KwRYiU1CUGZAh2rdIo6EB6">
+                <name>0000008_PREMIS.xml</name>
+                <originalName>0000008_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_YMIdWlejVlZGWLiDgqxKok">
+                <name>0000009_PREMIS.xml</name>
+                <originalName>0000009_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+            <datei id="_eT50SHQltjCNYFQE7Pivux">
+                <name>0000010_PREMIS.xml</name>
+                <originalName>0000010_PREMIS.xml</originalName>
+                <pruefalgorithmus>MD5</pruefalgorithmus>
+                <pruefsumme>0dd1d1133e8552dec5fdd2fd42f32a25</pruefsumme>
+            </datei>
+        </ordner>
+        </ordner>
+    </inhaltsverzeichnis>
+    <ablieferung xsi:type="ablieferungFilesSIP">
+        <ablieferungstyp>FILES</ablieferungstyp>
+        <ablieferndeStelle>Schweizerisches Bundesarchiv</ablieferndeStelle>
+        <entstehungszeitraum>
+            <von>
+                <datum>1993</datum>
+            </von>
+            <bis>
+                <datum>1995</datum>
+            </bis>
+        </entstehungszeitraum>
+        <ablieferungsnummer>E1004.1_054608</ablieferungsnummer>
+        <schutzfristenkategorie>keine</schutzfristenkategorie>
+        <schutzfrist>0</schutzfrist>
+        <provenienz>
+            <aktenbildnerName>Schweizerisches Bundesarchiv</aktenbildnerName>
+        </provenienz>
+        <ordnungssystem>
+            <name>Schweizerisches Bundesarchiv: Muster SIP</name>
+            <ordnungssystemposition id="_Wdv9sUxZEei3oJZosTYjHw">
+                <nummer>__054608</nummer>
+                <titel>Titel TestdossierE1004.1_054608</titel>
+                <dossier id="_QBxb8ExdEei17459mcEaVA">
+                    <titel>Unterlagen zum Projekt</titel>
+                    <entstehungszeitraum>
+                        <von>
+                            <datum>1993</datum>
+                        </von>
+                        <bis>
+                            <datum>1995</datum>
+                        </bis>
+                    </entstehungszeitraum>
+                    <dokument id="_2KnrJYrcJfD0tUPXOK0LMd">
+                        <titel>D_o_k_u_m_e_n_t_0000001</titel>
+                        <erscheinungsform>digital</erscheinungsform>
+                        <dateiRef>_no68rnyUb21F3K8DygBin2</dateiRef>
+                        <dateiRef>_Cp5j45eglKsH4rfXXiz27j</dateiRef>
+                        <dateiRef>_p8xrX8kTNas6I1zgpmkYsX</dateiRef>
+                        <dateiRef>_b4GUBLGxifpN1YIHg2RCK6</dateiRef>
+                        <dateiRef>_FVDIvIJoywBv88K9QztHoa</dateiRef>
+                        <dateiRef>_SSFrmprLOSmcNAdj4SZymN</dateiRef>
+                        <dateiRef>_W6CGNR1Y7PKS2boPNcJim6</dateiRef>
+                        <dateiRef>_br0HOPC6k5ZflyPTjbGWRX</dateiRef>
+                        <dateiRef>_5X21VpWvokto8GGo52xayw</dateiRef>
+                        <dateiRef>_lYLIo689nVUF0Y1eabISrq</dateiRef>
+                        <dateiRef>_kqFsUAmR8FyaBoOV5LBMkj</dateiRef>
+                        <dateiRef>_DsYpUkt7sP5EGc6GkG7lRD</dateiRef>
+                        <dateiRef>_jNdhJjgRvMHIwLwmVWIXmo</dateiRef>
+                        <dateiRef>_Kg70cEBoN9q4Uct9lYPqnE</dateiRef>
+                        <dateiRef>_0hFbZj6mYlMBH1Px1DurTm</dateiRef>
+                        <dateiRef>_KwRYiU1CUGZAh2rdIo6EB6</dateiRef>
+                        <dateiRef>_T31DjT0pDM75X6crJ6UIyf</dateiRef>
+                        <dateiRef>_YMIdWlejVlZGWLiDgqxKok</dateiRef>
+                        <dateiRef>_6vE4XheFn4UONMjWAnwsh9</dateiRef>
+                        <dateiRef>_eT50SHQltjCNYFQE7Pivux</dateiRef>
+                        <dateiRef>_DMeSUJ3xWLxx6G9o5SL8jC</dateiRef>
+                        <dateiRef>_kagf4EHPQ1SxryhgTWTu10</dateiRef>
+                        <dateiRef>_lIsQIx6qWF76r1ZENUMziI</dateiRef>
+                        <dateiRef>_DIxdxcthm2zrseUwNLdeSL</dateiRef>
+                        <dateiRef>_aaPcWVsehjZBlVkEBF1pzs</dateiRef>
+                        <dateiRef>_5kYcgb6Mc95uXXrbQpftOZ</dateiRef>
+                        <dateiRef>_z9YHO0F0vuecsSBpak82hX</dateiRef>
+                        <dateiRef>_8AFDLgJHRXh1NNFV5SlZaz</dateiRef>
+                        <dateiRef>_gqQEeITG82TrkPEPG1Yryp</dateiRef>
+                        <dateiRef>_v8H6Fv4x8j6flXWdPZDVsi</dateiRef>
+                        <dateiRef>_gInRDWpQr7Kbcs0KW6gpwl</dateiRef>
+                        <dateiRef>_MfKeV5uNHy9IOH6PbXMdY8</dateiRef>
+                        <dateiRef>_JAsvlLeHd0j1JIaMF7brLW</dateiRef>
+                        <dateiRef>_4rlr8bCLWFGNvlwlZ9DubI</dateiRef>
+                        <dateiRef>_hIwVY6fcKJ349njRvdwjeU</dateiRef>
+                        <dateiRef>_gdJPhA8pIPKOlc2o7SL5c4</dateiRef>
+                        <dateiRef>_2lisuJ0jNEaxdj8PwimApa</dateiRef>
+                        <dateiRef>_BAVUcz7NZngwLIht4CNr61</dateiRef>
+                        <dateiRef>_7OIxnxM74l1MQKwqMWll5z</dateiRef>
+                        <dateiRef>_Dg9UsvBujfqlcJ3MhJr4zg</dateiRef>
+                        <dateiRef>_eMK9SfrO7doboUj6fCXPJz</dateiRef>
+                        <dateiRef>_syQuGNYJsu7K7yUIGMLpDA</dateiRef>
+                        <dateiRef>_5QTycFVPZEeIu6nnfqQqnY</dateiRef>
+                        <dateiRef>_GjpYzreE9BBgyLD8oyWaw5</dateiRef>
+                        <dateiRef>_hygcHP0iOqpoR3qeCl2rDk</dateiRef>
+                        <dateiRef>_oRLE1ZCftKcrsqEsYqpov5</dateiRef>
+                        <dateiRef>_6gkmT2hq9dLgsfRA8GZ00y</dateiRef>
+                        <dateiRef>_IaAJEIiXSnNL5YMuzFBdS1</dateiRef>
+                        <dateiRef>_dFpt7Anox5U7192e68BhqL</dateiRef>
+                        <dateiRef>_EHdX46ZpvIJsJvEsU47V1z</dateiRef>
+                        <dateiRef>_duLKMCnwSNuHDe7k4gDUpP</dateiRef>
+                        <dateiRef>_dgvqfn0jmRnRW2qrNm7n2F</dateiRef>
+                        <dateiRef>_LvnSIeKazSIRm4hwxlBBnH</dateiRef>
+                        <dateiRef>_BMObqHuHg69Po6mNavyLf1</dateiRef>
+                        <dateiRef>_Mu6XgWEedVfNjah43Il1Xb</dateiRef>
+                        <dateiRef>_F2ZLBmqVYO6XeibE7szfvq</dateiRef>
+                        <dateiRef>_9v1CCHsbTomDi3Vu8yWVzw</dateiRef>
+                        <dateiRef>_RGOtF9LLyqkKGWBeGHbLiv</dateiRef>
+                        <dateiRef>_vZVHP3s2avuuuKfeT6vCC1</dateiRef>
+                        <dateiRef>_SQbDwVyFV9FZlS6RhqJMZP</dateiRef>
+                        <dateiRef>_kf1ojIKxeCmNAcq52ztaO0</dateiRef>
+                        <dateiRef>_xUbFDcmrEkIfy8RBNzXsUk</dateiRef>
+                        <dateiRef>_TyIKPdeakwt4y0PlTjsnRr</dateiRef>
+                        <dateiRef>_ErvshykuBVWCdHlrSVdo5f</dateiRef>
+                        <dateiRef>_HhKDxYD5SlntMDfY3qSEcz</dateiRef>
+                        <dateiRef>_RFd8AfcTzq4MQuTU5yGTjw</dateiRef>
+                        <dateiRef>_dFn0qRfKsljlql9LqGWoeI</dateiRef>
+                        <dateiRef>_IweKZggBPqoiapPiyFRrgp</dateiRef>
+                        <dateiRef>_QFnLF4pBUMPSEFZ6swZI2C</dateiRef>
+                        <dateiRef>_HQ01X8aphm6e7rezF6xxbO</dateiRef>
+                        <dateiRef>_KkX4ZsAMrxVUziMeMkeqQW</dateiRef>
+                        <dateiRef>_irToFWABB1QdoOUiIhlkIC</dateiRef>
+                        <dateiRef>_VYh4vtYkOVPO4CxLf7BIfc</dateiRef>
+                        <dateiRef>_m5shE8AV4sN3rJit3DogkE</dateiRef>
+                        <dateiRef>_6tP1uNkznLwxP9Xf6QxHi9</dateiRef>
+                        <dateiRef>_OdCPfhxPM1FfEX5hSBBq7h</dateiRef>
+                        <dateiRef>_EknJrAFhpH13bxo49L9ZrD</dateiRef>
+                        <dateiRef>_PvgL9Zoh5mbirOeydchpgW</dateiRef>
+                        <dateiRef>_cHxxxABvUX36opNkfjtGgo</dateiRef>
+                        <dateiRef>_xMEKxWvne3HqOQtThXko6c</dateiRef>
+                        <dateiRef>_5Wij0BQmHIRBIfW3NEf3wd</dateiRef>
+                        <dateiRef>_DfpqCdhiJRB38UGzmSwRIi</dateiRef>
+                        <dateiRef>_9fI9rYpaqlhyMbPNJ9esQu</dateiRef>
+                        <dateiRef>_bAAOFK5JE1ZUIieGTSG5uz</dateiRef>
+                        <dateiRef>_ongrOmWolm1bWCa1U27rcq</dateiRef>
+                        <dateiRef>_pVSYMrvS2pUfEpqyXXm9MJ</dateiRef>
+                        <dateiRef>_dUT5n95fZENO0fc9KCEBA4</dateiRef>
+                        <dateiRef>_doMiUg8dKMxlVp5r7NYv8u</dateiRef>
+                        <dateiRef>_6uENxSpmujR7JLYT9XtFNw</dateiRef>
+                        <dateiRef>_9mdzZe5tSumg1oMoXOUZeI</dateiRef>
+                        <dateiRef>_OHM5YVr5nbqjXj0aLm0xUo</dateiRef>
+                        <dateiRef>_scUB3qaZlbKtokEfGdib3C</dateiRef>
+                        <dateiRef>_62VRl1DqR4rKg6A14U4z60</dateiRef>
+                        <dateiRef>_9yxRfS0JbjQ13BfYlPS3JL</dateiRef>
+                        <dateiRef>_RkyzcjLHOZcjLTjHtz26Kv</dateiRef>
+                        <dateiRef>_VI9lk1I00CPpdfNlLHic9k</dateiRef>
+                        <dateiRef>_1NC3ZUrg2fsGludwYefJpR</dateiRef>
+                        <dateiRef>_dxqDAs2TJ93ydpR3s8AlsN</dateiRef>
+                        <dateiRef>_s6vrSxkF69pftkwiJ1Zsh6</dateiRef>
+                        <dateiRef>_lOi9KAELVrLupM5g1a8h3P</dateiRef>
+                        <dateiRef>_1Eryo7aYaAGkfGIsB45xis</dateiRef>
+                        <dateiRef>_vpCiUSZjbY1PLceAh2P8oM</dateiRef>
+                        <dateiRef>_aGB290Uot7tvEr9dJmoijp</dateiRef>
+                        <dateiRef>_msAE7LGknLUVc37mpwvvPx</dateiRef>
+                        <dateiRef>_ZJEqabzfwuYJnkwv7kDvQI</dateiRef>
+                        <dateiRef>_3aAdC13FS5ljDTiPUNd0uq</dateiRef>
+                    </dokument>
+                </dossier>
+            </ordnungssystemposition>
+        </ordnungssystem>
+    </ablieferung>
+</paket>
