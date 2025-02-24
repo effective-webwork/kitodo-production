@@ -127,6 +127,7 @@ public class ImportServiceIT {
     private static final String TITLE = "Title";
     private static final String PLACE = "Place";
     private static final String LABEL = "LABEL";
+    private static final String CATALOG_ID = "CatalogIDDigital";
     private static final String ORDERLABEL = "ORDERLABEL";
     private static final int EXPECTED_NR_OF_CHILDREN = 23;
     private static final String PICA_XML = "picaxml";
@@ -198,7 +199,8 @@ public class ImportServiceIT {
         Map<String, List<String>> presetMetadata = new HashMap<>();
         presetMetadata.put(TITLE, List.of("Band 1"));
         presetMetadata.put(PLACE, List.of("Hamburg", "Berlin"));
-        Process processWithAdditionalMetadata = importProcessWithAdditionalMetadata(RECORD_ID,
+        presetMetadata.put(CATALOG_ID, List.of(RECORD_ID));
+        Process processWithAdditionalMetadata = importProcessWithAdditionalMetadata(
                 MockDatabase.getK10PlusImportConfiguration(), presetMetadata);
         Workpiece workpiece = ServiceManager.getMetsService()
                 .loadWorkpiece(processService.getMetadataFileUri(processWithAdditionalMetadata));
@@ -227,7 +229,8 @@ public class ImportServiceIT {
         presetMetadata.put(PLACE, List.of("Hamburg", "Berlin"));
         presetMetadata.put(LABEL, List.of("TEST-LABEL"));
         presetMetadata.put(ORDERLABEL, List.of("TEST-ORDERLABEL"));
-        Process processWithAdditionalMetadata = importProcessWithAdditionalMetadata(RECORD_ID,
+        presetMetadata.put(CATALOG_ID, List.of(RECORD_ID));
+        Process processWithAdditionalMetadata = importProcessWithAdditionalMetadata(
                 MockDatabase.getK10PlusImportConfiguration(), presetMetadata);
         Workpiece workpiece = ServiceManager.getMetsService()
                 .loadWorkpiece(processService.getMetadataFileUri(processWithAdditionalMetadata));
@@ -659,22 +662,25 @@ public class ImportServiceIT {
         if (!SystemUtils.IS_OS_WINDOWS) {
             ExecutionPermission.setExecutePermission(script);
         }
-        Process importedProcess = importService.importProcess(recordId, 1, 1,
-                importConfiguration, new HashMap<>());
+        List<String> ids = Collections.singletonList(recordId);
+        Process importedProcess = importService.importProcess(1, 1,
+                importConfiguration, Collections.singletonMap(importConfiguration.getIdSearchField().getValue(), ids));
         if (!SystemUtils.IS_OS_WINDOWS) {
             ExecutionPermission.setNoExecutePermission(script);
         }
         return importedProcess;
     }
 
-    private Process importProcessWithAdditionalMetadata(String recordId, ImportConfiguration importConfiguration,
+    private Process importProcessWithAdditionalMetadata(ImportConfiguration importConfiguration,
                                                         Map<String, List<String>> presetMetadata)
             throws IOException, ImportException {
         File script = new File(ConfigCore.getParameter(ParameterCore.SCRIPT_CREATE_DIR_META));
         if (!SystemUtils.IS_OS_WINDOWS) {
             ExecutionPermission.setExecutePermission(script);
         }
-        Process importedProcess = importService.importProcess(recordId, 1, 1,
+        List<String> ids = Collections.singletonList(RECORD_ID);
+        presetMetadata.put(importConfiguration.getIdSearchField().getValue(), ids);
+        Process importedProcess = importService.importProcess(1, 1,
                 importConfiguration, presetMetadata);
         if (!SystemUtils.IS_OS_WINDOWS) {
             ExecutionPermission.setNoExecutePermission(script);

@@ -1737,6 +1737,36 @@ Import form
 Mass import
 ----------------------------------------------------------------------*/
 
+#editForm\:fileUploadButtonWrapper {
+    padding: 0;
+}
+
+#editForm\:recordsTable th span.metadata-record-id::after,
+#editForm\:recordsTable th span.metadata-doctype::after {
+    color: var(--medium-gray);
+    font-family: FontAwesome;
+    margin-left: var(--default-half-size);
+}
+
+#editForm\:recordsTable th span.metadata-record-id::after {
+    content: "\f2c2";
+}
+
+#editForm\:recordsTable th span.metadata-doctype::after {
+    content: "\f02d";
+}
+
+#editForm\:recordsTable th:has(> span.ui-column-title > span.invalid-configuration) {
+    background-color: var(--error-background);
+}
+
+#editForm\:recordsTable th.ui-state-default,
+#editForm\:recordsTable td.ui-editable-column {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 #editForm .ui-panelgrid-cell {
     padding-left: var(--default-full-size);
 }
@@ -1747,6 +1777,10 @@ Mass import
 
 #editForm .ui-fileupload-buttonbar .ui-button {
     margin-right: var(--default-full-size);
+}
+
+#editForm\:recordsTableWrapper {
+    padding: 0 var(--default-full-size);
 }
 
 #editForm\:recordsTable tr {
@@ -1773,7 +1807,8 @@ Mass import
 }
 
 #editForm\:csvFileUpload {
-    margin-bottom: 72px;
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 
 #editForm\:csvFileUpload .ui-fileupload-buttonbar {
@@ -1787,6 +1822,8 @@ Mass import
 #editForm\:recordsTable\:addMetadataColumn,
 #editForm\:recordsTable button.remove-metadata-column {
     background: var(--cloudy-gray);
+    overflow: hidden;
+    height: inherit;
 }
 
 #catalogSearchForm {

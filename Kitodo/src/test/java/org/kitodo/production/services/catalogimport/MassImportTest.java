@@ -20,6 +20,8 @@ import com.opencsv.exceptions.CsvException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -135,21 +137,21 @@ public class MassImportTest {
     public void shouldPrepareMetadata() throws ImportException, IOException, CsvException {
         MassImportService service = ServiceManager.getMassImportService();
         List<CsvRecord> csvRecords = service.parseLines(CSV_LINES, StringConstants.COMMA_DELIMITER);
-        Map<String, Map<String, List<String>>> metadata = service.prepareMetadata(METADATA_KEYS, csvRecords);
+        LinkedList<LinkedHashMap<String, List<String>>> metadata = service.prepareMetadata(METADATA_KEYS, csvRecords);
         assertEquals(3, metadata.size(), "Wrong number of metadata sets prepared");
-        Map<String, List<String>> metadataSet = metadata.get("123");
-        assertNotNull(metadataSet, "Metadata for record with ID 123 is null");
-        assertEquals(2, metadataSet.size(), "Wrong number of metadata sets prepared");
+        Map<String, List<String>> metadataSet = metadata.get(0);
+        assertNotNull(metadataSet, "Metadata for record is null");
+        assertEquals(3, metadataSet.size(), "Wrong number of metadata sets prepared");
         assertEquals("Band 1", metadataSet.get(TITLE).get(0), "Metadata for record with ID 123 contains wrong title");
         assertEquals(1, metadataSet.get(PLACE).size(), "Metadata for record with ID 123 has wrong size of place list");
         assertEquals("Hamburg", metadataSet.get(PLACE).get(0), "Metadata for record with ID 123 contains wrong place");
 
         List<CsvRecord> csvRecordsMultipleValues = service.parseLines(CSV_LINES_MULTIPLE_VALUES,
                 StringConstants.COMMA_DELIMITER);
-        Map<String, Map<String, List<String>>> metadataMultipleValues = service.prepareMetadata(METADATA_KEYS_MUTLIPLE_VALUES, csvRecordsMultipleValues);
-        Map<String, List<String>> metadataSetMultipleValues = metadataMultipleValues.get("321");
-        assertNotNull(metadataSetMultipleValues, "Metadata for record with ID 321 is null");
-        assertEquals(2, metadataSetMultipleValues.size(), "Wrong number of metadata sets prepared");
+        LinkedList<LinkedHashMap<String, List<String>>> metadataMultipleValues = service.prepareMetadata(METADATA_KEYS_MUTLIPLE_VALUES, csvRecordsMultipleValues);
+        Map<String, List<String>> metadataSetMultipleValues = metadataMultipleValues.get(0);
+        assertNotNull(metadataSetMultipleValues, "Metadata for record is null");
+        assertEquals(3, metadataSetMultipleValues.size(), "Wrong number of metadata sets prepared");
         assertTrue(metadataSetMultipleValues.containsKey(PLACE), "Metadata for record with ID 321 does not contain place metadata");
         assertEquals(2, metadataSetMultipleValues.get(PLACE).size(), "Metadata for record with ID 123 has wrong size of place list");
         assertEquals("Hamburg", metadataSetMultipleValues.get(PLACE).get(0), "Metadata for record with ID 321 contains wrong place");
@@ -157,12 +159,12 @@ public class MassImportTest {
 
         List<CsvRecord> csvRecordsMultipleValuesWithComma = service.parseLines(CSV_LINES_MULTIPLE_VALUES_WITH_COMMA,
                 StringConstants.COMMA_DELIMITER);
-        Map<String, Map<String, List<String>>> metadataMultipleValuesWithComma =
+        LinkedList<LinkedHashMap<String, List<String>>> metadataMultipleValuesWithComma =
                 service.prepareMetadata(METADATA_KEYS_MUTLIPLE_VALUES, csvRecordsMultipleValuesWithComma);
 
-        Map<String, List<String>> metadataSetMultipleValuesWithComma = metadataMultipleValuesWithComma.get("978");
-        assertNotNull(metadataSetMultipleValuesWithComma, "Metadata for record with ID 978 is null");
-        assertEquals(2, metadataSetMultipleValuesWithComma.size(), "Wrong number of metadata sets prepared");
+        Map<String, List<String>> metadataSetMultipleValuesWithComma = metadataMultipleValuesWithComma.get(0);
+        assertNotNull(metadataSetMultipleValuesWithComma, "Metadata for record is null");
+        assertEquals(3, metadataSetMultipleValuesWithComma.size(), "Wrong number of metadata sets prepared");
         assertTrue(metadataSetMultipleValuesWithComma.containsKey(PLACE),
                 "Metadata for record with ID 978 does not contain place metadata");
         assertEquals(2, metadataSetMultipleValuesWithComma.get(PLACE).size(),
