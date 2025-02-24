@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +50,7 @@ import org.primefaces.model.file.UploadedFile;
 public class MassImportService {
 
     private static MassImportService instance = null;
+    private final List<Character> csvSeparatorCharacters = Arrays.asList(',', ';');
 
     /**
      * Return singleton variable of type MassImportService.
@@ -124,20 +127,19 @@ public class MassImportService {
      * @param metadataKeys metadata keys for additional metadata added to individual records during import
      * @param records list of CSV records
      */
-    public Map<String, Map<String, List<String>>> prepareMetadata(List<String> metadataKeys, List<CsvRecord> records)
+    public LinkedList<LinkedHashMap<String, List<String>>> prepareMetadata(List<String> metadataKeys, List<CsvRecord> records)
             throws ImportException {
-        Map<String, Map<String, List<String>>> presetMetadata = new LinkedHashMap<>();
+        LinkedList<LinkedHashMap<String, List<String>>> presetMetadata = new LinkedList<>();
         for (CsvRecord record : records) {
-            Map<String, List<String>> processMetadata = new HashMap<>();
-            // skip first metadata key as it always contains the record ID to be used for search
-            for (int index = 1; index < metadataKeys.size(); index++) {
+            LinkedHashMap<String, List<String>> processMetadata = new LinkedHashMap<>();
+            for (int index = 0; index < metadataKeys.size(); index++) {
                 String metadataKey = metadataKeys.get(index);
                 if (StringUtils.isNotBlank(metadataKey)) {
                     List<String> values = processMetadata.computeIfAbsent(metadataKey, k -> new ArrayList<>());
                     values.add(record.getCsvCells().get(index).getValue());
                 }
             }
-            presetMetadata.put(record.getCsvCells().get(0).getValue(), processMetadata);
+            presetMetadata.add(processMetadata);
         }
         return presetMetadata;
     }
@@ -174,4 +176,48 @@ public class MassImportService {
         }
         return table.getRows();
     }
+
+    /**
+     * This method takes a list of lines from a CSV file and tries to guess separator character used in this file
+     * (e.g. comma or semicolon). To achieve this, the method gathers the number of occurrences of each candidate in all
+     * lines and selects the character with the highest number of lines containing one specific count of that character.
+     * character
+     * @param csvLines lines from CSV file
+     * @return character that is determined to be most likely used as separator character in uploaded CSV file
+     */
+    // TODO: write test(s)
+    public String guessCsvSeparator(List<String> csvLines) {
+        Map<Character, Map<Integer, Integer>> separatorOccurrences = new HashMap<>();
+        for (char separator : csvSeparatorCharacters) {
+            Map<Integer, Integer> currentOccurrences = new HashMap<>();
+            for (String line : csvLines) {
+                int occurrences = StringUtils.countMatches(line, separator);
+                if (currentOccurrences.containsKey(occurrences)) {
+                    currentOccurrences.put(occurrences, currentOccurrences.get(occurrences) + 1);
+                } else {
+                    currentOccurrences.put(occurrences, 1);
+                }
+            }
+            separatorOccurrences.put(separator, currentOccurrences);
+        }
+        Character probablyCharacter = csvSeparatorCharacters.get(0);
+        int maxOccurrence = 0;
+        for (Map.Entry<Character, Map<Integer, Integer>> characterStatistics : separatorOccurrences.entrySet()) {
+            Optional<Map.Entry<Integer, Integer>> highestOccurrence = characterStatistics.getValue().entrySet()
+                    .stream().max(Map.Entry.comparingByValue());
+            if (highestOccurrence.isPresent()) {
+                Map.Entry<Integer, Integer> occurrence = highestOccurrence.get();
+                // skip count of lines that did not contain current separator, e.g. occurrences are "0", which would otherwise be the most common count in the statistic for each unused separator character!
+                if (occurrence.getKey() > 0 && occurrence.getValue() > maxOccurrence) {
+                    probablyCharacter = characterStatistics.getKey();
+                }
+            }
+        }
+        return String.valueOf(probablyCharacter);
+    }
+
+    public List<Character> getCsvSeparatorCharacters() {
+        return csvSeparatorCharacters;
+    }
+
 }

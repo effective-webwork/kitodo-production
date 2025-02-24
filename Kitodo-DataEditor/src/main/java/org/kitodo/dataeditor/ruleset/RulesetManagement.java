@@ -150,7 +150,7 @@ public class RulesetManagement implements RulesetManagementInterface {
      * Returns a translated list of divisions available in the ruleset. The map
      * maps from ID to label.
      *
-     * @return the list of divisions
+     * @return the map of divisions
      */
     @Override
     public Map<String, String> getStructuralElements(List<LanguageRange> priorityList) {

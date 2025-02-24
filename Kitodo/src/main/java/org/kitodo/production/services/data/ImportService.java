@@ -110,6 +110,7 @@ import org.kitodo.production.helper.XMLUtils;
 import org.kitodo.production.metadata.MetadataEditor;
 import org.kitodo.production.process.ProcessGenerator;
 import org.kitodo.production.process.ProcessValidator;
+import org.kitodo.production.process.TitleGenerator;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.workflow.KitodoNamespaceContext;
 import org.kitodo.serviceloader.KitodoServiceLoader;
@@ -1352,16 +1353,48 @@ public class ImportService {
         updateTasks(process);
     }
 
+    public String getRecordId(Map<String, List<String>> metadata, int templateId)
+            throws ConfigException, IOException, DAOException {
+        Template template = ServiceManager.getTemplateService().getById(templateId);
+        Collection<String> recordIdMetadataKeys = getRecordIdentifierMetadata(template.getRuleset());
+        if (recordIdMetadataKeys.isEmpty()) {
+            throw new ConfigException("At least one metadata in ruleset '" + template.getRuleset().getTitle()
+                    + "' must be configured as 'recordIdentifier'");
+        }
+        for (String recordIdMetadataKey : recordIdMetadataKeys) {
+            List<String> ids = metadata.get(recordIdMetadataKey);
+            if (ids.size() == 1) {
+                return ids.iterator().next();
+            }
+        }
+        throw new ConfigException("No record identifier found in given metadata!");
+    }
+
+    public String getDocType(Map<String, List<String>> metadata, int templateId) throws DAOException, IOException {
+        Template template = ServiceManager.getTemplateService().getById(templateId);
+        Collection<String> docTypeMetadataKeys = getDocTypeMetadata(template.getRuleset());
+        if (docTypeMetadataKeys.isEmpty()) {
+            throw new ConfigException("At least one metadata in ruleset '" + template.getRuleset().getTitle()
+                    + "' must be configured as 'docType'");
+        }
+        for (String docTypeMetadataKey : docTypeMetadataKeys) {
+            List<String> types = metadata.get(docTypeMetadataKey);
+            if (types.size() == 1) {
+                return types.iterator().next();
+            }
+        }
+        throw new ConfigException("No document type found in given metadata!");
+    }
+
     /**
      * Imports a process and saves it to database.
-     * @param ppn the ppn to import
      * @param projectId the projectId
      * @param templateId the templateId
      * @param importConfiguration the selected import configuration
      * @param presetMetadata Map containing preset metadata with keys as metadata keys and values as metadata values
      * @return the importedProcess
      */
-    public Process importProcess(String ppn, int projectId, int templateId, ImportConfiguration importConfiguration,
+    public Process importProcess(int projectId, int templateId, ImportConfiguration importConfiguration,
                                  Map<String, List<String>> presetMetadata) throws ImportException {
         LinkedList<TempProcess> processList = new LinkedList<>();
         TempProcess tempProcess;
@@ -1374,7 +1407,8 @@ public class ImportService {
             if (!higherLevelIdentifiers.isEmpty()) {
                 parentMetadataKey = higherLevelIdentifiers.get(0);
             }
-            final String parentId = importProcessAndReturnParentID(ppn, processList, importConfiguration, projectId,
+            String id = getRecordId(presetMetadata, templateId);
+            final String parentId = importProcessAndReturnParentID(id, processList, importConfiguration, projectId,
                     templateId, false, parentMetadataKey);
             setParentProcess(parentId, projectId, template);
             tempProcess = processList.get(0);
@@ -1384,24 +1418,10 @@ public class ImportService {
                     CREATE, Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage),
                     parentTempProcess);
             setLabelAndOrderLabelOfImportedProcess(tempProcess, presetMetadata);
-            String title = tempProcess.getProcess().getTitle();
-            String validateRegEx = ConfigCore.getParameterOrDefaultValue(ParameterCore.VALIDATE_PROCESS_TITLE_REGEX);
-            if (StringUtils.isBlank(title)) {
-                throw new ProcessGenerationException(Helper.getTranslation("processTitleEmpty"));
-            } else if (!title.matches(validateRegEx)) {
-                throw new ProcessGenerationException(Helper.getTranslation("processTitleInvalid", title));
-            } else if (ServiceManager.getProcessService().findNumberOfProcessesWithTitle(title) > 0) {
-                throw new ProcessGenerationException(Helper.getTranslation("processTitleAlreadyInUse", title));
-            }
+            checkProcessTitle(tempProcess);
             ServiceManager.getProcessService().save(tempProcess.getProcess(), true);
-            URI processBaseUri = ServiceManager.getFileService().createProcessLocation(tempProcess.getProcess());
-            tempProcess.getProcess().setProcessBaseUri(processBaseUri);
-            OutputStream out = ServiceManager.getFileService()
-                    .write(ServiceManager.getProcessService().getMetadataFileUri(tempProcess.getProcess()));
-            tempProcess.getWorkpiece().setId(tempProcess.getProcess().getId().toString());
-            ServiceManager.getMetsService().save(tempProcess.getWorkpiece(), out);
+            saveTempProcessMetsFile(tempProcess);
             linkToParent(tempProcess);
-            ServiceManager.getProcessService().save(tempProcess.getProcess());
         } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException
                 | ParserConfigurationException | NoRecordFoundException | UnsupportedFormatException
                 | URISyntaxException | SAXException | InvalidMetadataValueException | NoSuchMetadataFieldException
@@ -1412,7 +1432,93 @@ public class ImportService {
         return tempProcess.getProcess();
     }
 
-    private void linkToParent(TempProcess tempProcess) throws DAOException, ProcessGenerationException, IOException {
+    /**
+     * Create new process solely from given data without querying a configured catalog search interface.
+     * @param projectId ID of project to which process will be added
+     * @param templateId ID of template used for process
+     * @param presetMetadata map containing metadata to add to process
+     * @throws ProcessGenerationException when process cannot be created
+     * @throws IOException when ruleset cannot be opened
+     * @throws InvalidMetadataValueException when temp process cannot be processed
+     * @throws NoSuchMetadataFieldException when temp process cannot be processed
+     * @throws DataException when saving created process fails
+     * @throws CommandException when creating metadata folder or file for process fails
+     * @throws DAOException when linking to potential parent process fails
+     * @return Process of created tempProcess
+     */
+    public Process createProcessFromData(int projectId, int templateId,
+                                      Map<String, List<String>> presetMetadata) throws ProcessGenerationException,
+            IOException, InvalidMetadataValueException, NoSuchMetadataFieldException, DataException, CommandException,
+            DAOException {
+        if (Objects.isNull(processGenerator)) {
+            processGenerator = new ProcessGenerator();
+        }
+        processGenerator.generateProcess(templateId, projectId);
+        Process process = processGenerator.getGeneratedProcess();
+        RulesetManagementInterface rulesetManagementInterface = ServiceManager.getRulesetService()
+                .openRuleset(process.getRuleset());
+        String metadataLanguage = ServiceManager.getUserService().getCurrentUser().getMetadataLanguage();
+        List<Locale.LanguageRange> metadataLanguages = Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" :
+                metadataLanguage);
+        String docType = getDocType(presetMetadata, templateId);
+        Map<String, String> divisions = rulesetManagementInterface.getStructuralElements(metadataLanguages);
+        if (!divisions.containsKey(docType)) {
+            throw new ProcessGenerationException("Invalid document type: " + docType);
+        }
+        TempProcess tempProcess = new TempProcess(process, docType, presetMetadata, rulesetManagementInterface);
+
+        for (String parentIdMetadataKey : getHigherLevelIdentifierMetadata(process.getRuleset())) {
+            if (presetMetadata.containsKey(parentIdMetadataKey)) {
+                for (String parentIdValue : presetMetadata.get(parentIdMetadataKey)) {
+                    if (Objects.nonNull(parentIdValue)) {
+                        setParentProcess(parentIdValue, process.getProject().getId(), process.getTemplate());
+                        break;
+                    }
+                }
+            }
+        }
+
+        List<ProcessDetail> processDetails = ProcessHelper.transformToProcessDetails(tempProcess,
+                rulesetManagementInterface, CREATE, metadataLanguages);
+        String titleDefinition = ProcessHelper.getTitleDefinition(rulesetManagementInterface, docType, CREATE, metadataLanguages);
+        TitleGenerator titleGenerator = new TitleGenerator(null, processDetails);
+        String newTitle = titleGenerator.generateTitle(titleDefinition, null, tempProcess.getProcess().getTitle());
+        // replace special characters with underscores to avoid invalid process titles
+        tempProcess.getProcess().setTitle(newTitle.replaceAll("[^a-zA-Z0-9]", "_"));
+        processTempProcess(tempProcess, rulesetManagementInterface, CREATE, metadataLanguages, parentTempProcess);
+        setLabelAndOrderLabelOfImportedProcess(tempProcess, presetMetadata);
+        checkProcessTitle(tempProcess);
+        ServiceManager.getProcessService().save(tempProcess.getProcess(), true);
+        saveTempProcessMetsFile(tempProcess);
+        linkToParent(tempProcess);
+        return tempProcess.getProcess();
+    }
+
+    private void saveTempProcessMetsFile(TempProcess tempProcess) throws IOException, CommandException, DataException {
+        URI processBaseUri = ServiceManager.getFileService().createProcessLocation(tempProcess.getProcess());
+        tempProcess.getProcess().setProcessBaseUri(processBaseUri);
+        OutputStream out = ServiceManager.getFileService()
+                .write(ServiceManager.getProcessService().getMetadataFileUri(tempProcess.getProcess()));
+        tempProcess.getWorkpiece().setId(tempProcess.getProcess().getId().toString());
+        ServiceManager.getMetsService().save(tempProcess.getWorkpiece(), out);
+        ServiceManager.getProcessService().save(tempProcess.getProcess());
+    }
+
+    private void checkProcessTitle(TempProcess tempProcess)
+            throws ProcessGenerationException, DataException {
+        String title = tempProcess.getProcess().getTitle();
+        String validateRegEx = ConfigCore.getParameterOrDefaultValue(ParameterCore.VALIDATE_PROCESS_TITLE_REGEX);
+        if (StringUtils.isBlank(title)) {
+            throw new ProcessGenerationException(Helper.getTranslation("processTitleEmpty"));
+        } else if (!title.matches(validateRegEx)) {
+            throw new ProcessGenerationException(Helper.getTranslation("processTitleInvalid", title));
+        } else if (ServiceManager.getProcessService().findNumberOfProcessesWithTitle(title) > 0) {
+            throw new ProcessGenerationException(Helper.getTranslation("processTitleAlreadyInUse", title));
+        }
+    }
+
+    private void linkToParent(TempProcess tempProcess) throws DAOException, ProcessGenerationException, IOException,
+            DataException {
         if (Objects.nonNull(parentTempProcess) && Objects.nonNull(parentTempProcess.getProcess())) {
             URI parentProcessUri = ServiceManager.getProcessService()
                     .getMetadataFileUri(parentTempProcess.getProcess());
@@ -1425,6 +1531,7 @@ public class ImportService {
                 ServiceManager.getMetsService().save(workpiece, outputStream);
             }
             ProcessService.setParentRelations(parentTempProcess.getProcess(), tempProcess.getProcess());
+            ServiceManager.getProcessService().save(tempProcess.getProcess());
         }
     }
 
@@ -1471,6 +1578,10 @@ public class ImportService {
         if (Objects.nonNull(orderLabelList) && !orderLabelList.isEmpty() && !orderLabelList.get(0).isBlank()) {
             tempProcess.getWorkpiece().getLogicalStructure().setOrderlabel(orderLabelList.get(0));
         }
+    }
+
+    public static Collection<String> getRecordIdentifierMetadata(Ruleset ruleset) throws IOException {
+        return getFunctionalMetadata(ruleset, FunctionalMetadata.RECORD_IDENTIFIER);
     }
 
     /**
@@ -1757,5 +1868,47 @@ public class ImportService {
             }
         }
         return null;
+    }
+
+    /**
+     * Check and return whether metadata with given key "metadataKey" is configured as functional metadata of type
+     * "recordIdentifier" in given Ruleset "ruleset".
+     * @param ruleset Ruleset
+     * @param metadataKey key of metadata to be checked as "recordIdentifier" functional metadata
+     * @return true, if metadata with key "metadataKey" is configured as "recordIdentifier" in Ruleset "ruleset"
+     *         false otherwise
+     * @throws IOException when opening ruleset file of given ruleset fails
+     */
+    public boolean isRecordIdentifierMetadata(Ruleset ruleset, String metadataKey) throws IOException {
+        RulesetManagementInterface managementInterface = ServiceManager.getRulesetService().openRuleset(ruleset);
+        return managementInterface.getFunctionalKeys(FunctionalMetadata.RECORD_IDENTIFIER).contains(metadataKey);
+    }
+
+    /**
+     * Check and return whether metadata with given key "metadataKey" is configured as functional metadata of type
+     * "docType" in given Ruleset "ruleset".
+     * @param ruleset Ruleset
+     * @param metadataKey key of metadata to be checked as "docType" functional metadata
+     * @return true, if metadata with key "metadataKey" is configured as "docType" in Ruleset "ruleset",
+     *         false otherwise
+     * @throws IOException when opening ruleset file of given ruleset fails
+     */
+    public boolean isDocTypeMetadata(Ruleset ruleset, String metadataKey) throws IOException {
+        RulesetManagementInterface managementInterface = ServiceManager.getRulesetService().openRuleset(ruleset);
+        return managementInterface.getFunctionalKeys(FunctionalMetadata.DOC_TYPE).contains(metadataKey);
+    }
+
+    public String getFunctionalMetadataStyleClass(Ruleset ruleset, List<String> metadataKeys, int index)
+            throws IOException {
+        String metadataKey = metadataKeys.get(index);
+        if (isRecordIdentifierMetadata(ruleset, metadataKey)) {
+            return "metadata-record-id";
+        } else if (isDocTypeMetadata(ruleset, metadataKey)) {
+            return "metadata-doctype";
+        } else if (index == 0) {
+            return "invalid-configuration";
+        } else {
+            return "";
+        }
     }
 }

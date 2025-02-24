@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,13 @@ import java.util.stream.Collectors;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.data.database.beans.ImportConfiguration;
+import org.kitodo.data.database.beans.Process;
+import org.kitodo.data.database.beans.Ruleset;
 import org.kitodo.data.database.beans.Template;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.ConfigException;
@@ -53,6 +57,7 @@ public class MassImportForm extends BaseForm {
     private int projectId;
     private int templateId;
     private String templateTitle;
+    private Ruleset ruleset;
     private ImportConfiguration importConfiguration;
     private UploadedFile file;
     private String csvSeparator = ";";
@@ -60,7 +65,6 @@ public class MassImportForm extends BaseForm {
     private List<CsvRecord> records = new LinkedList<>();
     private String importedCsvHeaderLine = "";
     private List<String> importedCsvLines = new LinkedList<>();
-    private final List<Character> csvSeparatorCharacters = Arrays.asList(',', ';');
     private final MassImportService massImportService = ServiceManager.getMassImportService();
     private final AddMetadataDialog addMetadataDialog = new AddMetadataDialog(this);
     private HashMap<String, String> importSuccessMap = new HashMap<>();
@@ -80,6 +84,7 @@ public class MassImportForm extends BaseForm {
         try {
             Template template = ServiceManager.getTemplateService().getById(templateId);
             templateTitle = template.getTitle();
+            ruleset = template.getRuleset();
             RulesetManagementInterface ruleset = ServiceManager.getRulesetService().openRuleset(template.getRuleset());
             addMetadataDialog.setRulesetManagement(ruleset);
             checkRecordIdentifierConfigured(ruleset);
@@ -110,6 +115,7 @@ public class MassImportForm extends BaseForm {
             resetValues();
             if (!csvLines.isEmpty()) {
                 importedCsvHeaderLine = csvLines.get(0);
+                csvSeparator = ServiceManager.getMassImportService().guessCsvSeparator(csvLines);
                 updateMetadataKeys();
                 if (csvLines.size() > 1) {
                     importedCsvLines = csvLines.subList(1, csvLines.size());
@@ -142,7 +148,7 @@ public class MassImportForm extends BaseForm {
     }
 
     private void updateMetadataKeys() {
-        metadataKeys = Arrays.stream(importedCsvHeaderLine.split(csvSeparator, -1)).map(String::trim)
+        metadataKeys = Arrays.stream(importedCsvHeaderLine.split(String.valueOf(csvSeparator), -1)).map(String::trim)
                 .collect(Collectors.toList());
     }
 
@@ -169,9 +175,16 @@ public class MassImportForm extends BaseForm {
         importSuccessMap = new HashMap<>();
         PrimeFaces.current().ajax().update("massImportResultDialog");
         try {
-            Map<String, Map<String, List<String>>> presetMetadata = massImportService.prepareMetadata(metadataKeys, records);
-            importRecords(presetMetadata);
-            PrimeFaces.current().executeScript("PF('massImportResultDialog').show();");
+            LinkedList<LinkedHashMap<String, List<String>>> presetMetadata = massImportService.prepareMetadata(metadataKeys, records);
+            if (firstColumnContainsRecordsIdentifier()) {
+                importRecords(presetMetadata);
+            } else if (firstColumnContainsDoctype()) {
+                createProcessesFromCsvData(presetMetadata);
+            } else {
+                // TODO: show _proper_ error message!
+                Helper.setErrorMessage("First column has to contain metadata configured either as 'recordIdentifier' or 'doctype' in the current ruleset!");
+            }
+            PrimeFaces.current().executeScript("PF('massImportProgressBar').cancel();PF('massImportProgressDialog').hide();PF('massImportResultDialog').show();");
             PrimeFaces.current().ajax().update("massImportResultDialog");
         } catch (ImportException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
@@ -195,20 +208,53 @@ public class MassImportForm extends BaseForm {
     /**
      * Import records by ID and add preset metadata.
      *
-     * @param processMetadata Map containing record IDs as keys and preset metadata lists as values
+     * @param processMetadata List preset metadata lists, with first metadata containing record ID for catalog search
      */
-    private void importRecords(Map<String, Map<String, List<String>>> processMetadata) {
+    private void importRecords(LinkedList<LinkedHashMap<String, List<String>>> processMetadata) {
         ImportService importService = ServiceManager.getImportService();
         PrimeFaces.current().ajax().update("massImportProgressDialog");
-        for (Map.Entry<String, Map<String, List<String>>> entry : processMetadata.entrySet()) {
+        for (LinkedHashMap<String, List<String>> record : processMetadata) {
             try {
-                importService.importProcess(entry.getKey(), projectId, templateId, importConfiguration,
-                        entry.getValue());
-                importSuccessMap.put(entry.getKey(), null);
+                Process process = importService.importProcess(projectId, templateId, importConfiguration, record);
+                importSuccessMap.put(process.getTitle(), null);
             } catch (ImportException e) {
-                importSuccessMap.put(entry.getKey(), e.getLocalizedMessage());
+                try {
+                    String id = importService.getRecordId(record, templateId);
+                    importSuccessMap.put(id, e.getLocalizedMessage());
+                } catch (ConfigException | IOException | DAOException ee) {
+                    logger.error(ee.getLocalizedMessage());
+                    importSuccessMap.put("[" + processMetadata.indexOf(record) + "]", e.getLocalizedMessage());
+                }
             }
             PrimeFaces.current().ajax().update("massImportProgressDialog");
+        }
+    }
+
+    /**
+     * Create records purely with given preset metadata.
+     *
+     * @param processMetadata List preset metadata lists, with first metadata containing document type of process to be created
+     */
+    private void createProcessesFromCsvData(LinkedList<LinkedHashMap<String, List<String>>> processMetadata) {
+        ImportService importService = ServiceManager.getImportService();
+        PrimeFaces.current().ajax().update("massImportProgressDialog");
+        // TODO: if "project" or "template" cannot be loaded, there is no need to iterate over the whole list of csv rows!
+        int iterator = 1;
+        for (LinkedHashMap<String, List<String>> entry : processMetadata) {
+            try {
+                Process process = importService.createProcessFromData(projectId, templateId, entry);
+                importSuccessMap.put(process.getTitle(), null);
+            } catch (Exception e) {
+                try {
+                    String docType = importService.getDocType(entry, templateId);
+                    importSuccessMap.put(docType + "(" + iterator + ")", e.getLocalizedMessage());
+                } catch (DAOException | IOException ex) {
+                    logger.error(ex.getLocalizedMessage());
+                    importSuccessMap.put("[" + processMetadata.indexOf(entry) + "]", ex.getLocalizedMessage());
+                }
+            }
+            PrimeFaces.current().ajax().update("massImportProgressDialog");
+            iterator++;
         }
     }
 
@@ -358,10 +404,10 @@ public class MassImportForm extends BaseForm {
     /**
      * Get csvSeparatorCharacters.
      *
-     * @return value of csvSeparatorCharacters
+     * @return value of csvSeparatorCharacters from MassImportService
      */
     public List<Character> getCsvSeparatorCharacters() {
-        return csvSeparatorCharacters;
+        return ServiceManager.getMassImportService().getCsvSeparatorCharacters();
     }
 
     /**
@@ -371,6 +417,15 @@ public class MassImportForm extends BaseForm {
      */
     public String getTemplateTitle() {
         return templateTitle;
+    }
+
+    /**
+     * Get rulesetTitle.
+     *
+     * @return value of rulesetTitle
+     */
+    public String getRulesetTitle() {
+        return ruleset.getTitle();
     }
 
     /**
@@ -472,5 +527,57 @@ public class MassImportForm extends BaseForm {
      */
     public String getConfigurationError() {
         return configurationError;
+    }
+
+    public boolean firstColumnContainsRecordIdentifierOrDocType() {
+        return firstColumnContainsRecordsIdentifier() || firstColumnContainsDoctype();
+    }
+
+    public boolean firstColumnContainsRecordsIdentifier() {
+        if (metadataKeys.isEmpty()) {
+            return false;
+        } else {
+            try {
+                return ServiceManager.getImportService().isRecordIdentifierMetadata(ruleset, metadataKeys.iterator().next());
+            } catch (IOException e) {
+                Helper.setErrorMessage(e.getLocalizedMessage());
+                return false;
+            }
+        }
+    }
+
+    public boolean firstColumnContainsDoctype() {
+        if (metadataKeys.isEmpty()) {
+            return false;
+        } else {
+            try {
+                return ServiceManager.getImportService().isDocTypeMetadata(ruleset, metadataKeys.iterator().next());
+            } catch (IOException e) {
+                Helper.setErrorMessage(e.getLocalizedMessage());
+                return false;
+            }
+        }
+    }
+
+    public String getFunctionalMetadataStyleClass(int index) {
+        try {
+            return ServiceManager.getImportService().getFunctionalMetadataStyleClass(ruleset, metadataKeys, index);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return "";
+        }
+    }
+
+    /**
+     * Generate and return label for table containing records imported from CSV file or added manually.
+     *
+     * @return record table label
+     */
+    public String getDataRecordLabel() {
+        if (Objects.isNull(this.file) || StringUtils.isBlank(this.file.getFileName())) {
+            return Helper.getTranslation("records");
+        } else {
+            return Helper.getTranslation("records") + " (\"" + this.file.getFileName() + "\")";
+        }
     }
 }

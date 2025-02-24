@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -279,6 +280,22 @@ public class ProcessHelper {
         StructuralElementViewInterface docTypeView = rulesetManagement.getStructuralElementView(docType,
                 acquisitionStage, priorityList);
         return docTypeView.getProcessTitle().orElse("");
+    }
+
+    public static HashSet<Metadata> convertMetadata(Map<String, List<String>> metadata,
+                                                    RulesetManagementInterface rulesetManagementInterface) {
+        HashSet<Metadata> metadataSet = new HashSet<>();
+        for (Map.Entry<String, List<String>> entry : metadata.entrySet()) {
+            // TODO 1: distinguish between metadata entries and groups (groups definitely required in the future!)
+            // TODO 2: optionally verify that "entry.getKey()" is a valid metadata defined in the given "RulesetManagementInterface"
+            for (String value : entry.getValue()) {
+                MetadataEntry metadataEntry = new MetadataEntry();
+                metadataEntry.setKey(entry.getKey());
+                metadataEntry.setValue(value);
+                metadataSet.add(metadataEntry);
+            }
+        }
+        return metadataSet;
     }
 
     /**
