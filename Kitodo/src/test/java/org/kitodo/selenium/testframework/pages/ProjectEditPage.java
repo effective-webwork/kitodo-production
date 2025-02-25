@@ -68,6 +68,11 @@ public class ProjectEditPage extends EditPage<ProjectEditPage> {
         return Pages.getProjectsPage();
     }
 
+    public ProjectsPage save(int numberOfAttempts) throws IllegalAccessException, InstantiationException {
+        clickButtonAndWaitForRedirect(saveButton, Pages.getProjectsPage().getUrl(), numberOfAttempts);
+        return Pages.getProjectsPage();
+    }
+
     public void changeTitle(String newTitle) throws InterruptedException {
         if (!areElementsEnabled()) {
             detailLockedButton.click();
@@ -79,8 +84,22 @@ public class ProjectEditPage extends EditPage<ProjectEditPage> {
         pagesAmountInput.click();
     }
 
+    public void changeTitleKeepFocus(String newTitle) throws InterruptedException {
+        if (!areElementsEnabled()) {
+            detailLockedButton.click();
+            await("Wait for button clicked").pollDelay(700, TimeUnit.MILLISECONDS).atMost(30, TimeUnit.SECONDS)
+                    .ignoreExceptions().until(() -> titleInput.isEnabled());
+        }
+        titleInput.clear();
+        titleInput.sendKeys(newTitle);
+    }
+
     public boolean areElementsEnabled() {
         return titleInput.isEnabled() && pagesAmountInput.isEnabled() && volumeAmountInput.isEnabled();
+    }
+
+    public boolean isSaveButtonEnabled() {
+        return saveButton.isEnabled();
     }
 
     public ProjectEditPage toggleProjectActiveCheckbox() throws InterruptedException {

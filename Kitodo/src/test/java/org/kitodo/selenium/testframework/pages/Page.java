@@ -183,7 +183,7 @@ public abstract class Page<T> {
     }
 
     /**
-     * Clicks a button which could be be stale, e.g. because of disabling and
+     * Clicks a button which could be stale, e.g. because of disabling and
      * enabling via Ajax. After click was performed, the browser waits for
      * redirecting to given url.
      *
@@ -193,8 +193,25 @@ public abstract class Page<T> {
      *            the url to which is redirected after click
      */
     protected void clickButtonAndWaitForRedirect(WebElement button, String url) {
+        clickButtonAndWaitForRedirect(button, url, 3);
+    }
+
+        /**
+         * Clicks a button which could be stale, e.g. because of disabling and
+         * enabling via Ajax. After click was performed, the browser waits for
+         * redirecting to given url.
+         *
+         * @param button
+         *            the button to be clicked
+         * @param url
+         *            the url to which is redirected after click
+         * @param maxAttempts
+         *            the maximum number of attempts for clicking the specified button
+         *
+         */
+    protected void clickButtonAndWaitForRedirect(WebElement button, String url, int maxAttempts) {
         WebDriverWait webDriverWait = new WebDriverWait(Browser.getDriver(), 60);
-        for (int attempt = 1; attempt < 4; attempt++) {
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 await("Wait for button clicked").pollDelay(700, TimeUnit.MILLISECONDS).atMost(10, TimeUnit.SECONDS)
                         .ignoreExceptions().until(() -> isButtonClicked.test(button));
