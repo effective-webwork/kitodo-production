@@ -282,6 +282,14 @@ public class ProcessHelper {
         return docTypeView.getProcessTitle().orElse("");
     }
 
+    /**
+     * Convert given map Strings and lists of Strings to a metadata set and return this set.
+     * Map keys contain metadata IDs and map values contain lists of metadata values.
+     *
+     * @param metadata map containing metadata IDs as keys and metadata values as lists of Strings
+     * @param rulesetManagementInterface used to determine whether keys are defined in corresponding ruleset
+     * @return metadata set
+     */
     public static HashSet<Metadata> convertMetadata(Map<String, List<String>> metadata,
                                                     RulesetManagementInterface rulesetManagementInterface) {
         HashSet<Metadata> metadataSet = new HashSet<>();
