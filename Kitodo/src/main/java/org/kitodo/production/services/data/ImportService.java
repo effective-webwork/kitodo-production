@@ -1935,7 +1935,7 @@ public class ImportService {
      * @param index index of metadata key for which style class is returned
      * @return style class of metadata
      * @throws IOException when opening ruleset file of given ruleset to determine whether given metadata key is
-     * functional metadata keys fails
+     *         functional metadata keys fails
      */
     public String getFunctionalMetadataStyleClass(Ruleset ruleset, List<String> metadataKeys, int index)
             throws IOException {
