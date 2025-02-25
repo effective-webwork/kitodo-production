@@ -181,10 +181,12 @@ public class MassImportForm extends BaseForm {
             } else if (firstColumnContainsDoctype()) {
                 createProcessesFromCsvData(presetMetadata);
             } else {
-                // TODO: show _proper_ error message!
-                Helper.setErrorMessage("First column has to contain metadata configured either as 'recordIdentifier' or 'doctype' in the current ruleset!");
+                // TODO: show _proper_ error message in popup dialog!
+                Helper.setErrorMessage("First column has to contain metadata configured either as 'recordIdentifier'"
+                        + " or 'doctype' in the current ruleset!");
             }
-            PrimeFaces.current().executeScript("PF('massImportProgressBar').cancel();PF('massImportProgressDialog').hide();PF('massImportResultDialog').show();");
+            PrimeFaces.current().executeScript("PF('massImportProgressBar').cancel();"
+                    + "PF('massImportProgressDialog').hide();PF('massImportResultDialog').show();");
             PrimeFaces.current().ajax().update("massImportResultDialog");
         } catch (ImportException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
@@ -529,10 +531,20 @@ public class MassImportForm extends BaseForm {
         return configurationError;
     }
 
+    /**
+     * Check and return whether first column contains metadata configured as "recordIdentifier" or "docType"
+     * in ruleset or not.
+     * @return 'true' if first column contains functional metadata of type "recordIdentifier" or "docType" and
+     *          'false' otherwise
+     */
     public boolean firstColumnContainsRecordIdentifierOrDocType() {
         return firstColumnContainsRecordsIdentifier() || firstColumnContainsDoctype();
     }
 
+    /**
+     * Check and return whether first column contains metadata configured as "recordIdentifier" in ruleset or not.
+     * @return 'true' if first column contains functional metadata of type "recordIdentifier" and 'false' otherwise
+     */
     public boolean firstColumnContainsRecordsIdentifier() {
         if (metadataKeys.isEmpty()) {
             return false;
@@ -546,6 +558,10 @@ public class MassImportForm extends BaseForm {
         }
     }
 
+    /**
+     * Check and return whether first column contains metadata configured as "docType" in ruleset or not.
+     * @return 'true' if first column contains functional metadata of type "docType" and 'false' otherwise
+     */
     public boolean firstColumnContainsDoctype() {
         if (metadataKeys.isEmpty()) {
             return false;
@@ -559,6 +575,11 @@ public class MassImportForm extends BaseForm {
         }
     }
 
+    /**
+     * Retrieve and return CSS style class of functional metadata with given index metadata key list 'metadataKeys'.
+     * @param index index of metadata in list 'metadataKeys' whose CSS class is returned
+     * @return CSS style class of metadata as String
+     */
     public String getFunctionalMetadataStyleClass(int index) {
         try {
             return ServiceManager.getImportService().getFunctionalMetadataStyleClass(ruleset, metadataKeys, index);

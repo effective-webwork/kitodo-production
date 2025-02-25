@@ -1353,6 +1353,17 @@ public class ImportService {
         updateTasks(process);
     }
 
+    /**
+     * Extract and return value of metadata configured as 'recordIdentifier' in the ruleset of the template with the
+     * provided ID 'templateID' from the given map 'metadata', which contains metadata IDs as keys and lists of Strings
+     * as metadata values.
+     * @param metadata map containing metadata to
+     * @param templateId ID of template whose ruleset contains definition of 'recordIdentifier' functional metadata
+     * @return value of metadata configured as 'recordIdentifier'
+     * @throws ConfigException when no 'recordIdentifier' metadata was found in given metadata map
+     * @throws IOException when loading ruleset file fails
+     * @throws DAOException when retrieving template with given ID 'templateID' from database fails
+     */
     public String getRecordId(Map<String, List<String>> metadata, int templateId)
             throws ConfigException, IOException, DAOException {
         Template template = ServiceManager.getTemplateService().getById(templateId);
@@ -1370,7 +1381,19 @@ public class ImportService {
         throw new ConfigException("No record identifier found in given metadata!");
     }
 
-    public String getDocType(Map<String, List<String>> metadata, int templateId) throws DAOException, IOException {
+    /**
+     * Extract and return value of metadata configured as 'docType' in the ruleset of the template with the
+     * provided ID 'templateID' from the given map 'metadata', which contains metadata IDs as keys and lists of Strings
+     * as metadata values.
+     * @param metadata map containing metadata to
+     * @param templateId ID of template whose ruleset contains definition of 'docType' functional metadata
+     * @return value of metadata configured as 'docType'
+     * @throws ConfigException when no 'docType' metadata was found in given metadata map
+     * @throws IOException when loading ruleset file fails
+     * @throws DAOException when retrieving template with given ID 'templateID' from database fails
+     */
+    public String getDocType(Map<String, List<String>> metadata, int templateId)
+            throws ConfigException, DAOException, IOException {
         Template template = ServiceManager.getTemplateService().getById(templateId);
         Collection<String> docTypeMetadataKeys = getDocTypeMetadata(template.getRuleset());
         if (docTypeMetadataKeys.isEmpty()) {
@@ -1437,6 +1460,7 @@ public class ImportService {
      * @param projectId ID of project to which process will be added
      * @param templateId ID of template used for process
      * @param presetMetadata map containing metadata to add to process
+     * @return Process of created tempProcess
      * @throws ProcessGenerationException when process cannot be created
      * @throws IOException when ruleset cannot be opened
      * @throws InvalidMetadataValueException when temp process cannot be processed
@@ -1444,7 +1468,6 @@ public class ImportService {
      * @throws DataException when saving created process fails
      * @throws CommandException when creating metadata folder or file for process fails
      * @throws DAOException when linking to potential parent process fails
-     * @return Process of created tempProcess
      */
     public Process createProcessFromData(int projectId, int templateId,
                                       Map<String, List<String>> presetMetadata) throws ProcessGenerationException,
@@ -1898,17 +1921,35 @@ public class ImportService {
         return managementInterface.getFunctionalKeys(FunctionalMetadata.DOC_TYPE).contains(metadataKey);
     }
 
+    /**
+     * Determine and return style class of metadata at given index in provided list of metadata keys.
+     * This method is used by the mass import feature to determine if the first key in the list of given metadata keys
+     * defines either the catalog record identifier of the records in the mass import and therefore indicates that
+     * the mass import should query a catalog search interface for each row in an uploaded CSV file or if it contains
+     * the definition of a document type and therefore the mass import should create processes just using the provided
+     * data without querying a catalog search interface. If the metadata key is neither defined as record identifier nor
+     * as document type, a style class is returned to indicate a faulty configuration, since the first metadata in the
+     * metadata list used for mass import always has to contain either of those functional metadata in order to work.
+     * @param ruleset Ruleset containing metadata definitions
+     * @param metadataKeys list of metadata keys
+     * @param index index of metadata key for which style class is returned
+     * @return style class of metadata
+     * @throws IOException when opening ruleset file of given ruleset to determine whether given metadata key is
+     * functional metadata keys fails
+     */
     public String getFunctionalMetadataStyleClass(Ruleset ruleset, List<String> metadataKeys, int index)
             throws IOException {
-        String metadataKey = metadataKeys.get(index);
-        if (isRecordIdentifierMetadata(ruleset, metadataKey)) {
-            return "metadata-record-id";
-        } else if (isDocTypeMetadata(ruleset, metadataKey)) {
-            return "metadata-doctype";
-        } else if (index == 0) {
-            return "invalid-configuration";
-        } else {
+        if (index != 0) {
             return "";
+        } else {
+            String metadataKey = metadataKeys.get(index);
+            if (isRecordIdentifierMetadata(ruleset, metadataKey)) {
+                return "metadata-record-id";
+            } else if (isDocTypeMetadata(ruleset, metadataKey)) {
+                return "metadata-doctype";
+            } else {
+                return "invalid-configuration";
+            }
         }
     }
 }

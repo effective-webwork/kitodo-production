@@ -207,7 +207,8 @@ public class MassImportService {
                     .stream().max(Map.Entry.comparingByValue());
             if (highestOccurrence.isPresent()) {
                 Map.Entry<Integer, Integer> occurrence = highestOccurrence.get();
-                // skip count of lines that did not contain current separator, e.g. occurrences are "0", which would otherwise be the most common count in the statistic for each unused separator character!
+                // skip count of lines that did not contain current separator, e.g. occurrences are "0", which would
+                // otherwise be the most common count in the statistic for each unused separator character!
                 if (occurrence.getKey() > 0 && occurrence.getValue() > maxOccurrence) {
                     probablyCharacter = characterStatistics.getKey();
                 }
