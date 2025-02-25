@@ -1373,9 +1373,11 @@ public class ImportService {
                     + "' must be configured as 'recordIdentifier'");
         }
         for (String recordIdMetadataKey : recordIdMetadataKeys) {
-            List<String> ids = metadata.get(recordIdMetadataKey);
-            if (ids.size() == 1) {
-                return ids.iterator().next();
+            if (metadata.containsKey(recordIdMetadataKey)) {
+                List<String> ids = metadata.get(recordIdMetadataKey);
+                if (ids.size() == 1) {
+                    return ids.iterator().next();
+                }
             }
         }
         throw new ConfigException("No record identifier found in given metadata!");
@@ -1401,9 +1403,11 @@ public class ImportService {
                     + "' must be configured as 'docType'");
         }
         for (String docTypeMetadataKey : docTypeMetadataKeys) {
-            List<String> types = metadata.get(docTypeMetadataKey);
-            if (types.size() == 1) {
-                return types.iterator().next();
+            if (metadata.containsKey(docTypeMetadataKey)) {
+                List<String> types = metadata.get(docTypeMetadataKey);
+                if (types.size() == 1) {
+                    return types.iterator().next();
+                }
             }
         }
         throw new ConfigException("No document type found in given metadata!");
@@ -1448,7 +1452,7 @@ public class ImportService {
         } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException
                 | ParserConfigurationException | NoRecordFoundException | UnsupportedFormatException
                 | URISyntaxException | SAXException | InvalidMetadataValueException | NoSuchMetadataFieldException
-                | DataException | CommandException | TransformerException | CatalogException e) {
+                | DataException | CommandException | TransformerException | CatalogException | ConfigException e) {
             logger.error(e);
             throw new ImportException(e.getLocalizedMessage());
         }
