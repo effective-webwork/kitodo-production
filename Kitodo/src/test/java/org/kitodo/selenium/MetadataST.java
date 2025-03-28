@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -46,6 +47,7 @@ import org.kitodo.selenium.testframework.pages.MetadataEditorPage;
 import org.kitodo.test.utils.ProcessTestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * Tests for functions in the metadata editor.
@@ -484,6 +486,59 @@ public class MetadataST extends BaseTestSelenium {
         assertTrue(Browser.getDriver().findElements(By.cssSelector("#logicalTree\\:0_1_0_1")).isEmpty());
     }
 
+    /*
+     * Check if media can be linked to next structure element via thumbnail context menu in gallery when media is hidden
+     * in structure tree.
+     */
+    @Test
+    public void linkPageToNextDivisionViaGalleryWhileMediaIsHiddenInStructureTreeTest() throws Exception {
+        login("kowal");
+
+        // open metadata editor
+        Pages.getProcessesPage().goTo().editMetadata(LINK_PAGE_TO_NEXT_DIVISION_PROCESS_TITLE);
+
+        MetadataEditorPage metaDataEditor = Pages.getMetadataEditorPage();
+
+        // wait until structure tree is shown
+        await().ignoreExceptions().pollDelay(100, TimeUnit.MILLISECONDS).atMost(5, TimeUnit.SECONDS)
+                .until(metaDataEditor::isLogicalTreeVisible);
+
+        // hide media!
+        Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
+        Browser.getDriver().findElement(By.id("logicalStructureMenuForm:hideMediaCheckbox")).click();
+        Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
+
+        // switch to "detail" view and then back to "list" view for thumbnail context menu to be updated
+        Browser.getDriver().findElement(By.id("imagePreviewForm:previewButton")).click();
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.cssSelector("#imagePreviewForm .ol-layer canvas")).isDisplayed());
+        Browser.getDriver().findElement(By.id("imagePreviewForm:listViewButton")).click();
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.id("imagePreviewForm:structuredPages")).isDisplayed());
+
+        String thumbnailId = "#imagePreviewForm\\:structuredPages\\:2\\:structureElementDataList\\:0\\:structuredPagePanel";
+
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.cssSelector(thumbnailId)).isDisplayed());
+
+        // open context menu in _gallery_ and verify, that option to link to next structure is there!
+        WebElement firstThumbnail = Browser.getDriver().findElement(By.cssSelector(thumbnailId));
+
+        // assert first thumbnail is not yet linked
+        assertTrue(firstThumbnail.findElements(By.className("assigned-several-times")).isEmpty());
+        assertTrue(Browser.getDriver().findElements(By.cssSelector(thumbnailId + " .assigned-several-times")).isEmpty());
+
+        Actions rightClickAction = new Actions(Browser.getDriver());
+        rightClickAction.contextClick(firstThumbnail).build().perform();
+        assertTrue(Browser.getDriver().findElement(By.id("imagePreviewForm:mediaContextMenu")).isDisplayed());
+        assertTrue(Browser.getDriver().findElement(By.partialLinkText("Mit nächstem Element verknüpfen")).isDisplayed());
+
+        // link to next structure via gallery
+        Browser.getDriver().findElement(By.partialLinkText("Mit nächstem Element verknüpfen")).click();
+
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.cssSelector(thumbnailId)).isDisplayed());
+
+        // assert first thumbnail is linked
+        assertFalse(Browser.getDriver().findElements(By.cssSelector(thumbnailId + " .assigned-several-times")).isEmpty());
+    }
+
     /**
      * Tests that a metadata row of the metadata table is highlighted as soon as a user adds a new
      * row via the add metadata dialog.
@@ -700,5 +755,13 @@ public class MetadataST extends BaseTestSelenium {
         xmlContent = xmlContent.replaceAll(FIRST_CHILD_ID, String.valueOf(firstChildId));
         xmlContent = xmlContent.replaceAll(SECOND_CHILD_ID, String.valueOf(secondChildId));
         Files.write(metaXml, xmlContent.getBytes());
+    }
+
+    private void pollAssertTrue(Callable<Boolean> conditionEvaluator) {
+        await().ignoreExceptions()
+                .pollDelay(1, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .atMost(5, TimeUnit.SECONDS)
+                .until(conditionEvaluator);
     }
 }
