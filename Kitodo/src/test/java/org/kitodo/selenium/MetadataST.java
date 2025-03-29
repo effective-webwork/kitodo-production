@@ -479,7 +479,7 @@ public class MetadataST extends BaseTestSelenium {
         // click on 2nd menu entry "remove assignment"
         metaDataEditor.clickStructureTreeContextMenuEntry("unassign");
 
-        // check page "2" is not marked as "linked" any more
+        // check page "2" is not marked as "linked" anymore
         assertFalse(metaDataEditor.isStructureTreeNodeAssignedSeveralTimes("0_0_0_0"));
 
         // check page "3" is now only child of folder again
@@ -507,12 +507,6 @@ public class MetadataST extends BaseTestSelenium {
         Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
         Browser.getDriver().findElement(By.id("logicalStructureMenuForm:hideMediaCheckbox")).click();
         Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
-
-        // switch to "detail" view and then back to "list" view for thumbnail context menu to be updated
-        Browser.getDriver().findElement(By.id("imagePreviewForm:previewButton")).click();
-        pollAssertTrue(() -> Browser.getDriver().findElement(By.cssSelector("#imagePreviewForm .ol-layer canvas")).isDisplayed());
-        Browser.getDriver().findElement(By.id("imagePreviewForm:listViewButton")).click();
-        pollAssertTrue(() -> Browser.getDriver().findElement(By.id("imagePreviewForm:structuredPages")).isDisplayed());
 
         String thumbnailId = "#imagePreviewForm\\:structuredPages\\:2\\:structureElementDataList\\:0\\:structuredPagePanel";
 
