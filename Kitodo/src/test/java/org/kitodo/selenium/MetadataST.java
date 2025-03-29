@@ -503,10 +503,16 @@ public class MetadataST extends BaseTestSelenium {
         await().ignoreExceptions().pollDelay(100, TimeUnit.MILLISECONDS).atMost(5, TimeUnit.SECONDS)
                 .until(metaDataEditor::isLogicalTreeVisible);
 
+        String menuButtonId = "logicalStructureMenuButton";
+        String hideMediaOptionId ="logicalStructureMenuForm:hideMediaCheckbox";
+
         // hide media!
-        Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
-        Browser.getDriver().findElement(By.id("logicalStructureMenuForm:hideMediaCheckbox")).click();
-        Browser.getDriver().findElement(By.id("logicalStructureMenuButton")).click();
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.id(menuButtonId)).isDisplayed());
+        Browser.getDriver().findElement(By.id(menuButtonId)).click();
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.id(hideMediaOptionId)).isDisplayed());
+        Browser.getDriver().findElement(By.id(hideMediaOptionId)).click();
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.id(menuButtonId)).isDisplayed());
+        Browser.getDriver().findElement(By.id(menuButtonId)).click();
 
         String thumbnailId = "#imagePreviewForm\\:structuredPages\\:2\\:structureElementDataList\\:0\\:structuredPagePanel";
 
@@ -522,10 +528,10 @@ public class MetadataST extends BaseTestSelenium {
         Actions rightClickAction = new Actions(Browser.getDriver());
         rightClickAction.contextClick(firstThumbnail).build().perform();
         assertTrue(Browser.getDriver().findElement(By.id("imagePreviewForm:mediaContextMenu")).isDisplayed());
-        assertTrue(Browser.getDriver().findElement(By.partialLinkText("Mit nächstem Element verknüpfen")).isDisplayed());
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.className("assignToNextElement")).isDisplayed());
 
         // link to next structure via gallery
-        Browser.getDriver().findElement(By.partialLinkText("Mit nächstem Element verknüpfen")).click();
+        Browser.getDriver().findElement(By.className("assignToNextElement")).click();
 
         pollAssertTrue(() -> Browser.getDriver().findElement(By.cssSelector(thumbnailId)).isDisplayed());
 
