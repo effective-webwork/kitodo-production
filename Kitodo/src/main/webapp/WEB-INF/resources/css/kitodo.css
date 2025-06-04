@@ -1774,7 +1774,8 @@ Mass import
 
 #editForm\:recordsTable th.ui-state-default,
 #editForm\:recordsTable td.ui-editable-column,
-#editForm\:recordsTable td.remove-column {
+#editForm\:recordsTable td.remove-column,
+#editForm\:recordsTable tr.ui-datatable-empty-message {
     border: 1px solid var(--carbon-blue);
 }
 
@@ -1829,6 +1830,11 @@ Mass import
 #editForm\:recordsTable .remove-column button.secondary,
 #editForm\:recordsTable .remove-metadata-column {
     border: none;
+}
+
+#editForm\:addCsvRecord,
+#editForm\:recordsTable .remove-column button.secondary {
+    float: right;
 }
 
 #editForm\:recordsTable input.ui-inputtext {
