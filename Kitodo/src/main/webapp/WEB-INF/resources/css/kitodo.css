@@ -1877,7 +1877,6 @@ Mass import
     height: inherit;
 }
 
-/* FIXME: one of these CSS rules seems to break "frozen colemns" of primefaces datatable */
 #editForm\:recordsTable span.ui-column-title {
     white-space: nowrap;
 }
@@ -1888,6 +1887,11 @@ Mass import
     text-overflow: ellipsis;
     vertical-align: middle;
     width: calc(100% - 20px);
+}
+
+#buttonForm\:hideCheckbox {
+    margin-left: var(--default-double-size);
+    margin-top: var(--default-double-size);
 }
 
 #catalogSearchForm {
