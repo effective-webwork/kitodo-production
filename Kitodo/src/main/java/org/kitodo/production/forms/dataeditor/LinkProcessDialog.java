@@ -11,6 +11,12 @@
 
 package org.kitodo.production.forms.dataeditor;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.data.database.beans.Process;
@@ -21,20 +27,13 @@ import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.dataeditor.DataEditorService;
 import org.primefaces.PrimeFaces;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-public class LinkProcessDialog extends AddNodeDialog{
+public class LinkProcessDialog extends AddNodeDialog {
 
     private static final Logger logger = LogManager.getLogger(LinkProcessDialog.class);
 
     private String processNumber = "";
     private List<Process> processes = Collections.emptyList();
     private Process selectedProcess = null;
-    private boolean linkSubDialogVisible = false;
 
     LinkProcessDialog(DataEditorForm form) {
         super(form);
