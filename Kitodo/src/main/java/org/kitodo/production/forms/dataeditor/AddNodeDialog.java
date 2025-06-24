@@ -1,11 +1,22 @@
-package org.kitodo.production.forms.dataeditor;
+/*
+ * (c) Kitodo. Key to digital objects e. V. <contact@kitodo.org>
+ *
+ * This file is part of the Kitodo project.
+ *
+ * It is licensed under GNU General Public License version 3 or later.
+ *
+ * For the full copyright and license information, please read the
+ * GPL3-License.txt file that was distributed with this source code.
+ */
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.kitodo.api.dataformat.LogicalDivision;
+package org.kitodo.production.forms.dataeditor;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.kitodo.api.dataformat.LogicalDivision;
 
 public class AddNodeDialog {
 
