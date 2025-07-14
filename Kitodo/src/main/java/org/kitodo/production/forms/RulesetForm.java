@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.model.LazyBeanModel;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.RulesetService;
 
 @Named("RulesetForm")
 @SessionScoped
@@ -197,6 +199,115 @@ public class RulesetForm extends BaseForm {
             Helper.setErrorMessage(ERROR_LOADING_MANY, new Object[] {ObjectType.RULESET.getTranslationPlural() },
                 logger, e);
             return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getProcessTitles() {
+        try {
+            return RulesetService.getProcessTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+
+    public Collection<String> getRecordIdentifiers() {
+        try {
+            return RulesetService.getRecordIdentifierMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getDocTypes() {
+        try {
+            return RulesetService.getDocTypeMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getStructureTreeTitles() {
+        try {
+            return RulesetService.getStructureTreeTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getGroupDisplayLabels() {
+        try {
+            return RulesetService.getGroupDisplayLabelMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getHigherLevelIdentifiers() {
+        try {
+            return RulesetService.getHigherLevelIdentifierMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getChildCounts() {
+        try {
+            return RulesetService.getChildCountMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getDisplaySummaries() {
+        try {
+            return RulesetService.getDisplaySummaryMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getAuthorLastNames() {
+        try {
+            return RulesetService.getAuthorLastNameMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getDataSources() {
+        try {
+            return RulesetService.getDataSourceMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public Collection<String> getTitles() {
+        try {
+            return RulesetService.getTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public String getMetadataLabel(String metadataKey) {
+        try {
+            return RulesetService.getMetadataKeyLabel(metadataKey, ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return "";
         }
     }
 }

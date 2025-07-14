@@ -1743,6 +1743,10 @@ Import form
     margin-top: var(--default-half-size);
 }
 
+.functional-metadata-list {
+    border: 1px solid var(--blue);
+}
+
 /*----------------------------------------------------------------------
 Mass import
 ----------------------------------------------------------------------*/
