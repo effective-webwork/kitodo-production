@@ -1372,7 +1372,7 @@ public class DataEditorForm implements MetadataTreeTableInterface, RulesetSetupI
             errorMessage = Helper.getTranslation("blocked");
             errorTitle = Helper.getTranslation("metadataLocked");
             blockingUserName = blockingUser.getFullName();
-        } else if (linkedProcess){
+        } else if (linkedProcess) {
             linkedProcessId = process.getId();
         }
     }
