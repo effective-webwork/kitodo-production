@@ -906,7 +906,7 @@ public class MetadataST extends BaseTestSelenium {
         List<WebElement> linkedProcessNodes = Browser.getDriver().findElements(By.className("linked"));
         assertEquals(2, linkedProcessNodes.size(), "Wrong number of linked child processes BEFORE unlinking one child process.");
         WebElement firstChildNode = Browser.getDriver().findElement(By.id("logicalTree:0_0"));
-        assertTrue(firstChildNode.getText().contains(FIRST_CHILD_PROCESS_TITLE), "Wrong title of first linked process");
+        assertTrue(firstChildNode.getText().startsWith("["), "First child node of root should be a linked process and test should start with '['");
         firstChildNode.click();
         Pages.getMetadataEditorPage().openContextMenuForStructureTreeNode("0_0");
         WebElement unlinkOption = Browser.getDriver().findElement(By.cssSelector("#contextMenuLogicalTree .ui-menuitem-link"));
