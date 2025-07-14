@@ -915,6 +915,9 @@ public class MetadataST extends BaseTestSelenium {
         // open context menu of first linked child process
         Pages.getMetadataEditorPage().openContextMenuForStructureTreeNode("0_0");
 
+        // wait for context menu to be displayed
+        pollAssertTrue(() -> Browser.getDriver().findElement(By.id("contextMenuLogicalTree")).isDisplayed());
+
         // click option to edit metadata of linked process
         Pages.getMetadataEditorPage().clickStructureTreeContextMenuEntry("editLinkedMetadata");
 
