@@ -30,6 +30,7 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Ruleset;
@@ -45,6 +46,7 @@ import org.kitodo.production.services.data.RulesetService;
 public class RulesetForm extends BaseForm {
     private Ruleset ruleset;
     private static final Logger logger = LogManager.getLogger(RulesetForm.class);
+    private static final String AT_MARK = "@";
 
     private final String rulesetEditPath = MessageFormat.format(REDIRECT_PATH, "rulesetEdit");
 
@@ -304,7 +306,8 @@ public class RulesetForm extends BaseForm {
 
     public String getMetadataLabel(String metadataKey) {
         try {
-            return RulesetService.getMetadataKeyLabel(metadataKey, ruleset);
+            RulesetManagementInterface rulesetManagement =  ServiceManager.getRulesetService().openRuleset(ruleset);
+            return ServiceManager.getRulesetService().getMetadataTranslation(rulesetManagement, metadataKey, AT_MARK);
         } catch (IOException e) {
             Helper.setErrorMessage(e.getLocalizedMessage());
             return "";

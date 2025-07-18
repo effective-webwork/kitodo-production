@@ -34,7 +34,6 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -1865,48 +1864,6 @@ public class ImportService {
             }
         }
         return processes;
-    }
-
-    /**
-     * Retrieve and return label of metadata with given key 'metadataKey'.
-     *
-     * @param ruleset RulesetManagementInterface from which metadata label is retrieved
-     * @param metadataKey key of metadata for which label ir retrieved
-     * @param groupSeparator SeparatorCharacter separating metadata group entries
-     * @return label of metadata
-     * @throws IOException if ruleset file could not be read
-     */
-    public String getMetadataTranslation(RulesetManagementInterface ruleset, String metadataKey, SeparatorCharacter groupSeparator)
-            throws IOException {
-        User user = ServiceManager.getUserService().getCurrentUser();
-        String metadataLanguage = user.getMetadataLanguage();
-        List<Locale.LanguageRange> languages = Locale.LanguageRange.parse(metadataLanguage.isEmpty()
-                ? Locale.ENGLISH.getCountry() : metadataLanguage);
-        if (Objects.isNull(groupSeparator) || StringUtils.isBlank(groupSeparator.getSeparator())
-                || !metadataKey.contains(groupSeparator.getSeparator())) {
-            return ruleset.getTranslationForKey(metadataKey, languages).orElse(metadataKey);
-        } else {
-            String separator = groupSeparator.getSeparator();
-            List<String> keyHierarchy = List.of(metadataKey.split(Pattern.quote(separator)));
-            List<String> translatedKeys = new LinkedList<>();
-            String groupLabel = "";
-            for (String key : keyHierarchy) {
-                if (keyHierarchy.indexOf(key) == 0) {
-                    groupLabel = ruleset.getTranslationForKey(keyHierarchy.get(0), languages).orElse(metadataKey);
-                } else {
-                    List<String> nestedKeys = new LinkedList<>();
-                    nestedKeys.add(keyHierarchy.get(0));
-                    nestedKeys.add(key);
-                    Optional<String> nestedKeyTranslation = ruleset.getTranslationForKey(nestedKeys, languages);
-                    if (nestedKeyTranslation.isPresent()) {
-                        translatedKeys.add(nestedKeyTranslation.get());
-                    } else {
-                        translatedKeys.add(key);
-                    }
-                }
-            }
-            return groupLabel + " (" + String.join(separator, translatedKeys) + ")";
-        }
     }
 
     private TempProcess extractParentRecordFromFile(Document internalDocument, CreateProcessForm createProcessForm)
