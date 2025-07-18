@@ -204,6 +204,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'processTitle' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'processTitle' in current ruleset.
+     */
     public Collection<String> getProcessTitles() {
         try {
             return RulesetService.getProcessTitleMetadata(ruleset);
@@ -213,7 +218,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
-
+    /**
+     * Get keys of metadata configured as functional metadata 'recordIdentifier' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'recordIdentifier' in current ruleset.
+     */
     public Collection<String> getRecordIdentifiers() {
         try {
             return RulesetService.getRecordIdentifierMetadata(ruleset);
@@ -223,6 +232,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'docType' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'docType' in current ruleset.
+     */
     public Collection<String> getDocTypes() {
         try {
             return RulesetService.getDocTypeMetadata(ruleset);
@@ -232,6 +246,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'structureTreeTitle' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'structureTreeTitle' in current ruleset.
+     */
     public Collection<String> getStructureTreeTitles() {
         try {
             return RulesetService.getStructureTreeTitleMetadata(ruleset);
@@ -241,6 +260,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'groupDisplayLabel' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'groupDisplayLabel' in current ruleset.
+     */
     public Collection<String> getGroupDisplayLabels() {
         try {
             return RulesetService.getGroupDisplayLabelMetadata(ruleset);
@@ -250,6 +274,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'higherLevelIdentifier' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'higherLevelIdentifier' in current ruleset.
+     */
     public Collection<String> getHigherLevelIdentifiers() {
         try {
             return RulesetService.getHigherLevelIdentifierMetadata(ruleset);
@@ -259,6 +288,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'childCount' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'childCount' in current ruleset.
+     */
     public Collection<String> getChildCounts() {
         try {
             return RulesetService.getChildCountMetadata(ruleset);
@@ -268,6 +302,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'displaySummary' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'displaySummary' in current ruleset.
+     */
     public Collection<String> getDisplaySummaries() {
         try {
             return RulesetService.getDisplaySummaryMetadata(ruleset);
@@ -277,6 +316,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'authorLastName' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'authorLastName' in current ruleset.
+     */
     public Collection<String> getAuthorLastNames() {
         try {
             return RulesetService.getAuthorLastNameMetadata(ruleset);
@@ -286,6 +330,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'dataSource' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'dataSource' in current ruleset.
+     */
     public Collection<String> getDataSources() {
         try {
             return RulesetService.getDataSourceMetadata(ruleset);
@@ -295,6 +344,11 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Get keys of metadata configured as functional metadata 'title' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'title' in current ruleset.
+     */
     public Collection<String> getTitles() {
         try {
             return RulesetService.getTitleMetadata(ruleset);
@@ -304,6 +358,12 @@ public class RulesetForm extends BaseForm {
         }
     }
 
+    /**
+     * Retrieve label of metadata with key 'metadataKey' from current ruleset.
+     *
+     * @param metadataKey key of metadata for which label is retrieved from current ruleset
+     * @return label of metadata with key 'metadataKey'
+     */
     public String getMetadataLabel(String metadataKey) {
         try {
             RulesetManagementInterface rulesetManagement =  ServiceManager.getRulesetService().openRuleset(ruleset);
