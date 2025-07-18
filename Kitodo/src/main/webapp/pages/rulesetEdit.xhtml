@@ -83,7 +83,8 @@
                             <p:selectOneMenu id="file" value="#{RulesetForm.ruleset.file}" disabled="#{isViewMode}">
                                 <f:selectItems value="#{RulesetForm.rulesetFilenames}" var="rulesetFile" itemValue="#{rulesetFile}"
                                                itemLabel="#{rulesetFile}"/>
-                                <p:ajax oncomplete="toggleSave()"/>
+                                <p:ajax oncomplete="toggleSave()"
+                                        update="editForm:rulesetTabView:functionalMetadataGrid"/>
                             </p:selectOneMenu>
                         </div>
                     </p:row>
@@ -97,6 +98,7 @@
                     </p:row>
                 </p:panelGrid>
                 <p:panelGrid layout="grid"
+                             id="functionalMetadataGrid"
                              columns="4">
                     <p:row>
                         <h:panelGroup layout="block"
