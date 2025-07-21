@@ -1743,6 +1743,15 @@ Import form
     margin-top: var(--default-half-size);
 }
 
+.functional-metadata-list {
+    border: 1px solid var(--blue);
+}
+
+.functional-metadata-list [role=gridcell] {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /*----------------------------------------------------------------------
 Mass import
 ----------------------------------------------------------------------*/

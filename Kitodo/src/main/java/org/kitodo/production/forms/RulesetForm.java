@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Ruleset;
@@ -37,12 +39,14 @@ import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.model.LazyBeanModel;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.RulesetService;
 
 @Named("RulesetForm")
 @SessionScoped
 public class RulesetForm extends BaseForm {
     private Ruleset ruleset;
     private static final Logger logger = LogManager.getLogger(RulesetForm.class);
+    private static final String AT_MARK = "@";
 
     private final String rulesetEditPath = MessageFormat.format(REDIRECT_PATH, "rulesetEdit");
 
@@ -197,6 +201,176 @@ public class RulesetForm extends BaseForm {
             Helper.setErrorMessage(ERROR_LOADING_MANY, new Object[] {ObjectType.RULESET.getTranslationPlural() },
                 logger, e);
             return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'processTitle' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'processTitle' in current ruleset.
+     */
+    public Collection<String> getProcessTitles() {
+        try {
+            return RulesetService.getProcessTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'recordIdentifier' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'recordIdentifier' in current ruleset.
+     */
+    public Collection<String> getRecordIdentifiers() {
+        try {
+            return RulesetService.getRecordIdentifierMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'docType' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'docType' in current ruleset.
+     */
+    public Collection<String> getDocTypes() {
+        try {
+            return RulesetService.getDocTypeMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'structureTreeTitle' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'structureTreeTitle' in current ruleset.
+     */
+    public Collection<String> getStructureTreeTitles() {
+        try {
+            return RulesetService.getStructureTreeTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'groupDisplayLabel' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'groupDisplayLabel' in current ruleset.
+     */
+    public Collection<String> getGroupDisplayLabels() {
+        try {
+            return RulesetService.getGroupDisplayLabelMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'higherLevelIdentifier' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'higherLevelIdentifier' in current ruleset.
+     */
+    public Collection<String> getHigherLevelIdentifiers() {
+        try {
+            return RulesetService.getHigherLevelIdentifierMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'childCount' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'childCount' in current ruleset.
+     */
+    public Collection<String> getChildCounts() {
+        try {
+            return RulesetService.getChildCountMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'displaySummary' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'displaySummary' in current ruleset.
+     */
+    public Collection<String> getDisplaySummaries() {
+        try {
+            return RulesetService.getDisplaySummaryMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'authorLastName' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'authorLastName' in current ruleset.
+     */
+    public Collection<String> getAuthorLastNames() {
+        try {
+            return RulesetService.getAuthorLastNameMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'dataSource' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'dataSource' in current ruleset.
+     */
+    public Collection<String> getDataSources() {
+        try {
+            return RulesetService.getDataSourceMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Get keys of metadata configured as functional metadata 'title' in current ruleset.
+     *
+     * @return keys of metadata configured as functional metadata 'title' in current ruleset.
+     */
+    public Collection<String> getTitles() {
+        try {
+            return RulesetService.getTitleMetadata(ruleset);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieve label of metadata with key 'metadataKey' from current ruleset.
+     *
+     * @param metadataKey key of metadata for which label is retrieved from current ruleset
+     * @return label of metadata with key 'metadataKey'
+     */
+    public String getMetadataLabel(String metadataKey) {
+        try {
+            RulesetManagementInterface rulesetManagement =  ServiceManager.getRulesetService().openRuleset(ruleset);
+            return ServiceManager.getRulesetService().getMetadataTranslation(rulesetManagement, metadataKey, AT_MARK);
+        } catch (IOException e) {
+            Helper.setErrorMessage(e.getLocalizedMessage());
+            return "";
         }
     }
 }
