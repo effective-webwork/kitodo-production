@@ -1747,6 +1747,11 @@ Import form
     border: 1px solid var(--blue);
 }
 
+.functional-metadata-list [role=gridcell] {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /*----------------------------------------------------------------------
 Mass import
 ----------------------------------------------------------------------*/

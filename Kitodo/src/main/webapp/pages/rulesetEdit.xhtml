@@ -97,227 +97,269 @@
                         </div>
                     </p:row>
                 </p:panelGrid>
-                <p:panelGrid layout="grid"
-                             id="functionalMetadataGrid"
-                             columns="4">
-                    <p:row>
-                        <h:panelGroup layout="block"
-                                      id="processTitleMetadata">
-                            <p:outputLabel for="processTitleList"
-                                           value="Process titles"/>
-                            <p:dataTable id="processTitleList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.processTitles}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="processTitle">
-                                <p:column id="processTitleLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(processTitle)}"/>
-                                </p:column>
-                                <p:column id="processTitleKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{processTitle}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="structureTreeTitleMetadata">
-                            <p:outputLabel for="structureTreeTitleList"
-                                           value="Structure tree titles"/>
-                            <p:dataTable id="structureTreeTitleList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.structureTreeTitles}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="structureTreeTitle">
-                                <p:column id="structureTreeTitleLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(structureTreeTitle)}"/>
-                                </p:column>
-                                <p:column id="structureTreeTitleKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{structureTreeTitle}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="authorLastNameMetadata">
-                            <p:outputLabel for="authorLastNameList"
-                                           value="Author last name"/>
-                            <p:dataTable id="authorLastNameList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.authorLastNames}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="authorLastName">
-                                <p:column id="authorLastNameLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(authorLastName)}"/>
-                                </p:column>
-                                <p:column id="structureTreeTitleKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{authorLastName}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                    </p:row>
-                    <p:row>
-                        <h:panelGroup layout="block"
-                                      id="recordIdentifierMetadata">
-                            <p:outputLabel for="recordIdentifierList"
-                                           value="Record Identifiers"/>
-                            <p:dataTable id="recordIdentifierList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.recordIdentifiers}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="recordIdentifier">
-                                <p:column id="recordIdentifierLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(recordIdentifier)}"/>
-                                </p:column>
-                                <p:column id="recordIdentifierKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{recordIdentifier}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="groupDisplayLabelMetadata">
-                            <p:outputLabel for="groupDisplayLabelList"
-                                           value="Group display labels"/>
-                            <p:dataTable id="groupDisplayLabelList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.groupDisplayLabels}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="groupDisplayLabel">
-                                <p:column id="groupDisplayLabelLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(groupDisplayLabel)}"/>
-                                </p:column>
-                                <p:column id="groupDisplayLabelKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{groupDisplayLabel}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="dataSourceMetadata">
-                            <p:outputLabel for="dataSourceList"
-                                           value="Data sources"/>
-                            <p:dataTable id="dataSourceList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.dataSources}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="dataSource">
-                                <p:column id="dataSourceLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(dataSource)}"/>
-                                </p:column>
-                                <p:column id="dataSourceKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{dataSource}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                    </p:row>
-                    <p:row>
-                        <h:panelGroup layout="block"
-                                      id="higherlevelIdentifierMetadata">
-                            <p:outputLabel for="higherlevelIdentifierList"
-                                           value="Higher level identifiers"/>
-                            <p:dataTable id="higherlevelIdentifierList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.higherLevelIdentifiers}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="higherlevelIdentifier">
-                                <p:column id="higherlevelIdentifierLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(higherlevelIdentifier)}"/>
-                                </p:column>
-                                <p:column id="higherlevelIdentifierKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{higherlevelIdentifier}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="childCountMetadata">
-                            <p:outputLabel for="childCountList"
-                                           value="Child counts"/>
-                            <p:dataTable id="childCountList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.childCounts}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="childCount">
-                                <p:column id="childCountLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(childCount)}"/>
-                                </p:column>
-                                <p:column id="childCountKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{childCount}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="titleMetadata">
-                            <p:outputLabel for="titleList"
-                                           value="Titles"/>
-                            <p:dataTable id="titleList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.titles}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="title">
-                                <p:column id="titleLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(title)}"/>
-                                </p:column>
-                                <p:column id="titleKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{title}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                    </p:row>
-                    <p:row>
-                        <h:panelGroup layout="block"
-                                      id="docTypeMetadata">
-                            <p:outputLabel for="docTypeList"
-                                           value="Doc types"/>
-                            <p:dataTable id="docTypeList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.docTypes}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="docType">
-                                <p:column id="docTypeLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(docType)}"/>
-                                </p:column>
-                                <p:column id="docTypeKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{docType}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block"
-                                      id="displaySummaryMetadata">
-                            <p:outputLabel for="displaySummaryList"
-                                           value="Display summaries"/>
-                            <p:dataTable id="displaySummaryList"
-                                         styleClass="functional-metadata-list"
-                                         value="#{RulesetForm.displaySummaries}"
-                                         emptyMessage="#{msgs['noRecordsFound']}"
-                                         var="displaySummary">
-                                <p:column id="displaySummaryLabel"
-                                          headerText="Label">
-                                    <h:outputText value="#{RulesetForm.getMetadataLabel(displaySummary)}"/>
-                                </p:column>
-                                <p:column id="displaySummaryKey"
-                                          headerText="Key">
-                                    <h:outputText value="#{displaySummary}"/>
-                                </p:column>
-                            </p:dataTable>
-                        </h:panelGroup>
-                    </p:row>
-                </p:panelGrid>
+                <h:panelGroup id="functionalMetadataWrapper">
+                    <p:panelGrid layout="grid"
+                                 id="functionalMetadataGrid"
+                                 rendered="#{RulesetForm.ruleset ne null and RulesetForm.ruleset.id ne null}"
+                                 columns="4">
+                        <p:row>
+                            <h:panelGroup layout="block"
+                                          id="processTitleMetadata">
+                                <p:outputLabel for="processTitleList"
+                                               value="'processTitle'"/>
+                                <p:dataTable id="processTitleList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.processTitles}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="processTitle">
+                                    <p:column id="processTitleLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(processTitle)}"
+                                                      title="#{RulesetForm.getMetadataLabel(processTitle)}"/>
+                                    </p:column>
+                                    <p:column id="processTitleKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{processTitle}"
+                                                      title="#{processTitle}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="structureTreeTitleMetadata">
+                                <p:outputLabel for="structureTreeTitleList"
+                                               value="'structureTreeTitle'"/>
+                                <p:dataTable id="structureTreeTitleList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.structureTreeTitles}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="structureTreeTitle">
+                                    <p:column id="structureTreeTitleLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(structureTreeTitle)}"
+                                                      title="#{RulesetForm.getMetadataLabel(structureTreeTitle)}"/>
+                                    </p:column>
+                                    <p:column id="structureTreeTitleKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{structureTreeTitle}"
+                                                      title="#{structureTreeTitle}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="authorLastNameMetadata">
+                                <p:outputLabel for="authorLastNameList"
+                                               style="display: inline;"
+                                               value="'authorLastName'"/>
+                                <p:commandButton id="authorLastNameHelp"
+                                                 type="button"
+                                                 styleClass="help-button"
+                                                 style="height: min-content; float: right;"
+                                                 icon="fa fa-lg fa-question-circle-o"/>
+                                <p:tooltip for="authorLastNameHelp"
+                                           value="The author’s last name. This is used in the application to generate the author-title key."/>
+                                <p:dataTable id="authorLastNameList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.authorLastNames}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             style="margin-top: 3px;"
+                                             var="authorLastName">
+                                    <p:column id="authorLastNameLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(authorLastName)}"
+                                                      title="#{RulesetForm.getMetadataLabel(authorLastName)}"/>
+                                    </p:column>
+                                    <p:column id="structureTreeTitleKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{authorLastName}"
+                                                      title="#{authorLastName}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                        </p:row>
+                        <p:row>
+                            <h:panelGroup layout="block"
+                                          id="recordIdentifierMetadata">
+                                <p:outputLabel for="recordIdentifierList"
+                                               value="'recordIdentifier'"/>
+                                <p:commandButton id="recordIdentifierHelp"
+                                                 type="button"
+                                                 styleClass="help-button"
+                                                 style="height: min-content; float: right;"
+                                                 icon="fa fa-lg fa-question-circle-o"/>
+                                <p:tooltip for="recordIdentifierHelp"
+                                           value="ID required for catalog metadata import"/>
+                                <p:dataTable id="recordIdentifierList"
+                                             styleClass="functional-metadata-list"
+                                             scrollable="true"
+                                             scrollHeight="40"
+                                             value="#{RulesetForm.recordIdentifiers}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="recordIdentifier">
+                                    <p:column id="recordIdentifierLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(recordIdentifier)}" title="#{RulesetForm.getMetadataLabel(recordIdentifier)}"/>
+                                    </p:column>
+                                    <p:column id="recordIdentifierKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{recordIdentifier}"
+                                                      title="#{recordIdentifier}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="groupDisplayLabelMetadata">
+                                <p:outputLabel for="groupDisplayLabelList"
+                                               value="'groupDisplayLabel'"/>
+                                <p:dataTable id="groupDisplayLabelList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.groupDisplayLabels}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="groupDisplayLabel">
+                                    <p:column id="groupDisplayLabelLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(groupDisplayLabel)}"
+                                                      title="#{RulesetForm.getMetadataLabel(groupDisplayLabel)}"/>
+                                    </p:column>
+                                    <p:column id="groupDisplayLabelKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{groupDisplayLabel}"
+                                                      title="#{groupDisplayLabel}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="dataSourceMetadata">
+                                <p:outputLabel for="dataSourceList"
+                                               value="'dataSource'"/>
+                                <p:dataTable id="dataSourceList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.dataSources}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="dataSource">
+                                    <p:column id="dataSourceLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(dataSource)}"
+                                                      title="#{RulesetForm.getMetadataLabel(dataSource)}"/>
+                                    </p:column>
+                                    <p:column id="dataSourceKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{dataSource}"
+                                                      title="#{dataSource}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                        </p:row>
+                        <p:row>
+                            <h:panelGroup layout="block"
+                                          id="higherlevelIdentifierMetadata">
+                                <p:outputLabel for="higherlevelIdentifierList"
+                                               value="'higherlevelIdentifier'"/>
+                                <p:dataTable id="higherlevelIdentifierList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.higherLevelIdentifiers}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="higherlevelIdentifier">
+                                    <p:column id="higherlevelIdentifierLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(higherlevelIdentifier)}"
+                                                      title="#{RulesetForm.getMetadataLabel(higherlevelIdentifier)}"/>
+                                    </p:column>
+                                    <p:column id="higherlevelIdentifierKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{higherlevelIdentifier}"
+                                                      title="#{higherlevelIdentifier}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="childCountMetadata">
+                                <p:outputLabel for="childCountList"
+                                               value="'childCount'"/>
+                                <p:dataTable id="childCountList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.childCounts}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="childCount">
+                                    <p:column id="childCountLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(childCount)}"
+                                                      title="#{RulesetForm.getMetadataLabel(childCount)}"/>
+                                    </p:column>
+                                    <p:column id="childCountKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{childCount}"
+                                                      title="#{childCount}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="titleMetadata">
+                                <p:outputLabel for="titleList"
+                                               value="'title'"/>
+                                <p:dataTable id="titleList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.titles}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="title">
+                                    <p:column id="titleLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(title)}"
+                                                      title="#{RulesetForm.getMetadataLabel(title)}"/>
+                                    </p:column>
+                                    <p:column id="titleKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{title}"
+                                                      title="#{title}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                        </p:row>
+                        <p:row>
+                            <h:panelGroup layout="block"
+                                          id="docTypeMetadata">
+                                <p:outputLabel for="docTypeList"
+                                               value="'docType'"/>
+                                <p:dataTable id="docTypeList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.docTypes}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="docType">
+                                    <p:column id="docTypeLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(docType)}"
+                                                      title="#{RulesetForm.getMetadataLabel(docType)}"/>
+                                    </p:column>
+                                    <p:column id="docTypeKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{docType}"
+                                                      title="#{docType}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup layout="block"
+                                          id="displaySummaryMetadata">
+                                <p:outputLabel for="displaySummaryList"
+                                               value="'displaySummary'"/>
+                                <p:dataTable id="displaySummaryList"
+                                             styleClass="functional-metadata-list"
+                                             value="#{RulesetForm.displaySummaries}"
+                                             emptyMessage="#{msgs['noRecordsFound']}"
+                                             var="displaySummary">
+                                    <p:column id="displaySummaryLabel"
+                                              headerText="Label">
+                                        <h:outputText value="#{RulesetForm.getMetadataLabel(displaySummary)}"
+                                                      title="#{RulesetForm.getMetadataLabel(displaySummary)}"/>
+                                    </p:column>
+                                    <p:column id="displaySummaryKey"
+                                              headerText="Key">
+                                        <h:outputText value="#{displaySummary}"
+                                                      title="#{displaySummary}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                        </p:row>
+                    </p:panelGrid>
+                </h:panelGroup>
             </p:tab>
         </p:tabView>
     </ui:define>
