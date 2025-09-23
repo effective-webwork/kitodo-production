@@ -18,6 +18,12 @@
 
 <!-- Change History -->
 
+<!-- September, 2025 -->
+<!-- Version 1.1 -->
+<!-- Changes:
+	 change definition of kitodoType and metadataGroupType to allow for arbitrary order of elements
+-->
+
 <!-- August, 2018 -->
 <!-- Version 1.0 -->
 <!-- Changes:
@@ -28,9 +34,9 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:element name="kitodo" type="kitodoType"/>
     <xs:complexType name="kitodoType">
-        <xs:choice>
-            <xs:element name="metadata" type="metadataType" maxOccurs="unbounded" minOccurs="0"/>
-            <xs:element name="metadataGroup" type="metadataGroupType" maxOccurs="unbounded" minOccurs="0"/>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="metadata" type="metadataType" minOccurs="0"/>
+            <xs:element name="metadataGroup" type="metadataGroupType" minOccurs="0"/>
         </xs:choice>
         <xs:attribute type="xs:string" name="version"/>
     </xs:complexType>
@@ -45,9 +51,9 @@
     </xs:complexType>
 
     <xs:complexType name="metadataGroupType">
-        <xs:choice>
-            <xs:element name="metadata" type="metadataType" maxOccurs="unbounded" minOccurs="0"/>
-            <xs:element name="metadataGroup" type="metadataGroupType" maxOccurs="unbounded" minOccurs="0"/>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="metadata" type="metadataType" minOccurs="0"/>
+            <xs:element name="metadataGroup" type="metadataGroupType" minOccurs="0"/>
         </xs:choice>
         <xs:attribute type="xs:string" name="name"/>
     </xs:complexType>
