@@ -32,6 +32,8 @@
                                   noSelectionOption="true"/>
                     <f:selectItems value="#{importConfigurationEditView.sruVersions}"/>
                     <p:ajax event="change"
+                            listener="#{importConfigurationEditView.sruVersionChanged()}"
+                            process="@this"
                             oncomplete="toggleSave()"/>
                 </p:selectOneMenu>
                 <p:commandButton id="sruVersionButton"
@@ -48,15 +50,19 @@
             <div>
                 <p:outputLabel for="sruRecordSchema"
                                value="#{msgs['importConfig.field.urlparameter.srurecordschema']}"/>
-                <p:inputText id="sruRecordSchema"
-                             required="#{not empty param['editForm:save'] and importConfigurationEditView.importConfiguration.interfaceType eq 'SRU'}"
-                             styleClass="input-with-button"
-                             value="#{importConfigurationEditView.importConfiguration.sruRecordSchema}"
-                             placeholder="#{msgs['importConfig.field.urlparameter.srurecordschema']}"
-                             disabled="#{isViewMode}">
+                <p:selectOneMenu id="sruRecordSchema"
+                                 required="#{not empty param['editForm:save'] and importConfigurationEditView.importConfiguration.interfaceType eq 'SRU'}"
+                                 value="#{importConfigurationEditView.importConfiguration.sruRecordSchema}"
+                                 disabled="#{isViewMode or empty importConfigurationEditView.importConfiguration.sruVersion}"
+                                 editable="#{true}"
+                                 styleClass="input-with-button">
+                    <f:selectItem itemValue="#{null}"
+                                  itemLabel="-- #{msgs['importConfig.field.urlparameter.selectsrurecordschema']} --"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{importConfigurationEditView.sruRecordSchemata}"/>
                     <p:ajax event="change"
-                            oncomplete="toggleSave();"/>
-                </p:inputText>
+                            oncomplete="toggleSave()"/>
+                </p:selectOneMenu>
                 <p:commandButton id="sruRecordSchemaHelpButton"
                                  type="button"
                                  styleClass="help-button"

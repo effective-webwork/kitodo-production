@@ -11,6 +11,10 @@
 
 package org.kitodo.production.services.data;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -19,14 +23,21 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
+import org.kitodo.api.externaldatamanagement.SearchInterfaceType;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.ImportConfigurationDAO;
 import org.kitodo.exceptions.ImportConfigurationInUseException;
+import org.kitodo.production.helper.XMLUtils;
 import org.kitodo.production.services.ServiceManager;
 import org.primefaces.model.SortOrder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class ImportConfigurationService extends BaseBeanService<ImportConfiguration, ImportConfigurationDAO> {
 
@@ -138,5 +149,39 @@ public class ImportConfigurationService extends BaseBeanService<ImportConfigurat
                         .equals(importConfiguration.getConfigurationType()))
                 .sorted(Comparator.comparing(ImportConfiguration::getTitle))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieve list of available SRU record schemata from SRU server defined in given ImportConfiguration.
+     *
+     * @param config ImportConfiguration containing SRU server connection data
+     * @return list of available SRU record schemata as Strings
+     * @throws IOException when loading the XML response from the SRU explain operation fails
+     * @throws ParserConfigurationException when parsing the XML response from the SRU explain operation fails
+     * @throws SAXException when parsing the XML response from the SRU explain operation fails
+     */
+    public static List<String> getAvailableSruRecordSchemata(ImportConfiguration config) throws IOException, ParserConfigurationException, SAXException {
+        List<String> recordSchemata = new ArrayList<>();
+        URL explainUrl = getSruExplainUrl(config);
+        Document explainDocument = XMLUtils.loadXmlDocumentByUrl(explainUrl);
+        NodeList schemaNodes = explainDocument.getElementsByTagName("schema");
+        for (int i = 0; i < schemaNodes.getLength(); i++) {
+            recordSchemata.add(schemaNodes.item(i).getAttributes().getNamedItem("name").getNodeValue());
+        }
+        return recordSchemata;
+    }
+
+    private static URL getSruExplainUrl(ImportConfiguration config) throws MalformedURLException {
+        URL explainUrl = null;
+        if (SearchInterfaceType.SRU.name().equals(config.getInterfaceType())) {
+            String sruUrl = config.getScheme() + "://" + config.getHost()
+                    + (Objects.nonNull(config.getPort())
+                    ? ":" + config.getPort() : "")
+                    + (Objects.nonNull(config.getPath()) ? config.getPath() : "")
+                    + "?version=" + config.getSruVersion()
+                    + "&operation=explain";
+            explainUrl = new URL(sruUrl);
+        }
+        return explainUrl;
     }
 }

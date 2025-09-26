@@ -24,6 +24,7 @@ import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
@@ -40,6 +41,8 @@ import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.ImportConfigurationService;
+import org.primefaces.PrimeFaces;
 import org.primefaces.model.DualListModel;
 
 @Named
@@ -50,6 +53,7 @@ public class ImportConfigurationEditView extends BaseForm {
     private ImportConfiguration importConfiguration = new ImportConfiguration();
     private List<SelectItem> searchFields = new ArrayList<>();
     private List<Client> availableClients = new ArrayList<>();
+    private List<String> sruRecordSchemata = new ArrayList<>();
     private static final List<String> SRU_VERSIONS = List.of("1.1", "1.2", "2.0");
     private static final List<String> SCHEMES = List.of("https", "http", "ftp");
     private static final List<String> PARENT_ELEMENT_TYPES = Collections.singletonList("reference");
@@ -471,5 +475,30 @@ public class ImportConfigurationEditView extends BaseForm {
             }
         }
         return availableClients;
+    }
+
+    /**
+     * When SRU version is changed, update list of available record schemata.
+     */
+    public void sruVersionChanged() {
+        // FIXME: changing the SRU version to the "noSelectionOption" does not empty the schema menu!
+        sruRecordSchemata = new ArrayList<>();
+        if (StringUtils.isNotBlank(this.importConfiguration.getSruVersion())) {
+            try {
+                sruRecordSchemata = ImportConfigurationService.getAvailableSruRecordSchemata(this.importConfiguration);
+            } catch (Exception e) {
+                Helper.setErrorMessage(e);
+            }
+        }
+        PrimeFaces.current().ajax().update("editForm:importConfigurationTabView:sruRecordSchema");
+    }
+
+    /**
+     * Get list of available SRU record schemata.
+     *
+     * @return list of available SRU record schemata
+     */
+    public List<String> getSruRecordSchemata() {
+        return sruRecordSchemata;
     }
 }

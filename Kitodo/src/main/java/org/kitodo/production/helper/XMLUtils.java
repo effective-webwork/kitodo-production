@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -287,6 +288,22 @@ public class XMLUtils {
             }
         }
         return count;
+    }
+
+    /**
+     * Load XML document from given URL 'xmlDocumentUrl'.
+     *
+     * @param xmlDocumentUrl URL of the XML document to be loaded
+     * @return Document loaded from given URL
+     * @throws ParserConfigurationException when DocumentBuilder cannot be created
+     * @throws IOException when input stream cannot be read
+     * @throws SAXException when input stream cannot be parsed
+     */
+    public static Document loadXmlDocumentByUrl(URL xmlDocumentUrl) throws ParserConfigurationException, IOException,
+            SAXException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        return documentBuilder.parse(xmlDocumentUrl.openStream());
     }
 
 }
