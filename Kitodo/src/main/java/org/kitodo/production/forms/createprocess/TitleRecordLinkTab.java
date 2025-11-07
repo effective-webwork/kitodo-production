@@ -37,6 +37,7 @@ import org.kitodo.api.dataformat.LogicalDivision;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.metadata.MetadataEditor;
 import org.kitodo.production.services.ServiceManager;
@@ -46,6 +47,7 @@ import org.kitodo.production.services.dataformat.MetsService;
 import org.omnifaces.util.Ajax;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.xml.sax.SAXException;
 
 /**
  * Backing bean for the title record link tab.
@@ -128,7 +130,7 @@ public class TitleRecordLinkTab {
             try {
                 titleRecordProcess = ServiceManager.getProcessService().getById(Integer.valueOf(chosenParentProcess));
                 createInsertionPositionSelectionTree();
-            } catch (DAOException | IOException e) {
+            } catch (DAOException | IOException | SAXException | FileStructureValidationException e) {
                 Helper.setErrorMessage("errorLoadingOne",
                         new Object[] {possibleParentProcesses.parallelStream()
                                 .filter(selectItem -> selectItem.getValue().equals(chosenParentProcess)).findAny()
@@ -144,7 +146,8 @@ public class TitleRecordLinkTab {
      * @throws IOException
      *             if the METS file cannot be read
      */
-    public void createInsertionPositionSelectionTree() throws DAOException, IOException {
+    public void createInsertionPositionSelectionTree() throws DAOException, IOException, SAXException,
+            FileStructureValidationException {
         if (Objects.isNull(titleRecordProcess)) {
             return;
         }
@@ -191,7 +194,8 @@ public class TitleRecordLinkTab {
      */
     private void createInsertionPositionSelectionTreeRecursive(String positionPrefix,
             LogicalDivision currentLogicalDivision, TreeNode parentNode,
-            RulesetManagementInterface ruleset, List<LanguageRange> priorityList) throws IOException, DAOException {
+            RulesetManagementInterface ruleset, List<LanguageRange> priorityList) throws IOException, DAOException,
+            SAXException, FileStructureValidationException {
 
         String type;
         List<String> tooltip = Collections.emptyList();
@@ -246,7 +250,8 @@ public class TitleRecordLinkTab {
      * @throws IOException
      *             if the METS file cannot be read
      */
-    private List<String> getToolTip(RulesetManagementInterface ruleset, Process linkedProcess) throws IOException {
+    private List<String> getToolTip(RulesetManagementInterface ruleset, Process linkedProcess) throws IOException,
+            SAXException, FileStructureValidationException {
 
         Collection<String> summaryKeys = ruleset.getFunctionalKeys(FunctionalMetadata.DISPLAY_SUMMARY);
         List<String> toolTip = new ArrayList<>();
@@ -317,7 +322,7 @@ public class TitleRecordLinkTab {
             indicationOfMoreHitsVisible = processes.size() > MAXIMUM_NUMBER_OF_HITS;
             possibleParentProcesses = ServiceManager.getImportService()
                     .getPotentialParentProcesses(processes, MAXIMUM_NUMBER_OF_HITS);
-        } catch (DAOException | IOException e) {
+        } catch (DAOException | IOException | FileStructureValidationException e) {
             Helper.setErrorMessage("createProcessForm.titleRecordLinkTab.searchButtonClick.error", e.getMessage(),
                     logger, e);
             indicationOfMoreHitsVisible = false;

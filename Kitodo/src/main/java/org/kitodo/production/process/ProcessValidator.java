@@ -150,6 +150,7 @@ public final class ProcessValidator {
             } catch (DAOException e) {
                 Helper.setErrorMessage(ERROR_READ, new Object[] {ObjectType.PROCESS.getTranslationSingular() }, logger,
                     e);
+                System.out.println(" - Process title: " + title);
                 return false;
             }
             if (amount > 0) {

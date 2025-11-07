@@ -61,6 +61,7 @@ import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Ruleset;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.MetadataException;
 import org.kitodo.exceptions.NoRecordFoundException;
@@ -402,7 +403,7 @@ public class DataEditorService {
                                                                    String selectedDivisionType)
             throws IOException, UnsupportedFormatException, XPathExpressionException, NoRecordFoundException,
             ProcessGenerationException, ParserConfigurationException, URISyntaxException, InvalidMetadataValueException,
-            TransformerException, NoSuchMetadataFieldException, SAXException {
+            TransformerException, NoSuchMetadataFieldException, SAXException, FileStructureValidationException {
         String recordID = getRecordIdentifierValueOfProcess(process, workpiece);
         ImportConfiguration importConfig = process.getImportConfiguration();
         if (Objects.isNull(recordID) || Objects.isNull(importConfig)) {
