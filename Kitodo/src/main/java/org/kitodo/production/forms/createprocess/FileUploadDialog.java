@@ -30,6 +30,7 @@ import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.ConfigException;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
 import org.kitodo.exceptions.ProcessGenerationException;
@@ -73,17 +74,18 @@ public class FileUploadDialog extends MetadataImportDialog {
             } else {
                 processXmlString();
             }
-        } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException
-                 | UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException
-                 | TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException
-                 | XMLStreamException e) {
+        } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException |
+                 UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException |
+                 TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException |
+                 XMLStreamException | FileStructureValidationException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
         }
     }
 
     private void processXmlString() throws UnsupportedFormatException, XPathExpressionException,
             ProcessGenerationException, URISyntaxException, IOException, ParserConfigurationException, SAXException,
-            InvalidMetadataValueException, TransformerException, NoSuchMetadataFieldException, DAOException {
+            InvalidMetadataValueException, TransformerException, NoSuchMetadataFieldException, DAOException,
+            FileStructureValidationException {
         LinkedList<TempProcess> processes = ServiceManager.getImportService().processUploadedFile(createProcessForm);
         if (!createProcessForm.getProcesses().isEmpty() && additionalImport) {
             extendsMetadataTableOfMetadataTab(processes);

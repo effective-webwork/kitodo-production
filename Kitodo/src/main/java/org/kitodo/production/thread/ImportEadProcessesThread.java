@@ -45,6 +45,7 @@ import org.kitodo.api.Metadata;
 import org.kitodo.api.MetadataEntry;
 import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
+import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
 import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.constants.StringConstants;
@@ -52,11 +53,7 @@ import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
-import org.kitodo.exceptions.CommandException;
-import org.kitodo.exceptions.InvalidMetadataValueException;
-import org.kitodo.exceptions.NoSuchMetadataFieldException;
-import org.kitodo.exceptions.ProcessGenerationException;
-import org.kitodo.exceptions.UnsupportedFormatException;
+import org.kitodo.exceptions.*;
 import org.kitodo.production.forms.createprocess.CreateProcessForm;
 import org.kitodo.production.helper.ProcessHelper;
 import org.kitodo.production.helper.TempProcess;
@@ -228,10 +225,10 @@ public class ImportEadProcessesThread extends EmptyTask {
                 }
             }
 
-        } catch (XMLStreamException | IOException | ParserConfigurationException | SAXException
-                 | UnsupportedFormatException | XPathExpressionException | ProcessGenerationException
-                 | URISyntaxException | InvalidMetadataValueException | TransformerException
-                | NoSuchMetadataFieldException | DAOException | CommandException e) {
+        } catch (XMLStreamException | IOException | ParserConfigurationException | SAXException |
+                 UnsupportedFormatException | XPathExpressionException | ProcessGenerationException |
+                 URISyntaxException | InvalidMetadataValueException | TransformerException |
+                 NoSuchMetadataFieldException | DAOException | CommandException | FileStructureValidationException e) {
             logger.error(e.getMessage(), e);
             cleanUpProcesses(newProcessIds, newParentId);
             throw new RuntimeException(e);
@@ -244,14 +241,14 @@ public class ImportEadProcessesThread extends EmptyTask {
         for (int id : processIds) {
             try {
                 ProcessService.deleteProcess(ServiceManager.getProcessService().getById(id));
-            } catch (DAOException | IOException ex) {
+            } catch (DAOException | IOException | SAXException | FileStructureValidationException ex) {
                 logger.error(ex);
             }
         }
         if (newParentId > 0 && Objects.nonNull(parentProcess) && Objects.nonNull(parentProcess.getProcess())) {
             try {
                 ProcessService.deleteProcess(parentProcess.getProcess());
-            } catch (DAOException | IOException ex) {
+            } catch (DAOException | IOException | SAXException | FileStructureValidationException ex) {
                 logger.error(ex);
             }
         }
@@ -296,7 +293,8 @@ public class ImportEadProcessesThread extends EmptyTask {
     }
 
     private TempProcess processTempProcess(TempProcess tempProcess) throws ProcessGenerationException, IOException,
-            InvalidMetadataValueException, NoSuchMetadataFieldException, DAOException, CommandException {
+            InvalidMetadataValueException, NoSuchMetadataFieldException, DAOException, CommandException, SAXException,
+            FileStructureValidationException {
         ProcessHelper.generateAtstslFields(tempProcess, Collections.emptyList(), CREATE, priorityList, false);
         tempProcess.getProcessMetadata().preserve();
         ImportService.processTempProcess(tempProcess, rulesetManagementInterface, CREATE, priorityList, parentProcess);
@@ -313,17 +311,18 @@ public class ImportEadProcessesThread extends EmptyTask {
     // used to parse parent (e.g. "collection")
     private TempProcess parseXmlStringToTempProcess(String xmlString, boolean isParent) throws IOException,
             ParserConfigurationException, SAXException, UnsupportedFormatException, XPathExpressionException,
-            ProcessGenerationException, URISyntaxException, TransformerException {
+            ProcessGenerationException, URISyntaxException, TransformerException, FileStructureValidationException {
         Document elementDocument = XMLUtils.parseXMLString(xmlString);
         Element element = elementDocument.getDocumentElement();
-        return importService.createTempProcessFromElement(element, importConfiguration, projectId, templateId, isParent);
+        return importService.createTempProcessFromElement(element, importConfiguration, projectId, templateId, isParent,
+                ImportConfigurationType.OPAC_SEARCH.name().equals(importConfiguration.getConfigurationType()));
     }
 
     // used to parse children (e.g. "files")
     private TempProcess parseXmlStringToProcessedTempProcess(String xmlElementString) throws IOException,
             ParserConfigurationException, SAXException, UnsupportedFormatException, XPathExpressionException,
             ProcessGenerationException, URISyntaxException, InvalidMetadataValueException, TransformerException,
-            NoSuchMetadataFieldException, DAOException, CommandException {
+            NoSuchMetadataFieldException, DAOException, CommandException, FileStructureValidationException {
         TempProcess tempProcess = parseXmlStringToTempProcess(xmlElementString, false);
         return processTempProcess(tempProcess);
     }

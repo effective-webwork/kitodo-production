@@ -35,12 +35,14 @@ import org.kitodo.config.ConfigCore;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyMetsModsDigitalDocumentHelper;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyPrefsHelper;
 import org.kitodo.production.helper.tasks.EmptyTask;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.file.FileService;
+import org.xml.sax.SAXException;
 
 public class ExportMets {
     private final FileService fileService = ServiceManager.getFileService();
@@ -61,7 +63,7 @@ public class ExportMets {
      * @param process
      *            Process object
      */
-    public boolean startExport(Process process) throws DAOException, IOException {
+    public boolean startExport(Process process) throws DAOException, IOException, SAXException, FileStructureValidationException {
         User user = ServiceManager.getUserService().getAuthenticatedUser();
         URI userHome = ServiceManager.getUserService().getHomeDirectory(user);
         boolean exportSuccessful = startExport(process, userHome);
@@ -81,7 +83,7 @@ public class ExportMets {
      * @param userHome
      *            String
      */
-    public boolean startExport(Process process, URI userHome) throws IOException, DAOException {
+    public boolean startExport(Process process, URI userHome) throws IOException, DAOException, SAXException, FileStructureValidationException {
 
         /*
          * Read Document
@@ -132,7 +134,7 @@ public class ExportMets {
      * @return true or false
      */
     protected boolean writeMetsFile(Process process, URI metaFile, LegacyMetsModsDigitalDocumentHelper gdzfile)
-            throws IOException, DAOException {
+            throws IOException, DAOException, SAXException, FileStructureValidationException {
 
         Workpiece workpiece = gdzfile.getWorkpiece();
         try {

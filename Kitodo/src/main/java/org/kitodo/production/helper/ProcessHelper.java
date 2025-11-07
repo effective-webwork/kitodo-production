@@ -42,10 +42,7 @@ import org.kitodo.api.dataformat.Division;
 import org.kitodo.api.dataformat.LogicalDivision;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
-import org.kitodo.exceptions.InvalidMetadataValueException;
-import org.kitodo.exceptions.NoSuchMetadataFieldException;
-import org.kitodo.exceptions.NotImplementedException;
-import org.kitodo.exceptions.ProcessGenerationException;
+import org.kitodo.exceptions.*;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
 import org.kitodo.production.forms.createprocess.ProcessFieldedMetadata;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyMetsModsDigitalDocumentHelper;
@@ -56,6 +53,7 @@ import org.kitodo.production.services.ServiceManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ProcessHelper {
 
@@ -548,7 +546,7 @@ public class ProcessHelper {
                     .readMetadataFile(process);
             return getTitleFromMetadata(
                     metsModsDigitalDocumentHelper.getWorkpiece().getLogicalStructure().getMetadata());
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException | NullPointerException | SAXException | FileStructureValidationException e) {
             logger.error(e.getMessage(), e);
         }
         return StringUtils.EMPTY;

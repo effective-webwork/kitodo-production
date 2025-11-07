@@ -42,6 +42,7 @@ import org.kitodo.data.database.enums.TaskEditType;
 import org.kitodo.data.database.enums.TaskStatus;
 import org.kitodo.data.database.enums.WorkflowConditionType;
 import org.kitodo.data.database.exceptions.DAOException;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.production.enums.ProcessState;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.VariableReplacer;
@@ -57,6 +58,7 @@ import org.kitodo.production.services.data.CommentService;
 import org.kitodo.production.services.data.ProcessService;
 import org.kitodo.production.services.data.TaskService;
 import org.kitodo.production.thread.TaskScriptThread;
+import org.xml.sax.SAXException;
 
 public class WorkflowControllerService {
 
@@ -75,7 +77,7 @@ public class WorkflowControllerService {
      * @param task
      *            to change status up
      */
-    public void setTaskStatusUp(Task task) throws DAOException, IOException {
+    public void setTaskStatusUp(Task task) throws DAOException, IOException, SAXException, FileStructureValidationException {
         setTaskStatusUp(Collections.singletonList(task));
     }
 
@@ -85,7 +87,7 @@ public class WorkflowControllerService {
      * @param tasks
      *            to change status up
      */
-    public void setTaskStatusUp(List<Task> tasks) throws DAOException, IOException {
+    public void setTaskStatusUp(List<Task> tasks) throws DAOException, IOException, SAXException, FileStructureValidationException {
         for (Task task : tasks) {
             if (task.getProcessingStatus() != TaskStatus.DONE) {
                 setProcessingStatusUp(task);
@@ -139,7 +141,7 @@ public class WorkflowControllerService {
      * @param process
      *            object
      */
-    public void setTasksStatusUp(Process process) throws DAOException, IOException {
+    public void setTasksStatusUp(Process process) throws DAOException, IOException, SAXException, FileStructureValidationException {
         List<Task> currentTask = ServiceManager.getProcessService().getCurrentTasks(process);
         if (currentTask.isEmpty()) {
             activateNextTasks(process.getTasks());
@@ -176,7 +178,7 @@ public class WorkflowControllerService {
         return lastOpenTasks;
     }
 
-    private boolean validateMetadata(Task task) throws IOException, DAOException {
+    private boolean validateMetadata(Task task) throws IOException, DAOException, SAXException, FileStructureValidationException {
         URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(task.getProcess());
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
         RulesetManagementInterface ruleset = ServiceManager.getRulesetManagementService().getRulesetManagement();
@@ -205,7 +207,7 @@ public class WorkflowControllerService {
      * @param task
      *            object
      */
-    public void closeTaskByUser(Task task) throws DAOException, IOException {
+    public void closeTaskByUser(Task task) throws DAOException, IOException, SAXException, FileStructureValidationException {
         // if the result of the task is to be verified first, then if necessary,
         // cancel the completion
         if (task.isTypeCloseVerify()) {
@@ -248,7 +250,7 @@ public class WorkflowControllerService {
      * @param task
      *            as Task object
      */
-    public void close(Task task) throws DAOException, IOException {
+    public void close(Task task) throws DAOException, IOException, SAXException, FileStructureValidationException {
         task.setProcessingStatus(TaskStatus.DONE);
         task.setCorrection(false);
         task.setProcessingTime(new Date());
@@ -401,7 +403,7 @@ public class WorkflowControllerService {
      *         as Comment object
      */
     public void solveProblem(Comment comment, TaskEditType taskEditType)
-            throws DAOException, IOException {
+            throws DAOException, IOException, SAXException, FileStructureValidationException {
         comment.setCorrected(Boolean.TRUE);
         comment.setCorrectionDate(new Date());
         try {
@@ -457,7 +459,8 @@ public class WorkflowControllerService {
         }
     }
 
-    private void activateTasksForClosedTask(Task closedTask) throws DAOException, IOException {
+    private void activateTasksForClosedTask(Task closedTask) throws DAOException, IOException, SAXException,
+            FileStructureValidationException {
         Process process = closedTask.getProcess();
 
         // check if there are tasks that take place in parallel but are not yet
@@ -565,7 +568,8 @@ public class WorkflowControllerService {
     /**
      * Activate the concurrent tasks.
      */
-    private void activateConcurrentTasks(List<Task> concurrentTasks) throws DAOException, IOException {
+    private void activateConcurrentTasks(List<Task> concurrentTasks) throws DAOException, IOException, SAXException,
+            FileStructureValidationException {
         for (Task concurrentTask : concurrentTasks) {
             if (concurrentTask.getProcessingStatus().equals(TaskStatus.LOCKED)) {
                 activateTask(concurrentTask);
@@ -576,7 +580,8 @@ public class WorkflowControllerService {
     /**
      * If no open parallel tasks are available, activate the next tasks.
      */
-    public void activateNextTasks(List<Task> allHigherTasks) throws DAOException, IOException {
+    public void activateNextTasks(List<Task> allHigherTasks) throws DAOException, IOException, SAXException,
+            FileStructureValidationException {
         List<Task> nextTasks = getNextTasks(allHigherTasks);
 
         for (Task nextTask : nextTasks) {
@@ -633,7 +638,7 @@ public class WorkflowControllerService {
     /**
      * If no open parallel tasks are available, activate the next tasks.
      */
-    private void activateTask(Task task) throws DAOException, IOException {
+    private void activateTask(Task task) throws DAOException, IOException, SAXException, FileStructureValidationException {
         if ((!task.isCorrection() || task.isRepeatOnCorrection())
                 && isWorkflowConditionFulfilled(task.getProcess(), task.getWorkflowCondition())) {
             // activate the task if it is not fully automatic
@@ -659,7 +664,7 @@ public class WorkflowControllerService {
     }
 
     private boolean isWorkflowConditionFulfilled(Process process, WorkflowCondition workflowCondition)
-            throws IOException {
+            throws IOException, SAXException, FileStructureValidationException {
         if (Objects.isNull(workflowCondition) || workflowCondition.getType().equals(WorkflowConditionType.NONE)) {
             return true;
         } else {
@@ -674,7 +679,7 @@ public class WorkflowControllerService {
         }
     }
 
-    private boolean runScriptCondition(String script, Process process) throws IOException {
+    private boolean runScriptCondition(String script, Process process) throws IOException, SAXException, FileStructureValidationException {
         LegacyPrefsHelper legacyPrefsHelper = ServiceManager.getRulesetService().getPreferences(process.getRuleset());
 
         LegacyMetsModsDigitalDocumentHelper legacyMetsModsDigitalDocumentHelper = ServiceManager.getProcessService()
@@ -746,7 +751,7 @@ public class WorkflowControllerService {
         for (Process processForStatus : processes) {
             try {
                 setTasksStatusUp(processForStatus);
-            } catch (DAOException | IOException e) {
+            } catch (DAOException | IOException | SAXException | FileStructureValidationException e) {
                 Helper.setErrorMessage("errorChangeTaskStatus",
                         new Object[] {Helper.getTranslation("up"), processForStatus.getId() }, logger, e);
             }

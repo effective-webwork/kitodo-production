@@ -37,13 +37,7 @@ import org.kitodo.config.ConfigCore;
 import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
-import org.kitodo.exceptions.CommandException;
-import org.kitodo.exceptions.InvalidMetadataValueException;
-import org.kitodo.exceptions.NoRecordFoundException;
-import org.kitodo.exceptions.NoSuchMetadataFieldException;
-import org.kitodo.exceptions.ProcessGenerationException;
-import org.kitodo.exceptions.ProcessorException;
-import org.kitodo.exceptions.UnsupportedFormatException;
+import org.kitodo.exceptions.*;
 import org.kitodo.production.forms.createprocess.ProcessFieldedMetadata;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.ProcessHelper;
@@ -101,10 +95,10 @@ public class CreateNewProcessesProcessor extends ActiveMQProcessor {
             Process parentProcess = formProcessTitle(order, tempProcess, process);
             createProcess(tempProcess, process, parentProcess);
 
-        } catch (CommandException | DAOException | InvalidMetadataValueException | IOException
-                | NoRecordFoundException | NoSuchMetadataFieldException | ParserConfigurationException
-                | ProcessGenerationException | SAXException | TransformerException | UnsupportedFormatException
-                | URISyntaxException | XPathExpressionException e) {
+        } catch (CommandException | DAOException | InvalidMetadataValueException | IOException |
+                 NoRecordFoundException | NoSuchMetadataFieldException | ParserConfigurationException |
+                 ProcessGenerationException | SAXException | TransformerException | UnsupportedFormatException |
+                 URISyntaxException | XPathExpressionException | FileStructureValidationException e) {
             throw new ProcessorException(e.getMessage());
         }
     }
@@ -116,7 +110,7 @@ public class CreateNewProcessesProcessor extends ActiveMQProcessor {
             InvalidMetadataValueException,
             IOException, NoRecordFoundException, NoSuchMetadataFieldException, ParserConfigurationException,
             ProcessGenerationException, ProcessorException, SAXException, TransformerException,
-            UnsupportedFormatException, URISyntaxException, XPathExpressionException {
+            UnsupportedFormatException, URISyntaxException, XPathExpressionException, FileStructureValidationException {
 
         if (order.getImports().isEmpty()) {
             ProcessGenerator processGenerator = new ProcessGenerator();
@@ -151,13 +145,14 @@ public class CreateNewProcessesProcessor extends ActiveMQProcessor {
     private TempProcess importProcess(CreateNewProcessOrder order, int which) throws DAOException,
             InvalidMetadataValueException, IOException, NoRecordFoundException, NoSuchMetadataFieldException,
             ParserConfigurationException, ProcessGenerationException, ProcessorException, SAXException,
-            TransformerException, UnsupportedFormatException, URISyntaxException, XPathExpressionException {
+            TransformerException, UnsupportedFormatException, URISyntaxException, XPathExpressionException,
+            FileStructureValidationException {
 
         List<TempProcess> processHierarchy = importService.importProcessHierarchy(
                 order.getImports().get(which).getValue(), order.getImports().get(which).getKey(),
                 order.getProjectId(), order.getTemplateId(), IMPORT_WITHOUT_ANY_HIERARCHY,
-                rulesetManagement.getFunctionalKeys(FunctionalMetadata.HIGHERLEVEL_IDENTIFIER));
-        if (processHierarchy.size() == 0) {
+                rulesetManagement.getFunctionalKeys(FunctionalMetadata.HIGHERLEVEL_IDENTIFIER), false);
+        if (processHierarchy.isEmpty()) {
             throw new ProcessorException("Process was not imported");
         } else if (processHierarchy.size() > 1) {
             throw new ProcessorException(processHierarchy.size() + " processes were imported");
@@ -188,7 +183,7 @@ public class CreateNewProcessesProcessor extends ActiveMQProcessor {
     /* In the third and final part of the processing routine, the process is
      * created and saved. */
     private void createProcess(TempProcess tempProcess, Process process, Process parentProcess) throws DAOException,
-            IOException, CommandException {
+            IOException, CommandException, SAXException, FileStructureValidationException {
 
         processService.save(process);
         fileService.createProcessLocation(process);
