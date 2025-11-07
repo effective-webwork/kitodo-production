@@ -44,8 +44,10 @@ import org.kitodo.api.dataformat.View;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.api.dataformat.mets.LinkedMetsResource;
 import org.kitodo.data.database.beans.Process;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.production.helper.Helper;
 import org.kitodo.production.services.ServiceManager;
+import org.xml.sax.SAXException;
 
 /**
  * This class contains some methods to handle metadata (semi) automatically.
@@ -79,7 +81,8 @@ public class MetadataEditor {
      * @throws IOException
      *             if the METS file cannot be read or written
      */
-    public static void addLink(Process process, String insertionPosition, int childProcessId) throws IOException {
+    public static void addLink(Process process, String insertionPosition, int childProcessId) throws IOException,
+            SAXException, FileStructureValidationException {
         URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
         List<String> indices = Arrays.asList(insertionPosition.split(Pattern.quote(INSERTION_POSITION_SEPARATOR)));
@@ -140,7 +143,8 @@ public class MetadataEditor {
      * @throws IOException
      *             thrown if meta.xml could not be loaded
      */
-    public static void removeLink(Process parentProcess, int childProcessId) throws IOException {
+    public static void removeLink(Process parentProcess, int childProcessId) throws IOException, SAXException,
+            FileStructureValidationException {
         URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(parentProcess);
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
         if (removeLinkRecursive(workpiece.getLogicalStructure(), childProcessId)) {

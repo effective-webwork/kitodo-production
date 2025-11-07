@@ -24,9 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -43,17 +41,20 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.lang3.StringUtils;
+import org.kitodo.api.externaldatamanagement.SearchInterfaceType;
 import org.kitodo.api.schemaconverter.DataRecord;
 import org.kitodo.api.schemaconverter.FileFormat;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.constants.StringConstants;
 import org.kitodo.data.database.beans.ImportConfiguration;
+import org.kitodo.exceptions.ConfigException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * The class XMLUtils contains an omnium-gatherum of functions that work on XML.
@@ -289,4 +290,25 @@ public class XMLUtils {
         return count;
     }
 
+    public static int extractNumberOfHits(String content, SearchInterfaceType searchInterfaceType) {
+        if (StringUtils.isBlank(content)) {
+            throw new ConfigException("Unable to extract number of hits from empty content.");
+        }
+        return 1;
+    }
+
+    public static void checkIfXmlIsWellFormed(String xmlContent) throws IOException, SAXException {
+        SAXParser saxParser;
+        try {
+            SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+            saxParserFactory.setValidating(false);
+            saxParserFactory.setNamespaceAware(true);
+
+            saxParser = saxParserFactory.newSAXParser();
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new RuntimeException(e);
+        }
+        InputSource inputSource = new InputSource(new StringReader(xmlContent));
+        saxParser.parse(inputSource, new DefaultHandler());
+    }
 }

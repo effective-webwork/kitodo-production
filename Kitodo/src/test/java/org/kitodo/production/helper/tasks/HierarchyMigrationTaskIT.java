@@ -34,6 +34,7 @@ import org.kitodo.config.enums.ParameterCore;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.CommandException;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.exceptions.ProcessGenerationException;
 import org.kitodo.production.services.ServiceManager;
 import org.w3c.dom.Document;
@@ -82,7 +83,7 @@ public class HierarchyMigrationTaskIT {
      */
     @Test
     public void testHierarchyMigration() throws DAOException, ProcessGenerationException, CommandException,
-            IOException, SAXException, ParserConfigurationException {
+            IOException, SAXException, ParserConfigurationException, FileStructureValidationException {
         HierarchyMigrationTask hierarchyMigrationTask = new HierarchyMigrationTask(Collections.singletonList(project));
         hierarchyMigrationTask.migrate(ServiceManager.getProcessService().getById(2));
         assertTrue(ServiceManager.getProcessService().getById(4).getTasks().isEmpty(), "Tasks should have been removed");
