@@ -101,7 +101,8 @@ public class KitodoScriptService {
      *            from frontend passed as String
      */
     public void execute(List<Process> processes, String script)
-            throws DAOException, IOException, InvalidImagesException, MediaNotFoundException, SAXException, FileStructureValidationException {
+            throws DAOException, IOException, InvalidImagesException, MediaNotFoundException, SAXException,
+            FileStructureValidationException {
         this.parameters = new HashMap<>();
         // decompose and capture all script parameters
         StringTokenizer tokenizer = new StringTokenizer(script, ' ', '\"');
@@ -129,7 +130,8 @@ public class KitodoScriptService {
     }
 
     private boolean executeScript(List<Process> processes, String script)
-            throws DAOException, IOException, InvalidImagesException, MediaNotFoundException, SAXException, FileStructureValidationException {
+            throws DAOException, IOException, InvalidImagesException, MediaNotFoundException, SAXException,
+            FileStructureValidationException {
         // call the correct method via the parameter
         switch (this.parameters.get("action")) {
             case "importFromFileSystem":

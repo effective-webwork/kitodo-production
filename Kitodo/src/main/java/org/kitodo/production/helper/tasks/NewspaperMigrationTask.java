@@ -166,8 +166,8 @@ public class NewspaperMigrationTask extends EmptyTask {
                 }
             }
             setProgress(100);
-        } catch (ConfigurationException | DAOException | IOException | ProcessGenerationException | CommandException |
-                 SAXException | FileStructureValidationException e) {
+        } catch (ConfigurationException | DAOException | IOException | ProcessGenerationException | CommandException
+                 | SAXException | FileStructureValidationException e) {
             setException(e);
         }
     }

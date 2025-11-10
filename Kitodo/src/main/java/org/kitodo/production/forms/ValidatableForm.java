@@ -154,6 +154,14 @@ public class ValidatableForm extends BaseForm {
         System.out.println("Proceeding in 'ValidatableForm'...");
     }
 
+    /**
+     * Displays a validation exception dialog based on the provided exception and redirection path.
+     * Updates the relevant UI components and sets necessary validation details for display.
+     *
+     * @param exception the {@code FileStructureValidationException} containing validation data,
+     *                  including error messages and additional validation context.
+     * @param redirectionPath the path to which the user is redirected when closing the dialog.
+     */
     public void showValidationExceptionDialog(FileStructureValidationException exception, String redirectionPath) {
         if (Objects.isNull(redirectionPath) || redirectionPath.contains(REDIRECT_PARAMETER)) {
             setRedirectionPath(redirectionPath);

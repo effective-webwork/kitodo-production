@@ -261,7 +261,8 @@ public class SchemaService {
         return journalIssueCount;
     }
 
-    private void addLinksToParents(Process process, Workpiece workpiece) throws IOException, SAXException, FileStructureValidationException {
+    private void addLinksToParents(Process process, Workpiece workpiece) throws IOException, SAXException,
+            FileStructureValidationException {
         Process parentProcess = process.getParent();
         while (Objects.nonNull(parentProcess)) {
             addParentLinkForExport(workpiece, parentProcess);

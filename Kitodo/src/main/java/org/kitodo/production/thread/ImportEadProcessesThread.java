@@ -225,10 +225,10 @@ public class ImportEadProcessesThread extends EmptyTask {
                 }
             }
 
-        } catch (XMLStreamException | IOException | ParserConfigurationException | SAXException |
-                 UnsupportedFormatException | XPathExpressionException | ProcessGenerationException |
-                 URISyntaxException | InvalidMetadataValueException | TransformerException |
-                 NoSuchMetadataFieldException | DAOException | CommandException | FileStructureValidationException e) {
+        } catch (XMLStreamException | IOException | ParserConfigurationException | SAXException
+                 | UnsupportedFormatException | XPathExpressionException | ProcessGenerationException
+                 | URISyntaxException | InvalidMetadataValueException | TransformerException
+                 | NoSuchMetadataFieldException | DAOException | CommandException | FileStructureValidationException e) {
             logger.error(e.getMessage(), e);
             cleanUpProcesses(newProcessIds, newParentId);
             throw new RuntimeException(e);

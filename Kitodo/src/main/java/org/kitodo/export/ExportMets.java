@@ -83,7 +83,8 @@ public class ExportMets {
      * @param userHome
      *            String
      */
-    public boolean startExport(Process process, URI userHome) throws IOException, DAOException, SAXException, FileStructureValidationException {
+    public boolean startExport(Process process, URI userHome) throws IOException, DAOException, SAXException,
+            FileStructureValidationException {
 
         /*
          * Read Document

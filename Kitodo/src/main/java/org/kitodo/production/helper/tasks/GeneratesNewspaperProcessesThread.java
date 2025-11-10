@@ -86,8 +86,8 @@ public class GeneratesNewspaperProcessesThread extends EmptyTask {
                 }
             }
             super.setProgress(100);
-        } catch (ConfigurationException | DAOException | DoctypeMissingException | IOException |
-                 ProcessGenerationException | CommandException | SAXException | FileStructureValidationException e) {
+        } catch (ConfigurationException | DAOException | DoctypeMissingException | IOException
+                 | ProcessGenerationException | CommandException | SAXException | FileStructureValidationException e) {
             setException(e);
         }
     }

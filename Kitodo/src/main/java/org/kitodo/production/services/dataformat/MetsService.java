@@ -120,8 +120,11 @@ public class MetsService {
      *             if reading is not working (disk broken, ...)
      * @throws SAXException
      *             if XML is malformed
+     * @throws FileStructureValidationException
+     *            when validating the metadata file fails
      */
-    public Workpiece loadWorkpiece(URI uri, boolean validateAgainstSchema) throws IOException, SAXException, FileStructureValidationException {
+    public Workpiece loadWorkpiece(URI uri, boolean validateAgainstSchema) throws IOException, SAXException,
+            FileStructureValidationException {
         try (InputStream inputStream = ServiceManager.getFileService().read(uri)) {
             logger.info("Reading {}", uri.toString());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

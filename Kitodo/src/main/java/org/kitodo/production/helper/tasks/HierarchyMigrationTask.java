@@ -158,8 +158,8 @@ public class HierarchyMigrationTask extends EmptyTask {
                     return;
                 }
             }
-        } catch (IOException | DAOException | ProcessGenerationException | CommandException | SAXException |
-                 FileStructureValidationException e) {
+        } catch (IOException | DAOException | ProcessGenerationException | CommandException | SAXException
+                 | FileStructureValidationException e) {
             setException(e);
         }
     }
@@ -170,7 +170,8 @@ public class HierarchyMigrationTask extends EmptyTask {
      * @param process
      *            process to migrate
      */
-    void migrate(Process process) throws IOException, ProcessGenerationException, DAOException, CommandException, SAXException, FileStructureValidationException {
+    void migrate(Process process) throws IOException, ProcessGenerationException, DAOException, CommandException,
+            SAXException, FileStructureValidationException {
         logger.info("Starting to convert process {} (ID {})...", process.getTitle(), process.getId());
         long begin = System.nanoTime();
         migrateMetadataFiles(process);
