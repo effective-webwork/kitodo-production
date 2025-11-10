@@ -63,14 +63,16 @@ public class FileStructureValidation implements FileStructureValidationInterface
         return validateStreamSource(new StreamSource(new StringReader(xmlContent)), xmlValidator, "N/A", xsdFiles);
     }
 
-    private ValidationResult validateStreamSource(StreamSource streamSource, Validator xmlValidator, String xmlPath, Collection<URI> xsdPaths) throws IOException {
+    private ValidationResult validateStreamSource(StreamSource source, Validator validator, String xmlPath, Collection<URI> xsdPaths)
+            throws IOException {
         try {
-            xmlValidator.validate(streamSource);
+            validator.validate(source);
         } catch (SAXException e) {
-            logger.error("XML file '{}' is not valid against schemata '{}': {}", xmlPath, xsdPaths.stream().map(URI::getPath).collect(Collectors.joining(", ")), e.getMessage());
+            logger.error("XML file '{}' is not valid against schemata '{}': {}", xmlPath, xsdPaths.stream()
+                    .map(URI::getPath).collect(Collectors.joining(", ")), e.getMessage());
         }
 
-        List<SAXParseException> xmlValidationErrors = ((FileStructureValidationErrorHandler)xmlValidator.getErrorHandler())
+        List<SAXParseException> xmlValidationErrors = ((FileStructureValidationErrorHandler)validator.getErrorHandler())
                 .getValidationErrors();
         if (xmlValidationErrors.isEmpty()) {
             return new ValidationResult(State.SUCCESS, Collections.emptyList());
