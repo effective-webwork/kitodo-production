@@ -144,6 +144,12 @@ public class XmlResponseHandler {
         }
     }
 
+    /**
+     * Check and return whether the given XML string 'xmlString' contains no error message and at least one record.
+     * Throws as NoRecordFoundException otherwise.
+     *
+     * @throws NoRecordFoundException if the given XML string contains an error message or no record
+     */
     public static void checkRecordFound(SearchInterfaceType searchInterfaceType, String xmlString, String identifier)
             throws NoRecordFoundException {
         if (Objects.nonNull(searchInterfaceType)) {
