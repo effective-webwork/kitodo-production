@@ -11,13 +11,13 @@
 
 package org.kitodo.production.forms;
 
-import org.kitodo.config.ConfigCore;
-import org.kitodo.exceptions.FileStructureValidationException;
-import org.primefaces.PrimeFaces;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+
+import org.kitodo.config.ConfigCore;
+import org.kitodo.exceptions.FileStructureValidationException;
+import org.primefaces.PrimeFaces;
 
 public class ValidatableForm extends BaseForm {
 

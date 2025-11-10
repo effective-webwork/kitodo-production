@@ -283,8 +283,8 @@ public final class ImportProcesses extends EmptyTask {
                 }
             }
             // error barrier
-        } catch (IOException | DAOException | ProcessGenerationException | MediaNotFoundException |
-                 InvalidImagesException | RuntimeException | SAXException | FileStructureValidationException exception) {
+        } catch (IOException | DAOException | ProcessGenerationException | MediaNotFoundException
+                 | InvalidImagesException | RuntimeException | SAXException | FileStructureValidationException exception) {
             Helper.setErrorMessage(exception.getLocalizedMessage(), logger, exception);
             super.setException(exception);
         }
