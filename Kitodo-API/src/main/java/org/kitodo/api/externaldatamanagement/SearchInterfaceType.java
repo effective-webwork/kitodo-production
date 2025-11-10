@@ -87,6 +87,14 @@ public enum SearchInterfaceType {
         return defaultStartValue;
     }
 
+    /**
+     * Get XML schema definition file for given interface type. Currently, returns specific schema definitions for
+     * OAI and SRU interfaces.
+     *
+     * @param interfaceType type of search interface as String for which the XML schema definition is returned
+     *
+     * @return name of XML schema definition file as String
+     */
     public static List<String> getSchemaFile(String interfaceType) {
         if (SearchInterfaceType.OAI.name().equals(interfaceType)) {
             return List.of("OAI-PMH.xsd");

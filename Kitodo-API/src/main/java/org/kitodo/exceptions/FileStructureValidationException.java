@@ -26,6 +26,12 @@ public class FileStructureValidationException extends Exception {
         this.validationResult = validationResult;
     }
 
+    /**
+     * Constructor settings exception message, validation result and whether the validated data was external data or not.
+     * @param message exception message
+     * @param validationResult the result of the validation
+     * @param externalDataValidation boolean flag signaling whether the validated data was external or not
+     */
     public FileStructureValidationException(String message, ValidationResult validationResult, boolean externalDataValidation) {
         super(message);
         this.validationResult = validationResult;
