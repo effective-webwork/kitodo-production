@@ -924,26 +924,30 @@ public class ImportService {
         try {
             resultDocument = XMLUtils.parseXMLString((String) internalRecord.getOriginalData());
         } catch (SAXParseException e) {
-            String interfaceName = importConfiguration.getInterfaceType();
-            if (Arrays.stream(SearchInterfaceType.values()).anyMatch(sit -> sit.name().equals(interfaceName))) {
-                SearchInterfaceType searchInterfaceType = SearchInterfaceType.valueOf(interfaceName);
-                String errorMessageXpath = searchInterfaceType.getErrorMessageXpath();
-                if (Objects.nonNull(errorMessageXpath) && dataRecord.getOriginalData() instanceof String) {
-                    Element originalDocument = XMLUtils.parseXMLString((String) dataRecord.getOriginalData()).getDocumentElement();
-                    String errorMessage = XPathFactory.newInstance().newXPath().evaluate(errorMessageXpath, originalDocument);
-                    if (StringUtils.isNotBlank(errorMessage)) {
-                        errorMessage = interfaceName.toUpperCase() + " error: '" + errorMessage + "'";
-                        throw new CatalogException(errorMessage);
-                    }
-                }
-            } else {
-                throw e;
-            }
+            handleSaxParseException(dataRecord, importConfiguration.getInterfaceType(), e);
         }
         if (Objects.isNull(resultDocument)) {
             throw new ProcessGenerationException(Helper.getTranslation("importError.emptyDocument"));
         }
         return resultDocument;
+    }
+
+    private void handleSaxParseException(DataRecord dataRecord, String interfaceType, SAXParseException e) throws SAXException,
+            IOException, ParserConfigurationException, XPathExpressionException {
+        if (Arrays.stream(SearchInterfaceType.values()).anyMatch(sit -> sit.name().equals(interfaceType))) {
+            SearchInterfaceType searchInterfaceType = SearchInterfaceType.valueOf(interfaceType);
+            String errorMessageXpath = searchInterfaceType.getErrorMessageXpath();
+            if (Objects.nonNull(errorMessageXpath) && dataRecord.getOriginalData() instanceof String) {
+                Element originalDocument = XMLUtils.parseXMLString((String) dataRecord.getOriginalData()).getDocumentElement();
+                String errorMessage = XPathFactory.newInstance().newXPath().evaluate(errorMessageXpath, originalDocument);
+                if (StringUtils.isNotBlank(errorMessage)) {
+                    errorMessage = interfaceType.toUpperCase() + " error: '" + errorMessage + "'";
+                    throw new CatalogException(errorMessage);
+                }
+            }
+        } else {
+            throw e;
+        }
     }
 
     private NodeList extractMetadataNodeList(Document document) throws ProcessGenerationException {
