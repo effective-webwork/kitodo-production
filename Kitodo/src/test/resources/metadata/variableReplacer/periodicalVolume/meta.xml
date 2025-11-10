@@ -4,7 +4,7 @@
         <mets:metsDocumentID>761701</mets:metsDocumentID>
     </mets:metsHdr>
     <mets:dmdSec ID="uuid-0c7cc09b-db59-32d1-ae04-98d848ed2e54">
-        <mets:mdWrap>
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="KITODO">
             <mets:xmlData>
                 <kitodo:kitodo>
                     <kitodo:metadata name="DocLanguage">ger</kitodo:metadata>

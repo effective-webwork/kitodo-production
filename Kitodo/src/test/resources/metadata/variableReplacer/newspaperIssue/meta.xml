@@ -4,7 +4,7 @@
         <mets:metsDocumentID>740460</mets:metsDocumentID>
     </mets:metsHdr>
     <mets:dmdSec ID="uuid-b6cf1e58-29a9-3a16-9a91-f0998a104007">
-        <mets:mdWrap>
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="KITODO">
             <mets:xmlData>
                 <kitodo:kitodo>
                     <kitodo:metadata name="PeriodicalIssue">01-Musiktheater</kitodo:metadata>
