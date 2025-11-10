@@ -74,10 +74,10 @@ public class FileUploadDialog extends MetadataImportDialog {
             } else {
                 processXmlString();
             }
-        } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException |
-                 UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException |
-                 TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException |
-                 XMLStreamException | FileStructureValidationException e) {
+        } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException
+                 | UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException
+                 | TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException
+                 | XMLStreamException | FileStructureValidationException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
         }
     }

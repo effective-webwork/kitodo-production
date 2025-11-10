@@ -458,7 +458,8 @@ public class ImportService {
             FileStructureValidationException {
 
         DataRecord dataRecord = importExternalDataRecord(importConfiguration, recordId, allProcesses.isEmpty());
-        Document internalDocument = convertDataRecordToInternal(dataRecord, importConfiguration, isParentInRecord, validateAgainstXmlSchema, recordId);
+        Document internalDocument = convertDataRecordToInternal(dataRecord, importConfiguration, isParentInRecord,
+                validateAgainstXmlSchema, recordId);
         TempProcess tempProcess = createTempProcessFromDocument(importConfiguration, internalDocument, templateID, projectID);
 
         // Workaround for classifying MultiVolumeWorks with insufficient information
@@ -665,8 +666,8 @@ public class ImportService {
             URI workpieceUri = ServiceManager.getProcessService().getMetadataFileUri(parentProcess);
             Workpiece parentWorkpiece = ServiceManager.getMetsService().loadWorkpiece(workpieceUri);
             return new TempProcess(parentProcess, parentWorkpiece);
-        } catch (ProcessGenerationException | DAOException | IOException | SAXException |
-                 FileStructureValidationException e) {
+        } catch (ProcessGenerationException | DAOException | IOException | SAXException
+                 | FileStructureValidationException e) {
             logger.error("Error retrieving parent process with 'recordIdentifier' {}, project ID {} and ruleset {}: {}",
                     parentRecordId, projectID, ruleset.getTitle(), e.getMessage());
             return null;
@@ -881,7 +882,6 @@ public class ImportService {
                                                 boolean isParentInRecord, boolean validateExternal, String identifier)
             throws UnsupportedFormatException, URISyntaxException, IOException, ParserConfigurationException,
             SAXException, XPathExpressionException, ProcessGenerationException, FileStructureValidationException {
-        SchemaConverterInterface converter = getSchemaConverter(dataRecord);
 
         FileStructureValidationService validationService = ServiceManager.getFileStructureValidationService();
 
@@ -895,13 +895,14 @@ public class ImportService {
         }
 
         // validate external record against corresponding XML metadata schema(ta)
-        // TODO: check if "SAXException" has to be handled differently to signal that error occurred during validation
+        // TODO: check if "SAXException" has to be handled differently to signal that validation could not be performed
         if (validateExternal) {
             validationService.validateExternalRecord(xmlContent, importConfiguration, identifier);
         }
 
         // transform dataRecord to Kitodo internal format using appropriate SchemaConverter!
         List<File> mappingFiles = getMappingFiles(importConfiguration, isParentInRecord);
+        SchemaConverterInterface converter = getSchemaConverter(dataRecord);
         DataRecord internalRecord = converter.convert(dataRecord, MetadataFormat.KITODO, FileFormat.XML, mappingFiles);
         if (Objects.nonNull(debugFolder)) {
             FileUtils.writeStringToFile(new File(debugFolder, "internalRecord.xml"),

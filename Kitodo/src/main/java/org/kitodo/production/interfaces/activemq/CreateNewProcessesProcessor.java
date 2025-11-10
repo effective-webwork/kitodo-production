@@ -95,10 +95,10 @@ public class CreateNewProcessesProcessor extends ActiveMQProcessor {
             Process parentProcess = formProcessTitle(order, tempProcess, process);
             createProcess(tempProcess, process, parentProcess);
 
-        } catch (CommandException | DAOException | InvalidMetadataValueException | IOException |
-                 NoRecordFoundException | NoSuchMetadataFieldException | ParserConfigurationException |
-                 ProcessGenerationException | SAXException | TransformerException | UnsupportedFormatException |
-                 URISyntaxException | XPathExpressionException | FileStructureValidationException e) {
+        } catch (CommandException | DAOException | InvalidMetadataValueException | IOException
+                 | NoRecordFoundException | NoSuchMetadataFieldException | ParserConfigurationException
+                 | ProcessGenerationException | SAXException | TransformerException | UnsupportedFormatException
+                 | URISyntaxException | XPathExpressionException | FileStructureValidationException e) {
             throw new ProcessorException(e.getMessage());
         }
     }

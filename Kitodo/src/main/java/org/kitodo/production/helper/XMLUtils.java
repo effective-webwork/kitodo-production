@@ -24,7 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -41,13 +45,11 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.lang3.StringUtils;
-import org.kitodo.api.externaldatamanagement.SearchInterfaceType;
 import org.kitodo.api.schemaconverter.DataRecord;
 import org.kitodo.api.schemaconverter.FileFormat;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.constants.StringConstants;
 import org.kitodo.data.database.beans.ImportConfiguration;
-import org.kitodo.exceptions.ConfigException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -290,13 +292,14 @@ public class XMLUtils {
         return count;
     }
 
-    public static int extractNumberOfHits(String content, SearchInterfaceType searchInterfaceType) {
-        if (StringUtils.isBlank(content)) {
-            throw new ConfigException("Unable to extract number of hits from empty content.");
-        }
-        return 1;
-    }
-
+    /**
+     * Checks if the provided XML content is well-formed.
+     * If the XML is not well-formed, an exception is thrown.
+     *
+     * @param xmlContent the XML content as a String to be checked for well-formedness
+     * @throws IOException if an I/O error occurs during processing
+     * @throws SAXException if the XML content is not well-formed or an error occurs during parsing
+     */
     public static void checkIfXmlIsWellFormed(String xmlContent) throws IOException, SAXException {
         SAXParser saxParser;
         try {

@@ -82,6 +82,15 @@ public class FileStructureValidationService {
         return validationModule.validate(xmlContent, schemaUris);
     }
 
+    /**
+     * Validates the given ruleset against its schema definition to ensure its structure
+     * and content conform to the required standards.
+     *
+     * @param ruleset the {@code Ruleset} instance to be validated
+     * @throws IOException if an I/O operation fails during validation
+     * @throws SAXException if the ruleset schema definition is malformed
+     * @throws FileStructureValidationException if the structure of the ruleset is invalid
+     */
     public void validateRuleset(Ruleset ruleset) throws IOException, SAXException, FileStructureValidationException {
         URL rulesetSchemaUrl = Thread.currentThread().getContextClassLoader().getResource("schemata/ruleset.xsd");
         String rulesetDirectory = ConfigCore.getParameter(ParameterCore.DIR_RULESETS);
@@ -92,7 +101,8 @@ public class FileStructureValidationService {
         }
     }
 
-    private ValidationResult validateFileAgainstSchemaByUrl(String filename, URL schemaUrl, String containingDirectory) throws IOException, SAXException {
+    private ValidationResult validateFileAgainstSchemaByUrl(String filename, URL schemaUrl, String containingDirectory)
+            throws IOException, SAXException {
         if (StringUtils.isNotBlank(containingDirectory) && Objects.nonNull(schemaUrl)) {
             File xmlFile = new File(containingDirectory + filename);
             try {
@@ -104,11 +114,31 @@ public class FileStructureValidationService {
         return null;
     }
 
-    public void validateRulesetByTemplateId(int templateId) throws DAOException, IOException, SAXException, FileStructureValidationException {
+    /**
+     * Validates the ruleset associated with the template identified by the given template ID.
+     * The method retrieves the template using the provided ID and validates its ruleset to ensure it is valid
+     * in accordance with the ruleset XML schema definition.
+     *
+     * @param templateId the ID of the template whose associated ruleset is to be validated
+     * @throws DAOException if an error occurs while retrieving the template
+     * @throws IOException if an I/O operation fails during the validation process
+     * @throws SAXException if the ruleset XML schema definition is malformed
+     * @throws FileStructureValidationException if the structure of the ruleset is invalid
+     */
+    public void validateRulesetByTemplateId(int templateId) throws DAOException, IOException, SAXException,
+            FileStructureValidationException {
         Template template = ServiceManager.getTemplateService().getById(templateId);
         validateRuleset(template.getRuleset());
     }
 
+    /**
+     * Validates the given mapping file to ensure its structure and content conform to the required standards.
+     *
+     * @param mappingFile the {@code MappingFile} instance to be validated
+     * @throws IOException if an I/O operation fails during validation
+     * @throws SAXException if the mapping file XML schema definition is malformed
+     * @throws FileStructureValidationException if the structure of the mapping file is invalid
+     */
     public void validateMappingFile(MappingFile mappingFile) throws IOException, SAXException, FileStructureValidationException {
         URL xsltSchemaUrl = Thread.currentThread().getContextClassLoader().getResource("schemata/xslt20.xsd");
         String mappingFileDirectory = ConfigCore.getParameter(ParameterCore.DIR_XSLT);
@@ -119,6 +149,14 @@ public class FileStructureValidationService {
         }
     }
 
+    /**
+     * Validates a list of mapping files to ensure their structure and content conform to the required standards.
+     *
+     * @param mappingFiles a list of MappingFile objects to be validated
+     * @throws IOException if an I/O operation fails during validation
+     * @throws SAXException if a mapping file XML schema definition is malformed
+     * @throws FileStructureValidationException if the structure of a mapping file is invalid
+     */
     public void validateMappingFiles(List<MappingFile> mappingFiles) throws IOException, SAXException, FileStructureValidationException {
         for (MappingFile mappingFile : mappingFiles) {
             validateMappingFile(mappingFile);

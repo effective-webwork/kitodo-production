@@ -64,8 +64,8 @@ public class KitodoScriptProcessor extends ActiveMQProcessor {
                 processes.add(processService.getById(id));
             }
             kitodoScriptService.execute(processes, script);
-        } catch (DAOException | IOException | InvalidImagesException | MediaNotFoundException | SAXException |
-                 FileStructureValidationException e) {
+        } catch (DAOException | IOException | InvalidImagesException | MediaNotFoundException | SAXException
+                 | FileStructureValidationException e) {
             throw new ProcessorException(e);
         }
     }

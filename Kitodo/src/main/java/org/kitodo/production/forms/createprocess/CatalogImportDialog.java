@@ -39,8 +39,8 @@ import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.CatalogException;
 import org.kitodo.exceptions.ConfigException;
-import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.FileStructureValidationException;
+import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.NoRecordFoundException;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
 import org.kitodo.exceptions.ParameterNotFoundException;
@@ -191,6 +191,15 @@ public class CatalogImportDialog  extends MetadataImportDialog implements Serial
         }
     }
 
+    /**
+     * Performs the import operation based on the given configuration and record hierarchy.
+     * Depending on the metadata format, processes can be created and imported.
+     * The function supports validating against schemata if specified and handles additional imports,
+     * attaching to existing parents, and importing children when configured.
+     *
+     * @param validateAgainstSchemata a boolean flag indicating whether the imported data should be validated against defined schemata
+     * @throws FileStructureValidationException if there are validation issues with the imported file structure
+     */
     public void performImport(boolean validateAgainstSchemata) throws FileStructureValidationException {
         try {
             createProcessForm.setChildProcesses(new LinkedList<>());

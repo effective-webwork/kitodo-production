@@ -37,7 +37,13 @@ import org.kitodo.constants.StringConstants;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.exceptions.DAOException;
-import org.kitodo.exceptions.*;
+import org.kitodo.exceptions.ConfigException;
+import org.kitodo.exceptions.FileStructureValidationException;
+import org.kitodo.exceptions.InvalidMetadataValueException;
+import org.kitodo.exceptions.NoRecordFoundException;
+import org.kitodo.exceptions.NoSuchMetadataFieldException;
+import org.kitodo.exceptions.ProcessGenerationException;
+import org.kitodo.exceptions.UnsupportedFormatException;
 import org.kitodo.production.forms.createprocess.CreateProcessForm;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
 import org.kitodo.production.helper.Helper;
@@ -149,10 +155,10 @@ public class UpdateMetadataImportDialogSequence implements Serializable {
             );
             createProcessForm.setProcesses(processes);
             showMetadataComparisonDialog();
-        } catch (IOException | ProcessGenerationException | XPathExpressionException | URISyntaxException |
-                 ParserConfigurationException | UnsupportedFormatException | SAXException | DAOException |
-                 ConfigException | TransformerException | NoRecordFoundException | InvalidMetadataValueException |
-                 NoSuchMetadataFieldException | FileStructureValidationException e) {
+        } catch (IOException | ProcessGenerationException | XPathExpressionException | URISyntaxException
+                 | ParserConfigurationException | UnsupportedFormatException | SAXException | DAOException
+                 | ConfigException | TransformerException | NoRecordFoundException | InvalidMetadataValueException
+                 | NoSuchMetadataFieldException | FileStructureValidationException e) {
             logger.error("error when selecting record in hitlist", e);
         }
     }
