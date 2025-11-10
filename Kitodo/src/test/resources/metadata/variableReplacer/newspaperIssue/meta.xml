@@ -21,7 +21,6 @@
             </mets:xmlData>
         </mets:mdWrap>
     </mets:dmdSec>
-    <mets:fileSec/>
     <mets:structMap TYPE="PHYSICAL">
         <mets:div ID="PHYS_0000"/>
     </mets:structMap>
@@ -32,5 +31,4 @@
             </mets:div>
         </mets:div>
     </mets:structMap>
-    <mets:structLink/>
 </mets:mets>
