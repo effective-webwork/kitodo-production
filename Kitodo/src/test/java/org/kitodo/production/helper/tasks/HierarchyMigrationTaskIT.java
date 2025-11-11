@@ -149,14 +149,14 @@ public class HierarchyMigrationTaskIT {
                 + "            <mets:mptr xlink:href=\"\" LOCTYPE=\"URL\"/>\n"
                 + "            <mets:div ID=\"LOG_0003\" DMDID=\"DMDLOG_0001\" TYPE=\"PeriodicalVolume\" ORDER=\"19130000\">\n"
                 + "                <mets:div ID=\"LOG_0004\" TYPE=\"TitlePage\"/>\n"
-                + "                <mets:div ID=\"LOG_0005\" DMDID=\"DMDLOG_0002\" TYPE=\"OtherDocStrct\">\n"
-                + "                    <mets:div ID=\"LOG_0006\" DMDID=\"DMDLOG_0003\" TYPE=\"OtherDocStrct\"/>\n"
-                + "                    <mets:div ID=\"LOG_0007\" DMDID=\"DMDLOG_0004\" TYPE=\"OtherDocStrct\"/>\n"
-                + "                    <mets:div ID=\"LOG_0008\" DMDID=\"DMDLOG_0005\" TYPE=\"OtherDocStrct\"/>\n"
-                + "                    <mets:div ID=\"LOG_0009\" DMDID=\"DMDLOG_0006\" TYPE=\"OtherDocStrct\"/>\n"
-                + "                    <mets:div ID=\"LOG_0010\" DMDID=\"DMDLOG_0007\" TYPE=\"OtherDocStrct\"/>\n"
+                + "                <mets:div ID=\"LOG_0005\" TYPE=\"OtherDocStrct\">\n"
+                + "                    <mets:div ID=\"LOG_0006\" TYPE=\"OtherDocStrct\"/>\n"
+                + "                    <mets:div ID=\"LOG_0007\" TYPE=\"OtherDocStrct\"/>\n"
+                + "                    <mets:div ID=\"LOG_0008\" TYPE=\"OtherDocStrct\"/>\n"
+                + "                    <mets:div ID=\"LOG_0009\" TYPE=\"OtherDocStrct\"/>\n"
+                + "                    <mets:div ID=\"LOG_0010\" TYPE=\"OtherDocStrct\"/>\n"
                 + "                </mets:div>\n"
-                + "                <mets:div ID=\"LOG_0011\" DMDID=\"DMDLOG_0008\" TYPE=\"Article\"/>\n"
+                + "                <mets:div ID=\"LOG_0011\" TYPE=\"Article\"/>\n"
                 + "            </mets:div>\n" + "        </mets:div>\n" + "    </mets:structMap>\n" + "</mets:mets>\n");
         File processHome = new File(ConfigCore.getKitodoDataDirectory(), "2");
         FileUtils.writeLines(new File(processHome, "meta.xml"), "UTF-8", lines);
