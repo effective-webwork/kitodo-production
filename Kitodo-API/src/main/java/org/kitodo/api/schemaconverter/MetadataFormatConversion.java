@@ -47,7 +47,7 @@ public enum MetadataFormatConversion {
     MetadataFormatConversion(String filename, String source, MetadataFormat targetFormat) {
         this.fileName = filename;
         try {
-            this.source = Paths.get(source).toUri().toURL();
+            this.source = Paths.get("xslt/" + source).toUri().toURL();
         } catch (MalformedURLException e) {
             this.source = null;
         }
