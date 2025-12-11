@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -73,14 +74,14 @@ public class WebDriverProvider {
         if (SystemUtils.IS_OS_WINDOWS) {
             geckoDriverFileName = "geckodriver.exe";
             File geckoDriverZipFile = new File(downloadFolder + "geckodriver.zip");
-            FileUtils.copyURLToFile(new URL(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-win64.zip"),
-                    geckoDriverZipFile);
+            FileUtils.copyURLToFile(Paths.get(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-win64.zip")
+                            .toUri().toURL(), geckoDriverZipFile);
             extractZipFileToFolder(geckoDriverZipFile, new File(extractFolder));
         } else if (SystemUtils.IS_OS_MAC_OSX) {
             geckoDriverFileName = "geckodriver";
             File geckoDriverTarFile = new File(downloadFolder + "geckodriver.tar.gz");
-            FileUtils.copyURLToFile(new URL(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-macos.tar.gz"),
-                    geckoDriverTarFile);
+            FileUtils.copyURLToFile(Paths.get(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-macos.tar.gz")
+                            .toUri().toURL(), geckoDriverTarFile);
             File theDir = new File(extractFolder);
             if (!theDir.mkdir()) {
                 logger.error("Unable to create directory '" + theDir.getPath() + "'!");
@@ -89,8 +90,8 @@ public class WebDriverProvider {
         } else {
             geckoDriverFileName = "geckodriver";
             File geckoDriverTarFile = new File(downloadFolder + "geckodriver.tar.gz");
-            FileUtils.copyURLToFile(new URL(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-linux64.tar.gz"),
-                    geckoDriverTarFile);
+            FileUtils.copyURLToFile(Paths.get(geckoDriverUrl + "geckodriver-v" + geckoDriverVersion + "-linux64.tar.gz")
+                            .toUri().toURL(), geckoDriverTarFile);
             extractTarFileToFolder(geckoDriverTarFile, new File(extractFolder));
         }
         File geckoDriverFile = new File(extractFolder, geckoDriverFileName);
@@ -128,14 +129,14 @@ public class WebDriverProvider {
         if (SystemUtils.IS_OS_WINDOWS) {
             driverFilename = driverFilename + EXE;
             File chromeDriverZipFile = new File(downloadFolder + CHROME_DRIVER_WIN_SUBDIR + File.separator + ZIP_FILE);
-            FileUtils.copyURLToFile(new URL(chromeDriverUrl + CHROME_DRIVER_WIN_PREFIX + '/'
-                    + CHROME_DRIVER_WIN_SUBDIR + ZIP), chromeDriverZipFile);
+            FileUtils.copyURLToFile(Paths.get(chromeDriverUrl + CHROME_DRIVER_WIN_PREFIX + '/'
+                    + CHROME_DRIVER_WIN_SUBDIR + ZIP).toUri().toURL(), chromeDriverZipFile);
             chromeDriverFile = extractZipFileToFolder(chromeDriverZipFile, new File(extractFolder), driverFilename,
                     CHROME_DRIVER_WIN_SUBDIR);
         } else if (SystemUtils.IS_OS_MAC_OSX) {
             File chromeDriverZipFile = new File(downloadFolder + CHROME_DRIVER_MAC_SUBDIR + File.separator + ZIP_FILE);
-            FileUtils.copyURLToFile(new URL(chromeDriverUrl + CHROME_DRIVER_MAC_PREFIX + File.separator
-                    + CHROME_DRIVER_MAC_SUBDIR + ZIP), chromeDriverZipFile);
+            FileUtils.copyURLToFile(Paths.get(chromeDriverUrl + CHROME_DRIVER_MAC_PREFIX + File.separator
+                    + CHROME_DRIVER_MAC_SUBDIR + ZIP).toUri().toURL(), chromeDriverZipFile);
             File theDir = new File(extractFolder);
             if (!theDir.exists()) {
                 if (!theDir.mkdir()) {
@@ -146,8 +147,8 @@ public class WebDriverProvider {
                     CHROME_DRIVER_MAC_SUBDIR);
         } else {
             File chromeDriverZipFile = new File(downloadFolder + CHROME_DRIVER_LINUX_SUBDIR + File.separator + ZIP_FILE);
-            FileUtils.copyURLToFile(new URL(chromeDriverUrl + CHROME_DRIVER_LINUX_PREFIX + File.separator
-                    + CHROME_DRIVER_LINUX_SUBDIR + ZIP), chromeDriverZipFile);
+            FileUtils.copyURLToFile(Paths.get(chromeDriverUrl + CHROME_DRIVER_LINUX_PREFIX + File.separator
+                    + CHROME_DRIVER_LINUX_SUBDIR + ZIP).toUri().toURL(), chromeDriverZipFile);
             chromeDriverFile = extractZipFileToFolder(chromeDriverZipFile, new File(extractFolder), driverFilename,
                     CHROME_DRIVER_LINUX_SUBDIR);
         }
@@ -194,7 +195,7 @@ public class WebDriverProvider {
     private static String fetchLatestStableChromeDriverVersion() {
         String version = "";
         try {
-            URL url = new URL(CHROME_DRIVER_LAST_GOOD_VERSIONS_URL);
+            URL url = Paths.get(CHROME_DRIVER_LAST_GOOD_VERSIONS_URL).toUri().toURL();
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()))) {
                 String content = bufferedReader.readLine();
                 JsonReader jsonReader = Json.createReader(new StringReader(content));
