@@ -145,8 +145,8 @@ public class MetadataEditorIT {
         List<Metadata> metadataListOne = new ArrayList<>(newSectionOne.getMetadata());
         LogicalDivision newSectionTwo = workpiece.getAllLogicalDivisions().get(newNrDivisions - 1);
         List<Metadata> metadataListTwo = new ArrayList<>(newSectionTwo.getMetadata());
-        Metadata metadatumOne = metadataListOne.get(0);
-        Metadata metadatumTwo = metadataListTwo.get(0);
+        Metadata metadatumOne = metadataListOne.getFirst();
+        Metadata metadatumTwo = metadataListTwo.getFirst();
 
         assertInstanceOf(MetadataEntry.class, metadatumOne, "Metadata should be of type MetadataEntry");
         assertTrue(((MetadataEntry) metadatumOne).getValue().equals("value 1")

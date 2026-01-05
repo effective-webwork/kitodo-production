@@ -233,7 +233,7 @@ public class BatchForm extends BaseForm {
             Helper.setErrorMessage(NO_BATCH_SELECTED);
         } else if (this.selectedBatches.size() == 1) {
             try {
-                ServiceManager.getProcessService().downloadDocket(selectedBatches.get(0).getProcesses());
+                ServiceManager.getProcessService().downloadDocket(selectedBatches.getFirst().getProcesses());
             } catch (IOException e) {
                 Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
             }

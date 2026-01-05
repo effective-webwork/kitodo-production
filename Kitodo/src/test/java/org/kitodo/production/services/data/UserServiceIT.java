@@ -118,7 +118,7 @@ public class UserServiceIT {
         User user = new User();
         user.setLogin("Remove");
         userService.save(user);
-        User foundUser = userService.getByQuery("FROM User WHERE login = 'Remove' ORDER BY id DESC").get(0);
+        User foundUser = userService.getByQuery("FROM User WHERE login = 'Remove' ORDER BY id DESC").getFirst();
         assertEquals("Remove", foundUser.getLogin(), "Additional user was not inserted in database!");
 
         userService.remove(foundUser);
@@ -128,7 +128,7 @@ public class UserServiceIT {
         user = new User();
         user.setLogin("remove");
         userService.save(user);
-        foundUser = userService.getByQuery("FROM User WHERE login = 'remove' ORDER BY id DESC").get(0);
+        foundUser = userService.getByQuery("FROM User WHERE login = 'remove' ORDER BY id DESC").getFirst();
         assertEquals("remove", foundUser.getLogin(), "Additional user was not inserted in database!");
 
         userService.remove(foundUser.getId());
@@ -146,9 +146,9 @@ public class UserServiceIT {
 
         User user = new User();
         user.setLogin("Cascade");
-        user.getRoles().add(roleService.getByQuery("FROM Role WHERE title = 'Cascade Group' ORDER BY id DESC").get(0));
+        user.getRoles().add(roleService.getByQuery("FROM Role WHERE title = 'Cascade Group' ORDER BY id DESC").getFirst());
         userService.save(user);
-        User foundUser = userService.getByQuery("FROM User WHERE login = 'Cascade'").get(0);
+        User foundUser = userService.getByQuery("FROM User WHERE login = 'Cascade'").getFirst();
         assertEquals("Cascade", foundUser.getLogin(), "Additional user was not inserted in database!");
 
         userService.remove(foundUser);
@@ -158,7 +158,7 @@ public class UserServiceIT {
         size = roleService.getByQuery("FROM Role WHERE title = 'Cascade Group'").size();
         assertEquals(1, size, "Role was removed from database!");
 
-        roleService.remove(roleService.getByQuery("FROM Role WHERE title = 'Cascade Group'").get(0));
+        roleService.remove(roleService.getByQuery("FROM Role WHERE title = 'Cascade Group'").getFirst());
     }
 
     @Test
@@ -203,7 +203,7 @@ public class UserServiceIT {
 
     @Test
     public void shouldGetAuthorityOfUser() throws Exception {
-        Authority authority = userService.getByLogin("kowal").getRoles().get(0).getAuthorities().get(1);
+        Authority authority = userService.getByLogin("kowal").getRoles().getFirst().getAuthorities().get(1);
         assertEquals("viewClient_globalAssignable", authority.getTitle(), "Authority title is incorrect!");
     }
 
@@ -231,7 +231,7 @@ public class UserServiceIT {
         User user = userService.getByLdapLoginOrLogin("nowakLDP");
         List<Task> tasks = userService.getTasksInProgress(user);
         assertEquals(1, tasks.size(), "Number of tasks in process is incorrect!");
-        assertEquals("Progress", tasks.get(0).getTitle(), "Title of task is incorrect!");
+        assertEquals("Progress", tasks.getFirst().getTitle(), "Title of task is incorrect!");
     }
 
     @Test

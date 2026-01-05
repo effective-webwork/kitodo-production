@@ -47,7 +47,7 @@ public class MetsKitodoHeaderHandler {
 
         List<MetsType.MetsHdr.Agent> agents = metsHdr.getAgent();
         if (!agents.isEmpty()) {
-            agents.get(0).getNote().add(noteMessage);
+            agents.getFirst().getNote().add(noteMessage);
         }
         return mets;
     }
