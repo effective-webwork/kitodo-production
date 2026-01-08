@@ -256,13 +256,13 @@ public class GalleryMediaContent {
         }
 
         /*
-         * Output of media data when the browser retrieves this URL. Note that
-         * we are NOT ALLOWED TO close the InputStream at this point. Faces does
-         * that after transferring the data.
+         * Output of media data when the browser retrieves this URL.
+         * Transfer data of input stream to "ByteArrayInputStream" so that
+         * original InputStream can be closed.
          */
-        try {
-            InputStream viewData = ServiceManager.getFileService().read(uri);
-            return DefaultStreamedContent.builder().stream(() -> viewData).contentType(mimeType)
+        try (InputStream viewData = ServiceManager.getFileService().read(uri)) {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(viewData.readAllBytes());
+            return DefaultStreamedContent.builder().stream(() -> inputStream).contentType(mimeType)
                     .name(Paths.get(uri.getPath()).getFileName().toString()).contentLength((long) viewData.available())
                     .build();
         } catch (IOException e) {
