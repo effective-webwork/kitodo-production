@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.kitodo.api.Metadata;
 import org.kitodo.api.dataformat.Division;
 import org.kitodo.api.dataformat.LogicalDivision;
+import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
 import org.kitodo.production.helper.Helper;
@@ -121,27 +122,32 @@ public class UpdateMetadataDialog implements Serializable {
     public void onUpdateCatalogMetadataClick() {
         if (canUpdateMetadata()) {
             // update metadata from catalog using existing record identifier and import configuration
-            updateCatalogMetadata();
+            updateCatalogMetadata(true);
         }
     }
 
     /**
      * Trigger re-import of metadata of current process.
+     *
+     * @param validate whether to validate re-imported metadata against XML schemata
      */
-    public void updateCatalogMetadata() {
+    public void updateCatalogMetadata(boolean validate) {
         if (dataEditor.getSelectedStructure().isPresent()) {
             setRecordIdentifier(dataEditor.getProcessRecordIdentifier());
             try {
                 HashSet<Metadata> existingMetadata = getMetadata(dataEditor.getMetadataPanel().getLogicalMetadataRows());
-                metadataComparisons = DataEditorService.reimportCatalogMetadata(dataEditor.getProcess(),
-                        dataEditor.getWorkpiece(), existingMetadata, dataEditor.getPriorityList(),
-                        dataEditor.getSelectedStructure().get().getType());
+                metadataComparisons = DataEditorService.reimportCatalogMetadata(dataEditor.getProcess(), dataEditor.getWorkpiece(),
+                        existingMetadata, dataEditor.getPriorityList(), dataEditor.getSelectedStructure().get().getType(), validate);
                 if (metadataComparisons.isEmpty()) {
                     PrimeFaces.current().executeScript("PF('metadataUnchangedDialog').show();");
                 } else {
                     PrimeFaces.current().ajax().update("updateMetadataDialog");
                     PrimeFaces.current().executeScript("PF('updateMetadataDialog').show();");
                 }
+            } catch (FileStructureValidationException e) {
+                // in case of schema validation error show validation error dialog with details instead of simple error message)
+                dataEditor.setValidationErrorTitle(Helper.getTranslation("validation.invalidExternalRecord"));
+                dataEditor.showValidationExceptionDialog(e, null);
             } catch (Exception e) {
                 Helper.setErrorMessage(e.getMessage());
             }
