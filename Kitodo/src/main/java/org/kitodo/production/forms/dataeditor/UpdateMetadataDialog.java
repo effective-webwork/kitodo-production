@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.kitodo.api.Metadata;
 import org.kitodo.api.dataformat.Division;
 import org.kitodo.api.dataformat.LogicalDivision;
+import org.kitodo.data.database.beans.Process;
 import org.kitodo.exceptions.FileStructureValidationException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
@@ -121,8 +122,11 @@ public class UpdateMetadataDialog implements Serializable {
      */
     public void onUpdateCatalogMetadataClick() {
         if (canUpdateMetadata()) {
+            Process process = dataEditor.getProcess();
             // update metadata from catalog using existing record identifier and import configuration
-            updateCatalogMetadata(true);
+            updateCatalogMetadata(Objects.nonNull(process)
+                    && Objects.nonNull(process.getImportConfiguration())
+                    && process.getImportConfiguration().getValidateExternalData());
         }
     }
 
