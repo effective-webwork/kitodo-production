@@ -105,6 +105,7 @@ public class Browser {
             logger.error("SessionNotCreatedException encountered: Chrome driver could not be started " +
                     "-> trying to determine version of installed Chrome browser to download corresponding Chrome driver version instead");
             String exceptionMessage = e.getMessage();
+            logger.error("Exception message: {}", exceptionMessage);
             if (Objects.nonNull(exceptionMessage) && exceptionMessage.contains("Current browser version is")) {
                 Pattern pattern = Pattern.compile(".*?(\\d+\\.\\d+\\.\\d+\\.\\d+).*");
                 Matcher matcher = pattern.matcher(exceptionMessage);
