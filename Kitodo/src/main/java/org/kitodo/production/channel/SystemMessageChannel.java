@@ -14,11 +14,11 @@ package org.kitodo.production.channel;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.faces.push.Push;
-import javax.faces.push.PushContext;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.faces.push.Push;
+import jakarta.faces.push.PushContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.kitodo.data.database.beans.User;
 import org.kitodo.production.security.SecuritySession;
@@ -102,9 +102,9 @@ public class SystemMessageChannel {
     }
 
     /**
-     * Get list of current users.
+     * Get a set of current users.
      *
-     * @return list of current users
+     * @return set of current users
      */
     public Set<String> getCurrentUsers() {
         return this.currentUsers.keySet();
