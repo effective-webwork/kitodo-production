@@ -44,9 +44,9 @@
     <ui:define name="pageTabView">
         <p:tabView id="searchTabView">
             <p:tab id="searchTab" title="#{msgs.details}">
-                <o:validateAllOrNone id="processPropertyValidation"
+                <o:validateAllOrNone id="processMetadataValidation"
                                      message="#{err.fillOutAllOrNone}"
-                                     components="processProperty processPropertyTitle"/>
+                                     components="processMetadata processMetadataTitle"/>
                 <o:validateAllOrNone id="taskStatusValidation"
                                      message="#{err.fillOutAllOrNone}"
                                      components="taskName taskStatus"/>
@@ -83,29 +83,32 @@
                             </p:selectOneMenu>
                         </p:column>
                     </p:row>
-                    <!--properties -->
+                    <!--metadata -->
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="processProperty" value="#{msgs.processProperties}"/>
+                            <p:outputLabel for="processMetadata" value="#{msgs.metadata}"/>
                         </p:column>
                         <p:column>
-                            <p:selectOneMenu value="#{SearchForm.processPropertyOperand}">
+                            <p:selectOneMenu value="#{SearchForm.processMetadataOperand}">
                                 <f:selectItems value="#{SearchForm.operands}"/>
                             </p:selectOneMenu>
                         </p:column>
                         <p:column>
-                            <p:selectOneMenu id="processPropertyTitle"
+                            <p:selectOneMenu id="processMetadataTitle"
                                              label="#{msgs.value}"
-                                             value="#{SearchForm.processPropertyTitle}">
-                                <f:selectItem itemValue="#{null}" itemLabel="#{msgs.notSelected}" noSelectionOption="true"/>
-                                <f:selectItems value="#{SearchForm.processPropertyTitles}"
-                                               var="proc" itemLabel="#{proc}"
+                                             value="#{SearchForm.processMetadataTitle}">
+                                <f:selectItem itemValue="#{null}"
+                                              itemLabel="#{msgs.notSelected}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{SearchForm.processMetadataTitles}"
+                                               var="proc"
+                                               itemLabel="#{proc}"
                                                itemValue="#{proc}"/>
                             </p:selectOneMenu>
                         </p:column>
                         <p:column>
-                            <p:inputText id="processProperty"
-                                         value="#{SearchForm.processPropertyValue}"
+                            <p:inputText id="processMetadata"
+                                         value="#{SearchForm.processMetadataValue}"
                                          styleClass="extended-search-input-field"/>
                         </p:column>
                     </p:row>

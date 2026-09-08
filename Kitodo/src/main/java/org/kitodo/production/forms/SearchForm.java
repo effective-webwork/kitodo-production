@@ -44,9 +44,9 @@ public class SearchForm {
     private List<String> projects = new ArrayList<>(); // proj:
     private String project = "";
 
-    private List<String> processPropertyTitles = new ArrayList<>(); // processeig:
-    private String processPropertyTitle = "";
-    private String processPropertyValue = "";
+    private List<String> processMetadataTitles;
+    private String processMetadataTitle = "";
+    private String processMetadataValue = "";
 
     private List<String> stepTitles = new ArrayList<>(); // step:
     private List<TaskStatus> stepstatus = new ArrayList<>();
@@ -63,9 +63,7 @@ public class SearchForm {
 
     private String projectOperand = "";
     private String processOperand = "";
-    private String processPropertyOperand = "";
-    private String masterpiecePropertyOperand = "";
-    private String templatePropertyOperand = "";
+    private String processMetadataOperand = "";
     private String stepOperand = "";
 
     private Boolean showInactiveProjects = false;
@@ -78,7 +76,7 @@ public class SearchForm {
         this.stepstatus.addAll(ServiceManager.getFilterService().initStepStatus());
         this.projects = ServiceManager.getFilterService().initProjects();
         this.stepTitles = ServiceManager.getFilterService().initStepTitles();
-        this.processPropertyTitles = ServiceManager.getFilterService().initProcessPropertyTitles();
+        this.processMetadataTitles = ServiceManager.getFilterService().initProcessPropertyTitles();
         this.user.addAll(ServiceManager.getFilterService().initUserList());
     }
 
@@ -90,12 +88,20 @@ public class SearchForm {
         this.projects = projects;
     }
 
-    public List<String> getProcessPropertyTitles() {
-        return this.processPropertyTitles;
+    /**
+     * Returns the list of process metadata titles.
+     * @return the list of process metadata titles
+     */
+    public List<String> getProcessMetadataTitles() {
+        return this.processMetadataTitles;
     }
 
-    public void setProcessPropertyTitles(List<String> processPropertyTitles) {
-        this.processPropertyTitles = processPropertyTitles;
+    /**
+     * Sets the list of process metadata titles.
+     * @param processMetadataTitles the list of process metadata titles to set
+     */
+    public void setProcessMetadataTitles(List<String> processMetadataTitles) {
+        this.processMetadataTitles = processMetadataTitles;
     }
 
     public List<String> getStepTitles() {
@@ -162,20 +168,36 @@ public class SearchForm {
         this.processTitle = processTitle;
     }
 
-    public String getProcessPropertyTitle() {
-        return this.processPropertyTitle;
+    /**
+     * Returns the title of the process metadata to search for.
+     * @return the title of the process metadata to search for
+     */
+    public String getProcessMetadataTitle() {
+        return this.processMetadataTitle;
     }
 
-    public void setProcessPropertyTitle(String processPropertyTitle) {
-        this.processPropertyTitle = processPropertyTitle;
+    /**
+     * Sets the title of the process metadata to search for.
+     * @param processPropertyTitle the title of the process metadata to search for
+     */
+    public void setProcessMetadataTitle(String processPropertyTitle) {
+        this.processMetadataTitle = processPropertyTitle;
     }
 
-    public String getProcessPropertyValue() {
-        return this.processPropertyValue;
+    /**
+     * Returns the value of the process metadata to search for.
+     * @return the value of the process metadata to search for
+     */
+    public String getProcessMetadataValue() {
+        return this.processMetadataValue;
     }
 
-    public void setProcessPropertyValue(String processPropertyValue) {
-        this.processPropertyValue = processPropertyValue;
+    /**
+     * Sets the value of the process metadata to search for.
+     * @param processMetadataValue the value of the process metadata to search for
+     */
+    public void setProcessMetadataValue(String processMetadataValue) {
+        this.processMetadataValue = processMetadataValue;
     }
 
     public String getStatus() {
@@ -278,18 +300,18 @@ public class SearchForm {
             search += "\"" + FilterString.TASKDONEUSER.getFilterEnglish() + this.stepdoneuser + "\" \""
                     + FilterString.TASKDONETITLE.getFilterEnglish() + this.stepdonetitle + "\" ";
         }
-        if (StringUtils.isNotBlank(this.processPropertyValue)) {
-            if (StringUtils.isNotBlank(this.processPropertyTitle)) {
-                search += "\"" + this.processPropertyOperand + FilterString.PROPERTY.getFilterEnglish() 
-                        + this.processPropertyTitle + ":" + this.processPropertyValue + "\" ";
+        if (StringUtils.isNotBlank(this.processMetadataValue)) {
+            if (StringUtils.isNotBlank(this.processMetadataTitle)) {
+                search += "\"" + this.processMetadataOperand + FilterString.PROPERTY.getFilterEnglish()
+                        + this.processMetadataTitle + ":" + this.processMetadataValue + "\" ";
             } else {
-                search += "\"" + this.processPropertyOperand + FilterString.PROPERTY.getFilterEnglish() 
-                        + "*:" + this.processPropertyValue + "\" ";
+                search += "\"" + this.processMetadataOperand + FilterString.PROPERTY.getFilterEnglish()
+                        + "*:" + this.processMetadataValue + "\" ";
             }
         } else {
-            if (StringUtils.isNotBlank(this.processPropertyTitle)) {
-                search += "\"" + this.processPropertyOperand + FilterString.PROPERTY.getFilterEnglish() 
-                        + this.processPropertyTitle + ":*\" ";
+            if (StringUtils.isNotBlank(this.processMetadataTitle)) {
+                search += "\"" + this.processMetadataOperand + FilterString.PROPERTY.getFilterEnglish()
+                        + this.processMetadataTitle + ":*\" ";
             }
         }
         return search;
@@ -328,28 +350,20 @@ public class SearchForm {
         this.projectOperand = projectOperand;
     }
 
-    public String getProcessPropertyOperand() {
-        return this.processPropertyOperand;
+    /**
+     * Returns the operand for the process metadata filter.
+     * @return the operand for the process metadata filter
+     */
+    public String getProcessMetadataOperand() {
+        return this.processMetadataOperand;
     }
 
-    public void setProcessPropertyOperand(String processPropertyOperand) {
-        this.processPropertyOperand = processPropertyOperand;
-    }
-
-    public String getMasterpiecePropertyOperand() {
-        return this.masterpiecePropertyOperand;
-    }
-
-    public void setMasterpiecePropertyOperand(String masterpiecePropertyOperand) {
-        this.masterpiecePropertyOperand = masterpiecePropertyOperand;
-    }
-
-    public String getTemplatePropertyOperand() {
-        return this.templatePropertyOperand;
-    }
-
-    public void setTemplatePropertyOperand(String templatePropertyOperand) {
-        this.templatePropertyOperand = templatePropertyOperand;
+    /**
+     * Sets the operand for the process metadata filter.
+     * @param processMetadataOperand the operand for the process metadata filter to set
+     */
+    public void setProcessMetadataOperand(String processMetadataOperand) {
+        this.processMetadataOperand = processMetadataOperand;
     }
 
     public String getStepOperand() {
