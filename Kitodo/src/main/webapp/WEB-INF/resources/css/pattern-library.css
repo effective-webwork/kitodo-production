@@ -1567,7 +1567,7 @@ body .ui-dialog .ui-datatable tbody.ui-datatable-data tr td.actionsColumn {
 }
 
 .ui-dialog div.dialogFieldWrapper {
-    height: calc(100% - 100px);
+    height: max(64px, calc(100% - 100px));
     overflow-y: auto;
 }
 
