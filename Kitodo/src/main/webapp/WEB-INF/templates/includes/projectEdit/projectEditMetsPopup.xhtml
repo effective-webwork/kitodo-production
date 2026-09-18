@@ -22,12 +22,14 @@
         <p:dialog id="editFolderDialog"
                   widgetVar="editFolderDialog"
                   width="700px"
+                  height="680px"
                   modal="true"
                   dynamic="true"
                   resizable="false"
                   showHeader="false"
                   styleClass="editDialog">
-            <h:form>
+            <h:form id="editFolderForm"
+                    style="height: 100%;">
                 <h3>#{empty ProjectEditView.editingFolder.path ? msgs['editFolderDialog.caption.add'] : msgs['editFolderDialog.caption.edit']}</h3>
                 <h:panelGroup layout="block"
                               styleClass="dialogFieldWrapper">
