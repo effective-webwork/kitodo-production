@@ -187,6 +187,18 @@ public class ProcessGeneratorIT {
         assertTrue(propertyValueUpdated, "Property value was not updated!");
     }
 
+    /**
+     * Test for retrieving all properties of a process, including template properties, workpiece properties and regular properties.
+     * @throws Exception when test process cannot be retrieved from database
+     */
+    @Test
+    public void shouldRetrieveAllProperties() throws Exception {
+        Process process = ServiceManager.getProcessService().getById(1);
+        int expected = process.getProperties().size() + process.getTemplates().size() + process.getWorkpieces().size();
+        int actual = process.getAllProperties().size();
+        assertEquals(expected, actual, "Properties were retrieved incorrectly!");
+    }
+
     @Test
     public void shouldCopyTasks() throws Exception {
         Converter converter = new Converter("gateway-test1");

@@ -1686,7 +1686,7 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
      *         empty String otherwise
      */
     public static String getPropertyValue(Process process, String propertyName) {
-        for (Property property : process.getProperties()) {
+        for (Property property : process.getAllProperties()) {
             if (property.getTitle().equals(propertyName)) {
                 return property.getValue();
             }

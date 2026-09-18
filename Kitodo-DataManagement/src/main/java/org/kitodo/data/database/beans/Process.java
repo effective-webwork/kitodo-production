@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -621,6 +623,20 @@ public class Process extends BaseTemplateBean {
             this.properties = new ArrayList<>();
         }
         return this.properties;
+    }
+
+    /**
+     * Returns all properties of the process, including template properties,
+     * workpieces properties and regular properties. The list is not guaranteed to be in reliable order.
+     *
+     * @return list of properties
+     */
+    public List<Property> getAllProperties() {
+        return Stream.of(getProperties(), getTemplates(), getWorkpieces())
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
