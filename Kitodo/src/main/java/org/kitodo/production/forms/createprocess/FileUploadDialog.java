@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.exceptions.DAOException;
@@ -77,8 +78,10 @@ public class FileUploadDialog extends MetadataImportDialog {
         } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException
                  | UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException
                  | TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException
-                 | XMLStreamException | FileStructureValidationException e) {
+                 | XMLStreamException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
+        }  catch (FileStructureValidationException e) {
+            createProcessForm.handleImportRecordSchemaValidationException(e, ImportConfigurationType.FILE_UPLOAD.name());
         }
     }
 

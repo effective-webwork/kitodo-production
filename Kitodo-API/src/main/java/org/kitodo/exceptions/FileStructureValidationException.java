@@ -20,6 +20,7 @@ public class FileStructureValidationException extends Exception {
 
     private final transient ValidationResult validationResult;
     private boolean externalDataValidation = false;
+    private boolean skippable = false;
 
     /**
      * Constructs a new FileStructureValidationException with the specified detail
@@ -38,11 +39,16 @@ public class FileStructureValidationException extends Exception {
      * @param message exception message
      * @param validationResult the result of the validation
      * @param externalDataValidation boolean flag signaling whether the validated data was external or not
+     * @param skippable boolean flag signaling whether validation of external data is skippable or not
      */
-    public FileStructureValidationException(String message, ValidationResult validationResult, boolean externalDataValidation) {
+    public FileStructureValidationException(String message,
+                                            ValidationResult validationResult,
+                                            boolean externalDataValidation,
+                                            boolean skippable) {
         super(message);
         this.validationResult = validationResult;
         this.externalDataValidation = externalDataValidation;
+        this.skippable = skippable;
     }
 
     /**
@@ -52,6 +58,15 @@ public class FileStructureValidationException extends Exception {
      */
     public boolean isExternalDataValidation() {
         return externalDataValidation;
+    }
+
+    /**
+     * Get skippable.
+     *
+     * @return value of skippable
+     */
+    public boolean isSkippable() {
+        return skippable;
     }
 
     /**

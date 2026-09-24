@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
+import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
 import org.kitodo.api.externaldatamanagement.SingleHit;
 import org.kitodo.api.schemaconverter.DataRecord;
 import org.kitodo.api.schemaconverter.ExemplarRecord;
@@ -187,7 +188,7 @@ public class CatalogImportDialog  extends MetadataImportDialog implements Serial
             try {
                 performImport(true);
             } catch (FileStructureValidationException e) {
-                createProcessForm.handleImportRecordSchemaValidationException(e);
+                createProcessForm.handleImportRecordSchemaValidationException(e, ImportConfigurationType.OPAC_SEARCH.name());
             }
         }
     }

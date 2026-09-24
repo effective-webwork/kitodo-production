@@ -27,6 +27,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
 import org.kitodo.api.externaldatamanagement.SearchInterfaceType;
 import org.kitodo.api.schemaconverter.MetadataFormat;
 import org.kitodo.api.validation.ValidationResult;
@@ -234,11 +235,22 @@ public class FileStructureValidationService {
         }
         ValidationResult validationResult = validateXmlFile(xmlContent, schemaFiles);
         if (Objects.nonNull(validationResult) && !validationResult.getResultMessages().isEmpty()) {
-            throw new FileStructureValidationException(Helper.getTranslation("validation.externalDataRecordValidationError",
-                    identifier,
-                    importConfiguration.getInterfaceType() + "/" + importConfiguration.getMetadataFormat(),
-                    String.join(", ", schemaFiles)),
-                    validationResult, true);
+            String configurationType = importConfiguration.getConfigurationType();
+            // provide an option to skip validation for data import from catalog interfaces because the user cannot fix them
+            if (ImportConfigurationType.OPAC_SEARCH.name().equals(configurationType)) {
+                String message = Helper.getTranslation("validation.externalDataRecordValidationError",
+                        identifier,
+                        importConfiguration.getInterfaceType() + "/" + importConfiguration.getMetadataFormat(),
+                        String.join(", ", schemaFiles));
+                throw new FileStructureValidationException(message, validationResult, true, true);
+            }
+            // do not provide an option to skip validation for files uploaded from the local file system because the user can fix them
+            if (ImportConfigurationType.FILE_UPLOAD.name().equals(configurationType)) {
+                String message = Helper.getTranslation("validation.uploadedDataRecordValidationError",
+                        importConfiguration.getMetadataFormat(),
+                        String.join(", ", schemaFiles));
+                throw new FileStructureValidationException(message, validationResult, true, false);
+            }
         }
     }
 }

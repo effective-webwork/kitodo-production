@@ -561,18 +561,25 @@ public class CreateProcessForm extends ValidatableForm implements MetadataTreeTa
      * @param exception the exception indicating a schema validation failure during the
      *                  record import process. This exception provides details about
      *                  whether the issue pertains to external or internal data.
+     * @param configurationType the import configuration type used to create the new process
      */
-    public void handleImportRecordSchemaValidationException(FileStructureValidationException exception) {
+    public void handleImportRecordSchemaValidationException(FileStructureValidationException exception,
+                                                            String configurationType) {
         String filename = "catalogRecord.xml";
         if (exception.isExternalDataValidation()) {
-            setValidationErrorTitle(Helper.getTranslation("validation.invalidExternalRecord"));
-            setValidationErrorNoteEmphasized(Helper.getTranslation("validation.informMaintainer"));
+            if (ImportConfigurationType.OPAC_SEARCH.name().equals(configurationType)) {
+                setValidationErrorTitle(Helper.getTranslation("validation.invalidExternalRecord"));
+                setValidationErrorNoteEmphasized(Helper.getTranslation("validation.informMaintainer"));
+            } else if (ImportConfigurationType.FILE_UPLOAD.name().equals(configurationType)) {
+                setValidationErrorTitle(Helper.getTranslation("validation.invalidUploadedRecord"));
+                setValidationErrorNoteEmphasized(Helper.getTranslation("validation.fixUploadedXmlFile"));
+            }
         } else {
             setValidationErrorTitle(Helper.getTranslation("validation.invalidInternalRecord"));
             setValidationErrorNoteEmphasized(Helper.getTranslation("validation.fixMetadataMapping"));
             filename = "internalRecord.xml";
         }
-        if (isDebugFolderConfigured()) {
+        if (ImportConfigurationType.OPAC_SEARCH.name().equals(configurationType) && isDebugFolderConfigured()) {
             setValidationErrorNote(Helper.getTranslation("validation.debugFolderMessage", filename));
         }
         showValidationExceptionDialog(exception, referringView);
@@ -1162,7 +1169,7 @@ public class CreateProcessForm extends ValidatableForm implements MetadataTreeTa
         try {
             this.catalogImportDialog.performImport(false);
         } catch (FileStructureValidationException e) {
-            handleImportRecordSchemaValidationException(e);
+            handleImportRecordSchemaValidationException(e, ImportConfigurationType.OPAC_SEARCH.name());
         }
     }
 }

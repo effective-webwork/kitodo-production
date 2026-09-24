@@ -201,7 +201,7 @@ public class ValidatableForm extends BaseEditView {
         }
         setValidationErrorDescription(exception.getMessage());
         setValidationErrors(exception.getValidationResult().getResultMessages());
-        setSchemaValidationSkippable(exception.isExternalDataValidation());
+        setSchemaValidationSkippable(exception.isSkippable());
         PrimeFaces.current().ajax().update("validationErrorsDialog");
         PrimeFaces.current().executeScript("PF('validationErrorsDialog').show();");
     }

@@ -850,6 +850,10 @@ public class ImportService {
 
         Document eadCollectionDocument = XMLUtils.parseXMLString((String) importedEADRecord.getOriginalData());
 
+        // validate complete XML document against EAD schema here instead of individual parent and child level elements later on
+        FileStructureValidationService validationService = ServiceManager.getFileStructureValidationService();
+        validationService.validateExternalRecord((String)importedEADRecord.getOriginalData(), importConfiguration, null);
+
         List<Element> parentElements = getEADElements(eadCollectionDocument, eadParentProcessLevel);
         List<Element> childElements = getEADElements(eadCollectionDocument, eadChildProcessLevel);
 
@@ -967,8 +971,9 @@ public class ImportService {
             FileUtils.writeStringToFile(new File(debugFolder, "catalogRecord.xml"), xmlContent, StandardCharsets.UTF_8);
         }
 
-        // validate external record against corresponding XML metadata schema(ta)
-        if (validateExternal && importConfiguration.getValidateExternalData()) {
+        // validate external record against corresponding XML metadata schema(ta) (EAD is validated prior to this point)
+        if (!MetadataFormat.EAD.name().equals(importConfiguration.getMetadataFormat())
+                && validateExternal && importConfiguration.getValidateExternalData()) {
             validationService.validateExternalRecord(xmlContent, importConfiguration, identifier);
         }
 
