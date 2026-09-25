@@ -75,13 +75,13 @@ public class FileUploadDialog extends MetadataImportDialog {
             } else {
                 processXmlString();
             }
+        } catch (FileStructureValidationException e) {
+            createProcessForm.handleImportRecordSchemaValidationException(e, ImportConfigurationType.FILE_UPLOAD.name());
         } catch (IOException | ProcessGenerationException | URISyntaxException | ParserConfigurationException
                  | UnsupportedFormatException | SAXException | ConfigException | XPathExpressionException
                  | TransformerException | DAOException | InvalidMetadataValueException | NoSuchMetadataFieldException
                  | XMLStreamException e) {
             Helper.setErrorMessage(e.getLocalizedMessage(), logger, e);
-        }  catch (FileStructureValidationException e) {
-            createProcessForm.handleImportRecordSchemaValidationException(e, ImportConfigurationType.FILE_UPLOAD.name());
         }
     }
 
