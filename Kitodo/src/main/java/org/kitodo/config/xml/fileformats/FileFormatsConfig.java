@@ -53,7 +53,7 @@ public class FileFormatsConfig {
      *             incorrect
      */
     public static List<FileFormat> getFileFormats() throws JAXBException {
-        return JAXBContextCache.getInstance().getUnmarshalled(FileFormatsConfig.class, CONFIG_FILE).fileFormat;
+        return JAXBContextCache.getUnmarshalled(FileFormatsConfig.class, CONFIG_FILE).fileFormat;
     }
 
     /**
