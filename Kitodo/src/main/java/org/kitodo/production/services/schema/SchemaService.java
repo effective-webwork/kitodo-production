@@ -38,6 +38,7 @@ import org.kitodo.production.helper.VariableReplacer;
 import org.kitodo.production.metadata.MetadataEditor;
 import org.kitodo.production.model.Subfolder;
 import org.kitodo.production.services.ServiceManager;
+import org.kitodo.production.services.data.FolderService;
 import org.kitodo.production.services.data.ProcessService;
 import org.kitodo.production.services.dataformat.MetsService;
 import org.xml.sax.SAXException;
@@ -131,7 +132,7 @@ public class SchemaService {
     }
 
     private void addVirtualFileGroupsToMetsMods(PhysicalDivision physicalDivision, Process process) {
-        String canonical = ServiceManager.getFolderService().getCanonical(process, physicalDivision);
+        String canonical = FolderService.getCanonical(process, physicalDivision);
         if (Objects.nonNull(canonical)) {
             removeFLocatsForUnwantedUses(process, physicalDivision, canonical);
             addMissingUses(process, physicalDivision, canonical);
@@ -290,7 +291,7 @@ public class SchemaService {
         VariableReplacer variableReplacer = new VariableReplacer(workpiece, process, null);
         String linkUri = variableReplacer.replace(uriWithVariables);
         link.setUri(URI.create(linkUri));
-        structure.setType(ServiceManager.getProcessService().getBaseType(process));
+        structure.setType(ProcessService.getBaseType(process));
     }
 
     private void copyLabelAndOrderlabel(Process source, LogicalDivision destination) throws IOException, SAXException,
