@@ -86,7 +86,7 @@ public class JAXBContextCache {
             }
         }
 
-        final Unmarshaller unmarshaller = getInstance().getJAXBContext(clazz).createUnmarshaller();
+        final Unmarshaller unmarshaller = getJAXBContext(clazz).createUnmarshaller();
         T unmarshalledFile = (T) unmarshaller.unmarshal(file);
         contextDescriptorObjectCache.put(contextDescriptor, unmarshalledFile);
         return unmarshalledFile;

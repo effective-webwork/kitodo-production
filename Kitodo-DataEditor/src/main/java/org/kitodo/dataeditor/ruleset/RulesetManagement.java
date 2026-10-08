@@ -318,7 +318,7 @@ public class RulesetManagement implements RulesetManagementInterface {
     @SuppressWarnings("unchecked")
     private static <T> T read(Class<T> objectClass, File inputFile) throws IOException {
         try {
-            return JAXBContextCache.getInstance().getUnmarshalled(objectClass, inputFile);
+            return JAXBContextCache.getUnmarshalled(objectClass, inputFile);
         } catch (JAXBException e) {
             /*
              * If the parser ran on an IOException, we can throw it out
