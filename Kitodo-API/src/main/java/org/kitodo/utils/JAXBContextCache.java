@@ -30,29 +30,9 @@ public class JAXBContextCache {
 
     // ConcurrentHashMap takes care of synchronization in a multi-threaded
     // environment
-    private static final Map<Class, JAXBContext> jaxbContextCache = new ConcurrentHashMap();
+    private static final Map<Class, JAXBContext> jaxbContextCache = new ConcurrentHashMap<>();
 
-    private static final Map<ContextDescriptor, Object> contextDescriptorObjectCache = new ConcurrentHashMap();
-
-    /**
-     * The synchronized function singleton() must be used to obtain singleton access
-     * to the JAXBContextCache instance.
-     *
-     * @return the singleton JAXBContextCache instance
-     */
-    public static JAXBContextCache getInstance() {
-        JAXBContextCache localReference = instance;
-        if (Objects.isNull(localReference)) {
-            synchronized (JAXBContextCache.class) {
-                localReference = instance;
-                if (Objects.isNull(localReference)) {
-                    localReference = new JAXBContextCache();
-                    instance = localReference;
-                }
-            }
-        }
-        return localReference;
-    }
+    private static final Map<ContextDescriptor, Object> contextDescriptorObjectCache = new ConcurrentHashMap<>();
 
     /**
      * Get unmarshalled object. This function caches unmarshalled objects of class
