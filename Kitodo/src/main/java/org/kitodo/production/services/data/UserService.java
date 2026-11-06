@@ -132,6 +132,18 @@ public class UserService extends BaseBeanService<User, UserDAO> implements UserD
             Collections.singletonMap(CLIENT_ID, getSessionClientId()));
     }
 
+    /**
+     * Get list of all users assigned to the client with the given 'clientId'.
+     *
+     * @param clientId ID of client whose users are returned
+     * @return list of users
+     */
+    public List<User> getAllClientUsers(int clientId) {
+        return getByQuery(
+                "SELECT u FROM User AS u INNER JOIN u.clients AS c WITH c.id = :clientId WHERE deleted = false",
+                Collections.singletonMap(CLIENT_ID, clientId));
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) {
         return new SecurityUserDetails(getByLdapLoginOrLogin(username));
