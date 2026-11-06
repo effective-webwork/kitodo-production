@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kitodo.data.database.beans.Client;
 import org.kitodo.data.database.beans.Role;
+import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.helper.Helper;
@@ -162,5 +163,14 @@ public class ClientEditView extends BaseEditView {
      */
     public List<Client> getPossibleClientsForCopying() throws DAOException {
         return allClients.stream().filter(c -> !c.equals(client)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get list of users assigned to the current client.
+     *
+     * @return list of users assigned to the current client
+     */
+    public List<User> getClientUsers() {
+        return ServiceManager.getUserService().getAllClientUsers(client.getId());
     }
 }

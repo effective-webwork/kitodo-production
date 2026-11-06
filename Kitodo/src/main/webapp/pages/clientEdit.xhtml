@@ -125,6 +125,11 @@
                     </p:panel>
                 </p:panelGrid>
             </p:tab>
+            <p:tab id="clientUserTab"
+                   title="#{msgs.users}">
+                <ui:include src="/WEB-INF/templates/includes/clientEdit/clientUsers.xhtml">
+                </ui:include>
+            </p:tab>
         </p:tabView>
     </ui:define>
 
