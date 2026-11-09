@@ -1205,4 +1205,13 @@ public class SecurityAccessService extends SecurityAccess {
     public boolean hasAuthorityToReimportMetadata() {
         return hasAuthorityForClient("reimportMetadata");
     }
+
+    /**
+     * Check if the current user has the permission to move media in the metadata editor and thus change its order.
+     *
+     * @return true if the current user has the permission to move media in the metadata editor
+     */
+    public boolean hasAuthorityToMoveMedia() {
+        return hasAuthorityForClient("moveMedia");
+    }
 }

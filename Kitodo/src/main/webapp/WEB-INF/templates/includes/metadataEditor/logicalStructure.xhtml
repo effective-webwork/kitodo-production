@@ -69,8 +69,8 @@
                 selectionMode="multiple"
                 multipleDrag="true"
                 selection="#{DataEditorForm.structurePanel.selectedLogicalNodesAsArray}"
-                draggable="#{not readOnly and SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
-                droppable="#{not readOnly and SecurityAccessController.hasAuthorityToEditProcessStructureData()}"
+                draggable="#{not readOnly and SecurityAccessController.hasAuthorityToMoveMedia()}"
+                droppable="#{not readOnly and SecurityAccessController.hasAuthorityToMoveMedia()}"
                 dragdropScope="logicalTree"
                 onNodeClick="metadataEditor.logicalTree.onNodeClick(node,event)">
             <p:ajax event="select"

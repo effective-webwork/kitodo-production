@@ -1207,4 +1207,13 @@ public class SecurityAccessController {
     public boolean hasAuthorityToReimportMetadata() {
         return securityAccessService.hasAuthorityToReimportMetadata();
     }
+
+    /**
+     * Check if the current user has the permission to move media in the metadata editor and thus change its order.
+     *
+     * @return true if the current user has the permission to move media in the metadata editor
+     */
+    public boolean hasAuthorityToMoveMedia() {
+        return securityAccessService.hasAuthorityToMoveMedia();
+    }
 }
