@@ -116,7 +116,7 @@ public class ListingQueryParameterST extends BaseTestSelenium {
         URI tasksURI = new URI(Browser.getDriver().getCurrentUrl());
 
         // check that four tasks are listed by default
-        assertEquals("Next Open", tasksPage.getFirstRowTaskTitle());
+        assertEquals("Progress", tasksPage.getFirstRowTaskTitle());
         assertEquals(4, tasksPage.countListedTasks());
 
         // check that sorting by title in descending order works
