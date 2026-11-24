@@ -97,8 +97,7 @@ public class WorkflowService extends BaseBeanService<Workflow, WorkflowDAO> {
      * {@link WorkflowStatus} {@code ACTIVE} for the client for which the
      * current user is working at the moment.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      *
      * @return all available workflows
@@ -111,8 +110,7 @@ public class WorkflowService extends BaseBeanService<Workflow, WorkflowDAO> {
      * Returns all active workflows. These are all workflows that are in
      * {@link WorkflowStatus} {@code ACTIVE}.
      *
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This method actually returns all objects of all clients and is therefore
      * more suitable for operational purposes, rather not for display purposes.
      * 

@@ -34,8 +34,7 @@ import org.kitodo.api.dataformat.mets.KitodoUUID;
  * containing envelopes with booklets and loose sheets and a dust jacket with a
  * phonographic record in it, etc.
  *
- * <p>
- * Media files that represent different representations of the same medium can
+ * <p>Media files that represent different representations of the same medium can
  * be attached to a physical division. This can be still images in different
  * resolutions with equal image content, but also the photography of the side of
  * a record along with its digitized soundtrack.

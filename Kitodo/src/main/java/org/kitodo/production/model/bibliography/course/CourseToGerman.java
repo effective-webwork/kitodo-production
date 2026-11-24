@@ -31,8 +31,7 @@ public class CourseToGerman {
     /**
      * Days of week’s names in German.
      *
-     * <p>
-     * Joda time’s days of week are 1-based, where 1 references Monday through 7
+     * <p>Joda time’s days of week are 1-based, where 1 references Monday through 7
      * references Sunday. Therefore the “null” in first place.
      */
     private static final String[] DAYS_OF_WEEK_NAMES = new String[] {null, "Montag", "Dienstag", "Mittwoch",
@@ -41,8 +40,7 @@ public class CourseToGerman {
     /**
      * Month’s names in German.
      *
-     * <p>
-     * Joda time’s months are 1-based, therefore the “null” in first place.
+     * <p>Joda time’s months are 1-based, therefore the “null” in first place.
      */
     private static final String[] MONTH_NAMES = new String[] {null, "Januar", "Februar", "März", "April", "Mai", "Juni",
                                                               "Juli", "August", "September", "Oktober", "November",

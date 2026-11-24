@@ -1212,14 +1212,12 @@ public class GalleryPanel {
     /**
      * Builds the dynamic resource URL used for image previews.
      *
-     * <p>
-     * Normally, {@code p:graphicImage} creates this URL internally while rendering
+     * <p>Normally, {@code p:graphicImage} creates this URL internally while rendering
      * the component. Since gallery thumbnails are rendered as plain {@code <img>}
      * elements for performance reasons, this part of the PrimeFaces behavior has
      * to be reproduced explicitly.
      *
-     * <p>
-     * The generated URL is associated with {@code #{mediaProvider.previewData}}.
+     * <p>The generated URL is associated with {@code #{mediaProvider.previewData}}.
      * When the browser later requests the URL, PrimeFaces resolves this expression
      * on the server and uses the returned preview data as the response content.
      *

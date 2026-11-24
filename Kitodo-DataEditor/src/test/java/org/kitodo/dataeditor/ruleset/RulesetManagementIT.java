@@ -82,8 +82,7 @@ public class RulesetManagementIT {
      * whether the parser has been implemented correctly. The only purpose of
      * this test is that the load command does not throw an exception.
      *
-     * <p>
-     * The ruleset for this test is more practice-oriented and also includes
+     * <p>The ruleset for this test is more practice-oriented and also includes
      * documentation, if you are looking for it.
      */
     @Test

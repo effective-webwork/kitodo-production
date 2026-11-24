@@ -37,8 +37,7 @@ import org.kitodo.data.database.enums.LinkingMode;
  * Stores configuration settings regarding a type of sub-folder in the process
  * directories of processes in a project.
  *
- * <p>
- * Typically, a folder has a corresponding sub-directory in the process
+ * <p>Typically, a folder has a corresponding sub-directory in the process
  * directory of each process and a {@code <fileGrp>} structure in the produced
  * METS file. The assumption is, that each folder contains the same number of
  * files with the same names, except for the file extension, which can vary.
@@ -46,15 +45,13 @@ import org.kitodo.data.database.enums.LinkingMode;
  * small low quality JPEG thumbnail, a high quality JPEG, an OCR-processed PDF,
  * etc.) Each version is represented by one {@code Folder} object.
  *
- * <p>
- * The sub-directory can be located by appending the value of {@link #path} to
+ * <p>The sub-directory can be located by appending the value of {@link #path} to
  * the path to the process directory. The {@code <fileGrp>} structure has the
  * {@code USE} attribute set to the value of {@link #fileGroup}. It contains
  * links to the files contained in the directory. The links are formed by
  * concatenating the {@link #urlStructure} with the simple name of the file.
  *
- * <p>
- * However, a {@code Folder} can also only exist on the drive without being
+ * <p>However, a {@code Folder} can also only exist on the drive without being
  * exported to METS. Or, it can exist only virtually without correspondence on a
  * drive, just to produce the METS {@code <fileGrp>} structure.
  */

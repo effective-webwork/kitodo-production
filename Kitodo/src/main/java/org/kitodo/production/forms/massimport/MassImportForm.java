@@ -140,18 +140,14 @@ public class MassImportForm extends BaseForm {
     /**
      * Parses the lines of a CSV file and processes the data for further use.
      *
-     * <p>
-     * This method updates the metadata keys, validates the integrity of the imported records,
+     * <p>This method updates the metadata keys, validates the integrity of the imported records,
      * and checks for consistency between the number of metadata keys and the data in the CSV.
      * It also handles scenarios such as missing separators, empty columns, and skips empty columns
      * if the configured option is enabled.
      *
-     * <p>
-     * When the parsing or validation fails due to mismatched separators, missing metadata keys,
+     * <p>When the parsing or validation fails due to mismatched separators, missing metadata keys,
      * or other issues, appropriate error or warning messages are set, and an empty record
      * structure is initialized.
-     *
-     * <p>
      *
      * @throws IOException if an error occurs while reading the CSV lines
      * @throws KitodoCsvImportException if an error specific to Kitodo CSV import occurs

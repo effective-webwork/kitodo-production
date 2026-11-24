@@ -20,8 +20,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * One node of a tree depicting the structure of the document.
  *
- * <p>
- * A DocStruct object represents a structure entity in work. Every document
+ * <p>A DocStruct object represents a structure entity in work. Every document
  * consists of a structure, which can be separated into several structure
  * entities, which build hierarchical structure. Usually a
  * {@code DigitalDocument} contains two structures; a logical and a physical
@@ -29,8 +28,7 @@ import org.apache.logging.log4j.Logger;
  * some kind of structure. This structure is represented by parent and children
  * of {@code DocStruct} objects.
  *
- * <p>
- * This class contains methods to:
+ * <p>This class contains methods to:
  * <ul>
  * <li>Retrieve information about the structure (add, move and remove children),
  * <li>set the parent (the top element has no parent),
@@ -38,8 +36,7 @@ import org.apache.logging.log4j.Logger;
  * <li>handle content files, which are linked to a structure entity.
  * </ul>
  *
- * <p>
- * Every structure entity is of a special kind. The kind of entity is stored in
+ * <p>Every structure entity is of a special kind. The kind of entity is stored in
  * a {@code DocStructType} element. Depending on the type of structure entities
  * certain metadata and children a permitted or forbidden.
  */
@@ -51,12 +48,10 @@ public interface LegacyDocStructHelperInterface {
      * allowed to add it, based on the configuration. If so, the object is added
      * and the method returns {@code true}, otherwise it returns {@code false}.
      * 
-     * <p>
-     * The {@code Metadata} object must already include all necessary
+     * <p>The {@code Metadata} object must already include all necessary
      * information, such as {@code MetadataType} and value.
      * 
-     * <p>
-     * For internal reasons, this method replaces the {@code MetadataType}
+     * <p>For internal reasons, this method replaces the {@code MetadataType}
      * object by a local copy, which is retrieved from the {@code DocStructType}
      * of this instance. The internal name of both {@code MetadataType} objects
      * will still be identical afterwards. If a local copy cannot be found,
@@ -100,8 +95,7 @@ public interface LegacyDocStructHelperInterface {
      * cannot be added a second time. Therefore these {@code MetadataType}s will
      * not be included in this list.
      *
-     * <p>
-     * Internal metadata groups, whose {@code MetadataGroupType} starts with
+     * <p>Internal metadata groups, whose {@code MetadataGroupType} starts with
      * the {@code HIDDEN_METADATA_CHAR}, will also not be included.
      *
      * @return all metadata types that users can add to this instance
@@ -128,8 +122,7 @@ public interface LegacyDocStructHelperInterface {
      * which have an author. It is possible to use "{@code *}" as wildcard
      * character value for {@code theDocTypeName} and {@code theMDTypeName}.
      *
-     * <p>
-     * If this instance has no children, null is returned.
+     * <p>If this instance has no children, null is returned.
      *
      * @param docStructType
      *            name of the structural type
@@ -159,8 +152,7 @@ public interface LegacyDocStructHelperInterface {
      * Returns all metadata of a given type, including persons. Can be used to
      * get all titles, authors, etc.
      *
-     * <p>
-     * If no {@code MetadataGroup}s are available, an empty list is returned.
+     * <p>If no {@code MetadataGroup}s are available, an empty list is returned.
      *
      * @param metadataType
      *            metadata type to look for

@@ -66,16 +66,14 @@ import org.kitodo.utils.JAXBContextCache;
  * a Production workflow. The file format for this management structure is METS
  * XML after the ZVDD DFG Viewer Application Profile.
  *
- * <p>
- * A {@code Workpiece} has two essential characteristics: {@link FileXmlElementAccess}s and
+ * <p>A {@code Workpiece} has two essential characteristics: {@link FileXmlElementAccess}s and
  * an outline {@link DivXmlElementAccess}. {@code PhysicalDivision}s are the types of every
  * single digital medium on a conceptual level, such as the individual pages of
  * a book. Each {@code PhysicalDivision} can be in different {@link UseXmlAttributeAccess}s (for
  * example, in different resolutions or file formats). Each {@code MediaVariant}
  * of a {@code PhysicalDivision} resides in a {@link FLocatXmlElementAccess} in the data store.
  *
- * <p>
- * The {@code LogicalDivision} is a tree structure that can be finely
+ * <p>The {@code LogicalDivision} is a tree structure that can be finely
  * subdivided, e.g. a book, in which the chapters, in it individual elements
  * such as tables or figures. Each outline level points to the
  * {@code PhysicalDivision}s that belong to it via {@link AreaXmlElementAccess}s.

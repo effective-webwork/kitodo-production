@@ -78,8 +78,7 @@ public abstract class ActiveMQProcessor implements MessageListener {
      * }
      * </pre>
      *
-     * <p>
-     * If the parameter is not set in kitodo_config.properties, it will return
+     * <p>If the parameter is not set in kitodo_config.properties, it will return
      * “null” and so prevents it from being set up in ActiveMQDirector.
      *
      * @param queueName
@@ -96,8 +95,7 @@ public abstract class ActiveMQProcessor implements MessageListener {
      * results to the results topic, which it does after the abstract method
      * process() has finished.
      *
-     * <p>
-     * Since this will be the same for all processors which use MapMessages, I
+     * <p>Since this will be the same for all processors which use MapMessages, I
      * extracted the portion into the abstract class.
      */
     @Override

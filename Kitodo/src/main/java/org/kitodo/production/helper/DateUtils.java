@@ -39,8 +39,7 @@ public class DateUtils {
      * Returns from an ordered set of dates for
      * a given year the last month which a date can be found for in that year.
      *
-     * <p>
-     * Example: Let the ordered data set contain: …, 5th May 1954, 20th May
+     * <p>Example: Let the ordered data set contain: …, 5th May 1954, 20th May
      * 1954, 13th October 1954, 5th February 1955, 23th March 1955, 15th October
      * 1956, …. Then the function will return 10 (DateTimeConstants.OCTOBER) for
      * 1954 and 3 (DateTimeConstants.MARCH) for 1955.

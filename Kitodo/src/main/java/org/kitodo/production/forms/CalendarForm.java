@@ -134,8 +134,7 @@ public class CalendarForm implements Serializable {
     /**
      * Empty constructor. Creates a new form without yet any data.
      *
-     * <p>
-     * The issue color presets are samples which have been chosen to provide
+     * <p>The issue color presets are samples which have been chosen to provide
      * distinguishability also for users with red-green color vision deficiency.
      * Arbitrary colors can be defined in kitodo_config.properties by setting
      * the property “issue.colours”.
@@ -395,8 +394,7 @@ public class CalendarForm implements Serializable {
      * not be presented with the option to generate processes “as imported” if
      * he or she never ran an import before.
      *
-     * <p>
-     * Note: The process data will be generated with a granularity of “days”
+     * <p>Note: The process data will be generated with a granularity of “days”
      * (each day forms one process). This setting can be changed later after the
      * data has been re-imported, but it will remain if the user uploads the
      * saved data and then proceeds right to the next page and creates processes
@@ -436,8 +434,7 @@ public class CalendarForm implements Serializable {
      * condition, i.e. there is no block defined yet, as read-only property
      * “blank”.
      *
-     * <p>
-     * Side note: “empty” is a reserved word in JSP and cannot be used as
+     * <p>Side note: “empty” is a reserved word in JSP and cannot be used as
      * property name.
      *
      * @return whether there is no block yet

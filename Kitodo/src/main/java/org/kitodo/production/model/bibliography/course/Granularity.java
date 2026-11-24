@@ -56,8 +56,7 @@ public enum Granularity {
      * <li>for YEARS: 2000
      * </ul>
      *
-     * <p>
-     * The remaining cases are undefined and will throw NotImplementedException.
+     * <p>The remaining cases are undefined and will throw NotImplementedException.
      *
      * @param date
      *            date to format

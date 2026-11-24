@@ -24,8 +24,7 @@ import org.kitodo.api.Metadata;
 /**
  * Interface for a service that provides access to the ruleset.
  *
- * <p>
- * The ruleset is an elongated XML file in an internal format that sets the
+ * <p>The ruleset is an elongated XML file in an internal format that sets the
  * rules for editing METS files in the Kitodo.Production application profile.
  * Much of the complexity of the rule set is realized by this service and hidden
  * to the outside.

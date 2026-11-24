@@ -56,8 +56,7 @@ public class OcrdWorkflowService {
 
     /**
      * Get list of OCR-D workflows from directory.
-     * <p>
-     * The files are relative paths to the OCR-D workflow directory.
+     * <p>The files are relative paths to the OCR-D workflow directory.
      * </p>
      *
      * @return list of OCR-D workflows

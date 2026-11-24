@@ -202,12 +202,10 @@ public enum ParameterCore implements ParameterInterface {
     /**
      * Sorting of images.
      *
-     * <p>
-     * Numeric sorting of images. 1 is lesser then 002, compares the number of
+     * <p>Numeric sorting of images. 1 is lesser then 002, compares the number of
      * image names, characters other than digits are not supported.
      *
-     * <p>
-     * Alphanumeric sorting of images. 1 is greater then 002, compares character
+     * <p>Alphanumeric sorting of images. 1 is greater then 002, compares character
      * by character of image names, all characters are supported.
      */
     IMAGE_SORTING(new Parameter<>("image.sorting", "number", Arrays.asList("number", "alphanumeric"))),
@@ -227,8 +225,7 @@ public enum ParameterCore implements ParameterInterface {
      * Absolute path to the directory that the resource bundle files are stored in,
      * terminated by a directory separator ("/").
      *
-     * <p>
-     * Note: If this directory DOESN'T EXIST, the internal resource bundles will be
+     * <p>Note: If this directory DOESN'T EXIST, the internal resource bundles will be
      * used. If this directory exists BUT DOES NOT CONTAIN suitable resources, the
      * screens will not work as expected.
      */
@@ -551,8 +548,7 @@ public enum ParameterCore implements ParameterInterface {
     /**
      * Which authority identifier to use for a given URI prefix.
      *
-     * <p>
-     * Example: authority.http\://d-nb.info/gnd/.id=gnd
+     * <p>Example: authority.http\://d-nb.info/gnd/.id=gnd
      */
     AUTHORITY_ID_FROM_URI(new Parameter<UndefinedParameter>("authority.{0}.id")),
 
@@ -561,8 +557,7 @@ public enum ParameterCore implements ParameterInterface {
      * person. This should usually be your preferred norm data file’s URI prefix as
      * to the user doesn’t have to enter it over and over again.
      *
-     * <p>
-     * Example: authority.default=http\://d-nb.info/gnd/
+     * <p>Example: authority.default=http\://d-nb.info/gnd/
      */
     AUTHORITY_DEFAULT(new Parameter<UndefinedParameter>("authority.default")),
 

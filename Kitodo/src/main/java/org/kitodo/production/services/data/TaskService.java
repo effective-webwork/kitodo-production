@@ -138,13 +138,11 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * Returns the number of objects of the implementing type that the filter
      * matches.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts the data records for the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      *
      * <!-- Here, an additional function countResults() is specified with
@@ -195,8 +193,7 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * navigate through the tasks page by page, without having to load all
      * objects into memory.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function filters the data according to the client, for which the
      * logged-in user is currently working.
      *
@@ -208,8 +205,7 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * SearchDatabaseServiceInterface. This could be equalized at some point in
      * the future. -->
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      * 
      * @param offset
@@ -367,8 +363,7 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * Finds all template task names that each differ from any other. That means, no
      * doubles.
      *
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This method actually returns all template task names of all clients and is
      * therefore more suitable for operational purposes, rather not for display
      * purposes.
@@ -492,8 +487,7 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * completed or set to open and the changed state is immediately saved to
      * the database.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * In previous versions, up to five scripts could be available in a task,
      * and the operator would then start one or another of them manually.
      * Therefore, the script can still be passed here (because there were
@@ -734,16 +728,14 @@ public class TaskService extends BaseBeanService<Task, TaskDAO> {
      * The function determines, from projects, the folders whose contents can be
      * generated automatically.
      *
-     * <p>
-     * This feature is needed once by the task in the template to determine
+     * <p>This feature is needed once by the task in the template to determine
      * which folders show buttons in the interface to turn content creation on
      * or off. In addition, the function of the task in the process is required
      * to determine if there is at least one folder to be created in the task,
      * because then action links for generating are displayed, and not
      * otherwise.
      *
-     * <p>
-     * To create content automatically, a folder must be defined as the template
+     * <p>To create content automatically, a folder must be defined as the template
      * folder in the project. The templates serve to create the contents in the
      * other folders to be created. Under no circumstances should the contents
      * of the template folder be automatically generated, even if, for example,

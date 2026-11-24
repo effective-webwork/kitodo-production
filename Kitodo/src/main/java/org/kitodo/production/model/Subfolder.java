@@ -57,8 +57,7 @@ import org.kitodo.production.services.file.FileService;
  * folders and which are conceptually the same file, share a part of their
  * filename. This is referred to here as the canonical part of the file name.
  *
- * <p>
- * For historical reasons, in some institutions using this software, there is a
+ * <p>For historical reasons, in some institutions using this software, there is a
  * situation where the different variants of a file are in the same folder and
  * differ in filename suffix. We do not want to advertise this setup, but we
  * will continue to support it because it would be difficult for these

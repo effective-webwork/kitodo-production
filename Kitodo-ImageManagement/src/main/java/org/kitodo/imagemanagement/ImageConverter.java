@@ -112,10 +112,8 @@ class ImageConverter {
      * ImageMagick. Arguments can be added to the configuration with the prefix
      * {@code ImageManagement.param.}.
      *
-     * <p>
-     * Examples:
+     * <p>Examples:
      *
-     * <p>
      * <table border=2 cellspacing=1 cellpadding=2>
      * <tr>
      * <th>Configuration entry</th>

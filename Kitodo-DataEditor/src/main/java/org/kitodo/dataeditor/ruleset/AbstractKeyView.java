@@ -38,8 +38,7 @@ abstract class AbstractKeyView<D extends Labeled> implements MetadataViewInterfa
      * The wish list of the user regarding the human languages best understood
      * by it.
      *
-     * <p>
-     * <small>That takes in both male and female users.</small>
+     * <p><small>That takes in both male and female users.</small>
      */
     protected final List<LanguageRange> priorityList;
 

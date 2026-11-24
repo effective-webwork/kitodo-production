@@ -83,8 +83,7 @@ public class ProjectService extends BaseBeanService<Project, ProjectDAO> {
      * Returns all projects of the client, for which the logged-in user is
      * currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      * 
      * @return all projects for the selected client
@@ -167,11 +166,9 @@ public class ProjectService extends BaseBeanService<Project, ProjectDAO> {
      * belong to the client for which the logged-in user is currently working.
      * These are displayed in the addProjectsPopup.
      * 
-     * <p>
-     * {P} := currentUser.currentClient.projects - userAccount.projects
+     * <p>{P} := currentUser.currentClient.projects - userAccount.projects
      *
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      * 
      * @param user
@@ -281,8 +278,7 @@ public class ProjectService extends BaseBeanService<Project, ProjectDAO> {
      * is assigned to, and that belong to the client, that they are currently
      * working for.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      * 
      * @return all projects the user is assigned to for the current client

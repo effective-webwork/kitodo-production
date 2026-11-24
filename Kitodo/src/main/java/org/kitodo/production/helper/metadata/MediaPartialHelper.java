@@ -108,8 +108,7 @@ public class MediaPartialHelper {
     /**
      * Calculate the extent of a media partial.
      *
-     * <p>
-     * Calculates the duration or extent of a media partial until the next one or until the end of the media.
+     * <p>Calculates the duration or extent of a media partial until the next one or until the end of the media.
      *
      * @param logicalDivisions
      *         The logical divisions of media partials.

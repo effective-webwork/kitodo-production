@@ -26,8 +26,7 @@ public enum ParameterAPI implements ParameterInterface {
      * Absolute path to the directory that the configuration files are stored
      * in, terminated by a directory separator ("/").
      *
-     * <p>
-     * Note: Several, but not all configuration files are read from that
+     * <p>Note: Several, but not all configuration files are read from that
      * directory. You may want to decide to point this path to the directory
      * where the servlet container will extract the configuration files to (like
      * webapps/kitodo/WEB-INF/classes) in order to make sure they are found.

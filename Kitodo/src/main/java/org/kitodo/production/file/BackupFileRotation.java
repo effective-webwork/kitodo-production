@@ -28,8 +28,7 @@ import org.kitodo.production.services.file.FileService;
  * Creates backup for files in a given directory that match a regular
  * expression.
  *
- * <p>
- * All backup files are named by the original file with a number appended. The
+ * <p>All backup files are named by the original file with a number appended. The
  * bigger the number, the older the backup. A specified maximum number of backup
  * files are generated:
  *
@@ -54,8 +53,7 @@ public class BackupFileRotation {
     /**
      * Start the configured backup.
      *
-     * <p>
-     * If the maximum backup count is less then 1, nothing happens.
+     * <p>If the maximum backup count is less then 1, nothing happens.
      *
      * @throws IOException
      *             if a file system operation fails

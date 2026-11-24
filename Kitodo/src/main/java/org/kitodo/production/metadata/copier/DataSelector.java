@@ -18,8 +18,7 @@ import org.kitodo.exceptions.ConfigurationException;
  * A DataSelector is useful to access a data object. There are different
  * DataSelectors available to access metadata and program variables.
  *
- * <p>
- * The factory method {{@link #create(String)} can be used to retrieve a
+ * <p>The factory method {{@link #create(String)} can be used to retrieve a
  * DataSelector instance for a given path.
  */
 public abstract class DataSelector {

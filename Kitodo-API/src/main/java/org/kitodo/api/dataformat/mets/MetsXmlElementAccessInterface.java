@@ -21,8 +21,7 @@ import org.kitodo.api.dataformat.Workpiece;
  * Interface for a service that handles access to the {@code <mets:mets>}
  * element.
  *
- * <p>
- * METS is a schema that describes possible structures of an XML file. Despite
+ * <p>METS is a schema that describes possible structures of an XML file. Despite
  * many definitions, it is so variable that the same piece of information can be
  * stored in various ways in the file, so that an extended technical use of the
  * information is not readily possible. To fix this shortcoming, so-called

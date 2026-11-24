@@ -364,8 +364,7 @@ public class FilterService extends BaseBeanService<Filter, FilterDAO> {
      * Everything that belongs together according to the above rules is now
      * processed as one search token.
      * 
-     * <p>
-     * Search syntax: A preceding minus sign indicates {@code not}-search. The
+     * <p>Search syntax: A preceding minus sign indicates {@code not}-search. The
      * search query can be either be words, or a fielded search. A search field
      * is preceded by its name and a colon. There are index search fields for
      * metadata, which are searched for using pseudowords in the index, and

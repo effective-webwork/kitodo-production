@@ -241,13 +241,11 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
      * Returns the number of objects of the implementing type that the filter
      * matches.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts the data records for the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      *
      * <!-- Here, an additional function countResults() is specified with
@@ -373,13 +371,11 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
      * navigate through the processes page by page, without having to load all
      * objects into memory.
      *
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function filters the data according to the client, for which the
      * logged-in user is currently working.
      *
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      *
      * <!-- Here, an additional function loadData() is specified with additional
@@ -436,8 +432,7 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
     /**
      * Saves multiple processes in the database.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * Each object is stored in its own database transaction.
      *
      * @param list
@@ -575,8 +570,7 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
      * topmost element of the logical outline below the selected parent element
      * is an allowed child.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * For the latter, the data file must be read at the moment. This will be
      * aborted after a timeout so that the user gets an answer (which may be
      * incomplete) in finite time.
@@ -636,14 +630,12 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
      * "select all", and then optionally deselected individual processes. The
      * function then returns a list of all <i>remaining</i> processes.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts the data records for the client, for which the
      * logged-in user is currently working. <b>Use it with caution, only if the
      * number of objects is manageable.</b>
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      * 
      * 
@@ -1356,13 +1348,11 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
     /**
      * Determines how many processes have a specific identifier.
      *
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts the data records for the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      *
      * <!-- Used to check whether a process identifier is already in use. In
@@ -2178,8 +2168,7 @@ public class ProcessService extends BaseBeanService<Process, ProcessDAO> {
     /**
      * Removes properties with empty title.
      * 
-     * <p>
-     * TODO: Is it really a case that title is empty?
+     * <p>TODO: Is it really a case that title is empty?
      * 
      * @param properties
      *            property list to be checked

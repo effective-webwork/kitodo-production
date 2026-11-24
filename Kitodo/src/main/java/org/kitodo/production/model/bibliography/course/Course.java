@@ -48,8 +48,7 @@ import org.w3c.dom.Node;
 /**
  * The class Course represents the course of appearance of a newspaper.
  *
- * <p>
- * A course of appearance consists of one or more blocks of time. Interruptions
+ * <p>A course of appearance consists of one or more blocks of time. Interruptions
  * in the course of appearance can be modeled by subsequent blocks.
  */
 public class Course extends ArrayList<Block> {
@@ -58,22 +57,19 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code after="…"} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * Newspapers, especially bigger ones, can have several issues that, e.g.,
+     * <p>Newspapers, especially bigger ones, can have several issues that, e.g.,
      * may differ in time of publication (morning issue, evening issue, …) or
      * geographic distribution (Edinburgh issue, London issue, …). Normally,
      * when parsing the XML file, the issues are created in their order of first
      * appearance. However, if you want to enforce a different order, you can
      * define it here.
      *
-     * <p>
-     * The attribute {@code after="…"} holds the names of issues that shall be
+     * <p>The attribute {@code after="…"} holds the names of issues that shall be
      * ordered before this issue. Several issues are to be separated by white
      * space. Issue names containing white space must be enclosed in double
      * replaced by two subsequent apostrophes ("{@code ''}", 2× U+0027).
      *
-     * <p>
-     * Not-yet-mentioned issues are created before, though maybe empty.
+     * <p>Not-yet-mentioned issues are created before, though maybe empty.
      */
     private static final String ATTRIBUTE_AFTER = "after";
 
@@ -87,8 +83,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code increment="…"} used in the XML representation of a
      * course of appearance.
      *
-     * <p>
-     * The attribute {@code increment="…"} can have as value one of the
+     * <p>The attribute {@code increment="…"} can have as value one of the
      * {@link Granularity} values, in lower case. It indicates when the counter
      * shall be incremented.
      */
@@ -98,8 +93,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code issue="…"} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * The attribute {@code issue="…"} holds the name of the issue. Newspapers,
+     * <p>The attribute {@code issue="…"} holds the name of the issue. Newspapers,
      * especially bigger ones, can have several issues that, e.g., may differ in
      * time of publication (morning issue, evening issue, …) or geographic
      * distribution (Edinburgh issue, London issue, …).
@@ -110,8 +104,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code metadataType="…"} used in the XML representation of a
      * course of appearance.
      *
-     * <p>
-     * The attribute {@code metadataType="…"} holds the name of the metadata
+     * <p>The attribute {@code metadataType="…"} holds the name of the metadata
      * type that this counter will be written to.
      */
     private static final String ATTRIBUTE_METADATA_TYPE = "metadataType";
@@ -120,8 +113,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code value="…"} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * The attribute {@code value="…"} holds the counter start value.
+     * <p>The attribute {@code value="…"} holds the counter start value.
      */
     private static final String ATTRIBUTE_VALUE = "value";
 
@@ -129,8 +121,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code index="…"} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * The attribute {@code index="…"} is optional. It may be used to
+     * <p>The attribute {@code index="…"} is optional. It may be used to
      * distinguish different blocks if needed and can be omitted if only one
      * block is used.
      */
@@ -140,8 +131,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code yearBegin="…"} used in the XML representation of a
      * course of appearance.
      *
-     * <p>
-     * The attribute {@code yearBegin="…"} is optional. It may be used to
+     * <p>The attribute {@code yearBegin="…"} is optional. It may be used to
      * indicate a year begin different from the first of January, as it may be
      * used for school years, business years, or seasons.
      */
@@ -151,8 +141,7 @@ public class Course extends ArrayList<Block> {
      * Attribute {@code yearTerm="…"} used in the XML representation of a course
      * of appearance.
      *
-     * <p>
-     * The attribute {@code yearTerm="…"} is optional. It may be used to
+     * <p>The attribute {@code yearTerm="…"} is optional. It may be used to
      * indicate the type of year that begins with a date different from the
      * first of January, values maybe like “business year”, “season”, or “school
      * year”.
@@ -163,8 +152,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <appeared>} used in the XML representation of a
      * course of appearance.
      *
-     * <p>
-     * Each {@code <appeared>} element represents one issue that
+     * <p>Each {@code <appeared>} element represents one issue that
      * physically appeared. It has the attributes {@code issue="…"}
      * (required, may be empty) and {@code date="…"} (required) and cannot
      * hold child elements.
@@ -175,8 +163,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <course>} used in the XML representation of a
      * course of appearance.
      *
-     * <p>
-     * {@code <course>} is the root element of the XML
+     * <p>{@code <course>} is the root element of the XML
      * representation. It can hold two children,
      * {@code <description>} (output only, optional) and
      * {@code <processes>} (required).
@@ -187,8 +174,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <description>} used in the XML representation
      * of a course of appearance.
      *
-     * <p>
-     * {@code <description>} holds a verbal, human-readable
+     * <p>{@code <description>} holds a verbal, human-readable
      * description of the course of appearance, which is generated only and
      * doesn’t have an effect on input.
      */
@@ -198,8 +184,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <metadata>} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * {@code <metadata>} declares an auto-counting metadata value assigned to
+     * <p>{@code <metadata>} declares an auto-counting metadata value assigned to
      * the issue it is used in. The counter will start counting until it is
      * replaced by another counter. A counter value of {@code ""} disables the
      * counter.
@@ -210,8 +195,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <process>} used in the XML representation of a course of
      * appearance.
      *
-     * <p>
-     * Each {@code <process>} element represents one process to be generated in
+     * <p>Each {@code <process>} element represents one process to be generated in
      * Production. It can hold {@code <title>} elements (of any quantity).
      */
     private static final String ELEMENT_PROCESS = "process";
@@ -220,8 +204,7 @@ public class Course extends ArrayList<Block> {
      * Element {@code <processes>} used in the XML representation of
      * a course of appearance.
      *
-     * <p>
-     * Each {@code <processes>} element represents the processes to
+     * <p>Each {@code <processes>} element represents the processes to
      * be generated in Production. It can hold
      * {@code <process>} elements (of any quantity).
      */
@@ -234,8 +217,7 @@ public class Course extends ArrayList<Block> {
      * attribute {@code index="…"} and can hold
      * {@code <appeared>} elements (of any quantity).
      *
-     * <p>
-     * Note: In the original design, the element was intended to model title
+     * <p>Note: In the original design, the element was intended to model title
      * name changes. This was given up later, but for historical reasons, the
      * XML element’s name is still “title”. For the original design, see
      * https://github.com/kitodo/kitodo-production/issues/51#issuecomment-38035674

@@ -40,8 +40,7 @@ import org.kitodo.longtermpreservationvalidation.conditions.LtpValidationConditi
 /**
  * Manages Jhove.
  * 
- * <p>
- * The png module (PNG-gdm, "com.mcgath.jhove.module.PngModule") is disabled,
+ * <p>The png module (PNG-gdm, "com.mcgath.jhove.module.PngModule") is disabled,
  * because it depends on the package "jhove-ext-modules". For some reason,
  * including this jar interferes with the xml processing in Kitodo.Production
  * somehow. Specifically, mods2kitodo schema conversion does not work correctly.

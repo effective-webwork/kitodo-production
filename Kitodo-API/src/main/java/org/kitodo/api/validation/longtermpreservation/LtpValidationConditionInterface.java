@@ -17,12 +17,10 @@ import java.util.List;
  * Describes a condition that has to be met when validating files for long term
  * preservation (ltp).
  * 
- * <p>
- * For example, a validation condition for a TIF file might be that the file is
+ * <p>For example, a validation condition for a TIF file might be that the file is
  * stored in one of several acceptable color spaces (RGB, CMYK).
  * 
- * <p>
- * A condition is modelled by the simple format "{property} {operation}
+ * <p>A condition is modelled by the simple format "{property} {operation}
  * {value(s)}". Example: "{ColorSpace} {contained in} {RGB,CMYK}".
  */
 public interface LtpValidationConditionInterface {
@@ -37,7 +35,7 @@ public interface LtpValidationConditionInterface {
 
     /**
      * Return the operation that is used to check the property against the
-     * condition values (e.g., equal, not_equal, smaller_than, etc.)
+     * condition values (e.g., equal, not_equal, smaller_than, etc.).
      * 
      * @return the operation that is used to check the property against the
      *         condition values
@@ -48,8 +46,7 @@ public interface LtpValidationConditionInterface {
      * Return a list of values that are checked against the property of the
      * file.
      * 
-     * <p>
-     * May be a single value (comparing via equal), two values (comparing as
+     * <p>May be a single value (comparing via equal), two values (comparing as
      * interval) or multiple values (comparing as set) depending on the
      * operation
      * </p>

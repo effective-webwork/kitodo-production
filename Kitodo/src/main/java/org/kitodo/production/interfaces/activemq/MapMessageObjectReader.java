@@ -58,8 +58,7 @@ public class MapMessageObjectReader {
      * implementation that requires the collection not to be empty and not to
      * contain the null element.
      *
-     * <p>
-     * Please note that the Set is allowed to contain the empty String (“”).
+     * <p>Please note that the Set is allowed to contain the empty String (“”).
      *
      * @param key
      *            the name of the set to return

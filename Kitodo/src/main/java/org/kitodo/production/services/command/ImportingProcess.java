@@ -155,8 +155,7 @@ final class ImportingProcess {
      * Specifies the number of actions required to import this process. This is
      * used to display the progress bar in Task Manager.
      * 
-     * <p>
-     * One action is the validation. One action is to create the directory for
+     * <p>One action is the validation. One action is to create the directory for
      * the import. One action is either creating the process in the database
      * <i>or</i> writing the error file. One action each is creating a
      * sub-directory or copying a file.

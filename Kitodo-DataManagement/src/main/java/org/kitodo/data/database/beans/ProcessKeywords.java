@@ -79,8 +79,7 @@ public class ProcessKeywords {
      * itself, and fielded into pseudowords to enable searches for specific
      * metadata fields that are only known at runtime.
      * 
-     * <p>
-     * In this implementation, most of the work actually happens in the
+     * <p>In this implementation, most of the work actually happens in the
      * constructor because it is placed as a singleton in a transient field of
      * the respective process object. Different subsets of the keywords are
      * retrieved via different getters whose call order is undefined. However,
@@ -363,8 +362,7 @@ public class ProcessKeywords {
      * both the bare terms and pseudowords to particularly powerfully search the
      * various metadata keys.
      * 
-     * <p>
-     * Suppose there is metadata with the key "TitleDocMain" and a value
+     * <p>Suppose there is metadata with the key "TitleDocMain" and a value
      * containing the string "Berlin, Charlottenburg". In the ruleset,
      * "TitleDocMain" is translated as "Maint title" and "Hauptsachtitel". This
      * produces the following pseudo search terms in addition to the search term
@@ -399,8 +397,7 @@ public class ProcessKeywords {
      * in a meaningful way to achieve meaningful hits even with the substring
      * search.
      * 
-     * <p>
-     * A process with title "PineSeve_313539383" would be searchable as: pin,
+     * <p>A process with title "PineSeve_313539383" would be searchable as: pin,
      * pine, pines, pinese, pinesev, pineseve, ineseve, eseve, seve, eve, 313,
      * 3135, 31353, 313539, 3135393, 31353938, 313539383, 13539383, 3539383,
      * 539383, 39383, 9383, 383.

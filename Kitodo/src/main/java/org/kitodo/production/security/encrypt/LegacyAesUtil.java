@@ -57,8 +57,7 @@ public class LegacyAesUtil {
     /**
      * Encrypts a value by the secret using AES/CBC/PKCS5Padding algorithm.
      *
-     * <p>
-     * Function generates salt to convert secret to AES-256 secret key and makes
+     * <p>Function generates salt to convert secret to AES-256 secret key and makes
      * simple secrets more complex. In addition, function generates initialization
      * vector (iv) to made encrypted value different when original value is the
      * same. Salt and iv will be become one with the cipher text and result is
@@ -106,8 +105,7 @@ public class LegacyAesUtil {
     /**
      * Checks if value is encrypted.
      *
-     * <p>
-     * Function checks if value starts with defined salt prefix after base64
+     * <p>Function checks if value starts with defined salt prefix after base64
      * decoding.
      * </p>
      *
@@ -133,8 +131,7 @@ public class LegacyAesUtil {
     /**
      * Decrypts encrypted value by the secret using AES/CBC/PKCS5Padding algorithm.
      * 
-     * <p>
-     * Function splits encrypted value salt, cipher text and iv after base64
+     * <p>Function splits encrypted value salt, cipher text and iv after base64
      * decoding. Salt and secret will be used to build AES-256 secret key. With the
      * help of the iv and the secret key, the cipher text is decrypted and returned.
      * </p>

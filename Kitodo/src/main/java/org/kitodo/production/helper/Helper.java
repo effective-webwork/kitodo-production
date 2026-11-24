@@ -154,8 +154,7 @@ public class Helper {
     /**
      * Set error message to message tag with given name 'title'.
      *
-     * <p>
-     * This method also accepts logger and exception instances to automatically log
+     * <p>This method also accepts logger and exception instances to automatically log
      * the exceptions message or stackTrace values to the given logger.
      *
      * @param title
@@ -178,8 +177,7 @@ public class Helper {
      * Set error message to message tag with given name 'title'. Substitute all
      * placeholders in message tag with elements of given array 'parameters'.
      *
-     * <p>
-     * This method also accepts logger and exception instances to automatically log
+     * <p>This method also accepts logger and exception instances to automatically log
      * the exceptions message or stackTrace values to the given logger.
      *
      * @param title
@@ -199,8 +197,7 @@ public class Helper {
     /**
      * Set error message to message tag with given name 'title'.
      *
-     * <p>
-     * This method also accepts a description text and logger and exception
+     * <p>This method also accepts a description text and logger and exception
      * instances to automatically log the exceptions message or stackTrace values to
      * the given logger.
      *

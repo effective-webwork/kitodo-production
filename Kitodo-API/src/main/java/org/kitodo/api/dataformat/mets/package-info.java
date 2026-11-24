@@ -13,8 +13,7 @@
  * Interfaces for services that handles access to METS XML files in the
  * Production application profile format.
  *
- * <p>
- * METS is a schema that describes possible structures of an XML file. Despite
+ * <p>METS is a schema that describes possible structures of an XML file. Despite
  * many definitions, it is so variable that the same piece of information can be
  * stored in various ways in the file, so that an extended technical use of the
  * information is not readily possible. To fix this shortcoming, so-called
@@ -32,8 +31,7 @@
  * saves the user from the internal complexity and richness of the METS file
  * format.
  *
- * <p>
- * As a basis for the development of this interface, the design decision was
+ * <p>As a basis for the development of this interface, the design decision was
  * made that Production is the only editor of the Kitodo.Production METS
  * application profile, so that only components of the METS that can be produced
  * by Production itself are taken into account. Any additional information will

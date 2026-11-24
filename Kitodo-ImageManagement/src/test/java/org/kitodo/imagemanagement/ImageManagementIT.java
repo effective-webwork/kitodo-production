@@ -42,14 +42,12 @@ import org.kitodo.config.enums.ParameterImageManagement;
 /**
  * Tests the Image Management.
  *
- * <p>
- * To successfully run this test on Windows, create the file
+ * <p>To successfully run this test on Windows, create the file
  * <code>C:\Users\</code><i>your user
  * name</i><code>\kitodo_config.properties</code> with path to the your
  * ImageMagick program folder in it, like:
  *
- * <p>
- * {@code ImageManagement.searchPath=C:\\Program Files\\ImageMagick-7.0.7-Q16}
+ * <p>{@code ImageManagement.searchPath=C:\\Program Files\\ImageMagick-7.0.7-Q16}
  */
 public class ImageManagementIT {
     /**

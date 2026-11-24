@@ -87,8 +87,7 @@ public class TaskManager {
      * executing. If this fails for some reason (i.e. the list got concurrently
      * modified) it will be added in the end.
      *
-     * <p>
-     * This is a fallback method that is called by the overloaded start() method
+     * <p>This is a fallback method that is called by the overloaded start() method
      * of AbstractTask. Do not use it. Use TaskManager.addTask() to properly add
      * the tasks you created.
      *

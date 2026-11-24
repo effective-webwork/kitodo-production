@@ -65,15 +65,13 @@ public class LtpValidationConfigurationEditView extends BaseEditView {
      * simplified options to the user, such that a user does not need to learn
      * how validation conditions work and how they need to be specified.
      * 
-     * <p>
-     * If a non-null value is selected by a user, a corresponding validation
+     * <p>If a non-null value is selected by a user, a corresponding validation
      * condition is added to the list of conditions. If a user removes the
      * option (sets it to null), the corresponding validation condition is
      * removed from the list of validation conditions.
      * </p>
      * 
-     * <p>
-     * Simplified options take precedence over manually specifying the same
+     * <p>Simplified options take precedence over manually specifying the same
      * condition in the list of validation conditions, meaning a condition on
      * the same property is modified to match the simplified option chosen by
      * the user.

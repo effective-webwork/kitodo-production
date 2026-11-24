@@ -50,17 +50,14 @@ public abstract class BaseBeanService<T extends BaseBean, S extends BaseDAO<T>> 
      * makes it possible to navigate through the data objects page by page,
      * without having to load <i>all</i> objects into memory.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function filters the data according to the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * For {@code SearchDatabaseServiceInterface<Template>}, this must take into
      * account the value from
      * {@link DatabaseTemplateServiceInterface#setShowInactiveTemplates(boolean)}.
@@ -139,8 +136,7 @@ public abstract class BaseBeanService<T extends BaseBean, S extends BaseDAO<T>> 
     /**
      * Returns the number of objects of the implementing type in the database.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts all data records in the database for all clients.
      *
      * @return the number of objects
@@ -175,17 +171,14 @@ public abstract class BaseBeanService<T extends BaseBean, S extends BaseDAO<T>> 
      * Returns the number of objects of the implementing type that the filter
      * matches.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This function counts the data records for the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * This function requires that the thread is assigned to a logged-in user.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * For {@code SearchDatabaseServiceInterface<Template>}, this must take into
      * account the value from
      * {@link DatabaseTemplateServiceInterface#setShowInactiveTemplates(boolean)}.
@@ -286,13 +279,11 @@ public abstract class BaseBeanService<T extends BaseBean, S extends BaseDAO<T>> 
     /**
      * Returns all objects of the implementing type from the database.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This method actually returns all objects of all clients and is therefore
      * more suitable for operational purposes, rather not for display purposes.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * Use this with caution, only if the number of objects is manageable.
      *
      * @return all objects of the implementing type
@@ -305,8 +296,7 @@ public abstract class BaseBeanService<T extends BaseBean, S extends BaseDAO<T>> 
      * Returns a range of all objects of the implementing type from the
      * database. In this way the objects can be fetched in groups.
      * 
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * This method actually returns all objects of all clients and is therefore
      * more suitable for operational purposes, rather not for display purposes.
      *

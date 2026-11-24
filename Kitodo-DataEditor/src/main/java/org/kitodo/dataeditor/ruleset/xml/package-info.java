@@ -12,11 +12,9 @@
  * The classes in this package can be used by the JAXB parser to read the
  * ruleset XML file.
  *
- * <p>
- * <b>What is the ruleset?</b>
+ * <p><b>What is the ruleset?</b>
  *
- * <p>
- * The ruleset is the heart of Production. It describes the elements from which
+ * <p>The ruleset is the heart of Production. It describes the elements from which
  * the structure of the digitally represented cultural work can exist, and in
  * what form metadata for describing the structure can be entered. Technically,
  * this means that it determines which input masks the web interface displays.
@@ -24,11 +22,9 @@
  * also maintained in the current version as an XML file, because otherwise you
  * would need a whole set of different tables in the database to manage this.
  *
- * <p>
- * <b>Structure</b>
+ * <p><b>Structure</b>
  *
- * <p>
- * The rule set is divided into three conceptually separated sections (in this
+ * <p>The rule set is divided into three conceptually separated sections (in this
  * order):
  *
  * <dl>
@@ -43,11 +39,9 @@
  * metadata keys.</dd>
  * </dl>
  *
- * <p>
- * <b>The {@code <declaration>} section</b>
+ * <p><b>The {@code <declaration>} section</b>
  *
- * <p>
- * The declarations section defines
+ * <p>The declarations section defines
  * <ol>
  * <li>the outline elements from which the tree-shaped outline of the digital
  * representation of the cultural work can be constructed, and
@@ -75,8 +69,7 @@
  * </ul>
  * </ul>
  *
- * <p>
- * For example, perhaps the simplest variant of a rule set might look like this.
+ * <p>For example, perhaps the simplest variant of a rule set might look like this.
  * It has only the {@code declaration} section. With this rule set only books
  * can be cataloged. For each book author, year, title, publisher and place of
  * publication can be recorded. Otherwise there are no further requirements.
@@ -108,8 +101,7 @@
  * }
  * </pre>
  *
- * <p>
- * But of course the ruleset is much more powerful. You can specify a domain for
+ * <p>But of course the ruleset is much more powerful. You can specify a domain for
  * the keys. This is passed on to the outside and then determines in which
  * container they are stored in the file, of which there are six different ones.
  * Then the label. It translates into several languages. This applies to
@@ -130,8 +122,7 @@
  * }
  * </pre>
  *
- * <p>
- * For divisions, that was it, but there are many more options for keys. For
+ * <p>For divisions, that was it, but there are many more options for keys. For
  * keys, the codomain can be specified, that is, from what data type they are a
  * sub-interface. Currently the values {@code anyURI}, {@code boolean},
  * {@code date}, {@code integer} and {@code string} are supported. URIs can be
@@ -152,8 +143,7 @@
  * }
  * </pre>
  *
- * <p>
- * With the element {@code <option>}, enumeration types can be defined. Options
+ * <p>With the element {@code <option>}, enumeration types can be defined. Options
  * can have labels, also multilingual. Without a label, the value itself is
  * displayed. This can be used, for example, to implement digital collections:
  *
@@ -189,8 +179,7 @@
  * &lt;/key>
  * </pre>
  *
- * <p>
- * With {@code <preset>}, you can specify a value that is pre-filled when
+ * <p>With {@code <preset>}, you can specify a value that is pre-filled when
  * creating an entry with this metadata key.
  *
  * <pre>
@@ -206,8 +195,7 @@
  * }
  * </pre>
  *
- * <p>
- * Keys can be grouped. Here is an example of a natural person as contributor
+ * <p>Keys can be grouped. Here is an example of a natural person as contributor
  * with an indication of the role in relation to the work:
  *
  * <pre>
@@ -232,11 +220,9 @@
  * }
  * </pre>
  *
- * <p>
- * <b>The {@code <correlation>} section</b>
+ * <p><b>The {@code <correlation>} section</b>
  *
- * <p>
- * The difference between {@code <declaration>} and {@code <correlation>} is a
+ * <p>The difference between {@code <declaration>} and {@code <correlation>} is a
  * bit like the difference between well-formedness and validity in XML files.
  * {@code <declaration>} defines requirements for the well-formedness of the
  * data. If I define a metadata key that should be an integer, then “{@code 19th
@@ -255,11 +241,9 @@
  * define the display order of the elements. You can also drag items up and the
  * others will just show below.
  *
- * <p>
- * <b>The {@code <editing>} section</b>
+ * <p><b>The {@code <editing>} section</b>
  *
- * <p>
- * One can discuss whether the editing settings belong to the rule set at all.
+ * <p>One can discuss whether the editing settings belong to the rule set at all.
  * However, since they refer directly to the metadata keys declared at the
  * outset, they are also recorded here because otherwise there would be
  * references between several files, which would more easily lead to errors.
@@ -267,8 +251,7 @@
  * one acquisition stage. The specific settings then apply before the general,
  * and if there are none, the default applies.
  *
- * <p>
- * In the tests, there is a fairly detailed ruleset as an example of what is
+ * <p>In the tests, there is a fairly detailed ruleset as an example of what is
  * possible. It also explains all parameters. An XSD file for the ruleset is
  * provided in the resources of this module.
  *

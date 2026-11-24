@@ -77,8 +77,7 @@ public class DocketService extends BaseBeanService<Docket, DocketDAO> {
      * Returns all docket configuration objects of the client, for which the
      * logged-in user is currently working.
      * 
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      * 
      * @return all dockets for the selected client
@@ -92,8 +91,7 @@ public class DocketService extends BaseBeanService<Docket, DocketDAO> {
      * Returns all docket configuration objects with the specified label. This
      * can be used to check whether a label is still available.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * There is currently no filtering by client, so a label used by one client
      * cannot be used by another client.
      * 

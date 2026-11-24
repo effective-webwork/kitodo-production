@@ -107,8 +107,7 @@ public class TitleGenerator extends Generator {
      * title. Note that this implementation removes non-word characters (any
      * characters except A-Z, such as letters with diacritics).
      *
-     * <p>
-     * <u>Examples:</u><br>
+     * <p><u>Examples:</u><br>
      * {@code createAtstsl("Twenty Thousand Leagues Under the Sea", "Verne")}:
      * {@code VernTwen}<br>
      * {@code createAtstsl("Oxford English Dictionary", null)}: {@code OxfoEnDi}

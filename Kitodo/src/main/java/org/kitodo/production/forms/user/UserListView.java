@@ -99,8 +99,7 @@ public class UserListView extends BaseListView {
     /**
      * View action to delete a user if he does not have tasks in progress.
      *
-     * <p>
-     * Please note that deleting a user in Production will not delete the
+     * <p>Please note that deleting a user in Production will not delete the
      * user from a connected LDAP service.
      */
     public void delete(User userObject) {

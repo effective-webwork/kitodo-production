@@ -171,8 +171,7 @@ public class DivXmlElementAccess extends LogicalDivision {
      * Determines from a METS data structure of which type is a metadata
      * section.
      *
-     * <p>
-     * Implementation note: This method would be a good candidate for
+     * <p>Implementation note: This method would be a good candidate for
      * parallelization.
      *
      * @param mets

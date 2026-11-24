@@ -51,11 +51,9 @@ public abstract class Division<T extends Division<T>> {
     /**
      * Sequence number. The sequence number must be unique across all divisions.
      *
-     * <p>
-     * <i>For logical structures</i> meaningless, only used internally.
+     * <p><i>For logical structures</i> meaningless, only used internally.
      *
-     * <p>
-     * <i>For physical divisions</i>, the display or playback order of several media
+     * <p><i>For physical divisions</i>, the display or playback order of several media
      * units referenced from one logical division is determined by
      * this attribute, not by the order of the references.
      */
@@ -64,13 +62,11 @@ public abstract class Division<T extends Division<T>> {
     /**
      * The order label of this division.
      *
-     * <p>
-     * <i>For logical structures</i>, used to store <b>the machine-readable
+     * <p><i>For logical structures</i>, used to store <b>the machine-readable
      * value</b> if the <i>label</i> contains a human-readable value that can be
      * mapped to a machine-readable value.
      *
-     * <p>
-     * <i>For physical divisions</i>, <b>a human readable label</b> for the
+     * <p><i>For physical divisions</i>, <b>a human readable label</b> for the
      * <i>order</i> of this physical division. This need not be directly related to the
      * order number. Examples of order labels could be “I, II, III, IV, V, - ,
      * 1, 2, 3”, meanwhile the order would be “1, 2, 3, 4, 5, 6, 7, 8, 9”.

@@ -691,8 +691,7 @@ public class User extends BaseBean {
      * user ID may still be referenced somewhere, the user is not hard deleted from
      * the database, instead the account is set inactive and invisible.
      *
-     * <p>
-     * To allow recreation of an account with the same login the login is cleaned -
+     * <p>To allow recreation of an account with the same login the login is cleaned -
      * otherwise it would be blocked eternally by the login existence test performed
      * in the UserEditView.save() function. In addition, all personally identifiable
      * information is removed from the database as well.

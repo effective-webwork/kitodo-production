@@ -17,8 +17,7 @@ import org.kitodo.production.helper.VariableReplacer;
  * A replacement for the variable replacer, which simply replaces the process
  * title.
  *
- * <p>
- * The variable replacer fetches the process data directory from the process
+ * <p>The variable replacer fetches the process data directory from the process
  * service. If the latter does not find a process base URI in the process object
  * in the JUnit integration test, it would try to determine it via the file
  * service and then would want to store it in the process object in the

@@ -73,8 +73,7 @@ public class BatchService extends BaseBeanService<Batch, BatchDAO> {
     /**
      * Deletes all given batches from the database.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * The function must get all processes from each batch and delete the
      * batches to be deleted in each process, before it deletes the batches.
      *

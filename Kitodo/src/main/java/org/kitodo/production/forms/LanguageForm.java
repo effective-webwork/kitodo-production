@@ -82,8 +82,7 @@ public class LanguageForm implements Serializable {
      * itself, e.g. “English”, “Deutsch”, “français”, “español”, “русский”,
      * “日本語”, …
      *
-     * <p>
-     * It’s a good practice to identify a language in its own spelling, since
+     * <p>It’s a good practice to identify a language in its own spelling, since
      * this will be most likely what a speaker of that language will recognize.
      * See also: http://www.cs.tut.fi/~jkorpela/flags.html Note that
      * capitalisation is subject to the respective language. If the language is
@@ -91,15 +90,13 @@ public class LanguageForm implements Serializable {
      * the language in the currently selected language, e.g., if the current
      * language is English: “English”, “German”, “French”, …
      *
-     * <p>
-     * This is just a nice feature because the language names are provided by
+     * <p>This is just a nice feature because the language names are provided by
      * Java; and it’s used in the mouse-over titles, so you can find out what
      * e.g. “हिंदी” means, even if you don’t have a clue of the glyphs used. If
      * no translations are available, this will fall back to English. selected −
      * whether this is the current language
      *
-     * <p>
-     * This can be used for a sophisticated layout.
+     * <p>This can be used for a sophisticated layout.
      *
      * @return a list of maps, each with the fields “id”, “displayName” and
      *         “selected”

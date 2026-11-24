@@ -12,15 +12,13 @@
 /**
  * Implements the functionality of the ruleset.
  *
- * <p>
- * The ruleset is the heart of Production. It describes the elements, that the
+ * <p>The ruleset is the heart of Production. It describes the elements, that the
  * structure of the digitally represented cultural work can be built from, and
  * in what form metadata for describing these structures can be attached.
  * Technically, this means that it determines which input masks the web
  * interface displays.
  * 
- * <p>
- * This is a fairly complex process and happens in the following way:
+ * <p>This is a fairly complex process and happens in the following way:
  * Essentially, an auxiliary table is set up. This is not a table in the
  * database but a list of objects of the class {@link AuxiliaryTableRow}. The
  * whole thing exists only in memory as long as a view is used. The view is

@@ -45,8 +45,7 @@ public class LtpValidationReportDialog implements Serializable {
      * The maximum number of folders (that contain validation errors) that are
      * shown in the dialog.
      * 
-     * <p>
-     * The maximum prevents the dialog from containing thousands of errors
+     * <p>The maximum prevents the dialog from containing thousands of errors
      * messages in case the validation configuration is set up incorrectly by
      * the user and all files in all folders have validation errors.
      * </p>
@@ -58,8 +57,7 @@ public class LtpValidationReportDialog implements Serializable {
      * The maximum number of files (that contain validation errors) that are
      * shown in the dialog.
      * 
-     * <p>
-     * The maximum prevents the dialog from containing thousands of errors
+     * <p>The maximum prevents the dialog from containing thousands of errors
      * messages in case the validation configuration is set up incorrectly by
      * the user and all files in all folders have validation errors.
      * </p>

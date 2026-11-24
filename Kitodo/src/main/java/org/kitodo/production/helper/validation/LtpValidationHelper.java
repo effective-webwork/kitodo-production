@@ -373,8 +373,7 @@ public class LtpValidationHelper {
      * Validate all images of all folders for a task when clicking on the
      * "finish task" link.
      * 
-     * <p>
-     * Reports the first error that was found to the user as a ErrorMessage
+     * <p>Reports the first error that was found to the user as a ErrorMessage
      * </p>
      * 
      * @param task

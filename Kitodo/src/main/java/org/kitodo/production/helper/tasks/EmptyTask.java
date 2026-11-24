@@ -438,8 +438,7 @@ public class EmptyTask extends Thread {
      * on). The name detail should be set once (in the constructor). You may
      * pass in null to reset the name and remove the detail.
      *
-     * <p>
-     * I.e., if your task is about creation of OCR for a process, the detail
+     * <p>I.e., if your task is about creation of OCR for a process, the detail
      * here could be the process title.
      *
      * @param detail
@@ -492,8 +491,7 @@ public class EmptyTask extends Thread {
      * processed by the task). The name detail should be set every time the
      * progress is determined. You may pass in null to remove the detail.
      *
-     * <p>
-     * I.e., if your task is about creation of OCR for a process, the detail
+     * <p>I.e., if your task is about creation of OCR for a process, the detail
      * here could be the image file being processed right now.
      *
      * @param detail

@@ -130,16 +130,13 @@ public class TemplateService extends BaseBeanService<Template, TemplateDAO> {
      * </ul>
      * These are displayed in the templateAddPopup.
      * 
-     * <p>
-     * {T} := currentUser.currentClient.processTemplates[active] -
+     * <p>{T} := currentUser.currentClient.processTemplates[active] -
      * projectEdited.processTemplates
      *
-     * <p>
-     * <b>Implementation Requirements:</b><br>
+     * <p><b>Implementation Requirements:</b><br>
      * The function requires that the thread is assigned to a logged-in user.
      * 
-     * <p>
-     * <b>Implementation Note:</b><br>
+     * <p><b>Implementation Note:</b><br>
      * ✻) If the project has already been saved. If not, if {@code projectID} is
      * {@code null}, returns all active process templates for the current
      * client.
@@ -308,8 +305,7 @@ public class TemplateService extends BaseBeanService<Template, TemplateDAO> {
     /**
      * Sets whether to display non-active production templates in the list.
      *
-     * <p>
-     * <b>API Note:</b><br>
+     * <p><b>API Note:</b><br>
      * Affects the results of functions {@link #count()} and
      * {@link #loadData(int, int, String, SortOrder, Map)} in
      * {@link SearchDatabaseServiceInterface}.

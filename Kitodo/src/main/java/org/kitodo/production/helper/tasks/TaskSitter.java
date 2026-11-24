@@ -31,8 +31,7 @@ import org.kitodo.production.helper.tasks.EmptyTask.Behaviour;
  * there aren’t too many working any more. Several limits are configurable for
  * the {@link #run()} method.
  *
- * <p>
- * On shutdown of the servlet container, the TaskSitter will try to shut down
+ * <p>On shutdown of the servlet container, the TaskSitter will try to shut down
  * all threads that are still running. Because the TaskManager is singleton (its
  * constructor is private) a caring class is needed which will be available for
  * instantiation to the servlet container.
@@ -65,8 +64,7 @@ public class TaskSitter implements Runnable {
      * died, replaces threads that are to be restarted by new copies of
      * themselves and finally starts new threads up to the given limit.
      *
-     * <p>
-     * Several limits are configurable: There are both limits in number and in
+     * <p>Several limits are configurable: There are both limits in number and in
      * time for successfully finished or erroneous threads which can be set in
      * the configuration. There are internal default values for these settings
      * too, which will be applied in case of missing configuration entries.
@@ -75,19 +73,16 @@ public class TaskSitter implements Runnable {
      * restrictive. For the limit for auto starting threads, see
      * {@link #setAutoRunningThreads(boolean)}.
      *
-     * <p>
-     * If the task list is empty, the method will exit without further delay,
+     * <p>If the task list is empty, the method will exit without further delay,
      * otherwise it will initialise its variables and read the configuration.
      * Reading the configuration is done again in each iteration so
      * configuration changes will propagate here.
      *
-     * <p>
-     * Then the function iterates along the task list and takes care for each
+     * <p>Then the function iterates along the task list and takes care for each
      * task. To be able to modify the list in passing, we need a
      * {@link java.util.ListIterator} here.
      *
-     * <p>
-     * Running tasks reduce the clearance to run new tasks. (However, the
+     * <p>Running tasks reduce the clearance to run new tasks. (However, the
      * clearance must not become negative.) New tasks will be added to the
      * launch list, except if they have already been marked for removal, of
      * course. If a task has terminated, it is handled as specified by its
@@ -98,14 +93,12 @@ public class TaskSitter implements Runnable {
      * {@link java.lang.Thread} cannot be started a second time) by a copy of
      * them.
      *
-     * <p>
-     * If a ConcurrentModificationException arises during list examination, the
+     * <p>If a ConcurrentModificationException arises during list examination, the
      * method will behave like a polite servant and retire silently until the
      * lordship has scarpered. This is not a pity because it will be started
      * every some seconds.
      *
-     * <p>
-     * After having finished iterating, the method will reduce the absolute
+     * <p>After having finished iterating, the method will reduce the absolute
      * number of expired threads as configured. (Since new threads will be added
      * to the bottom of the list and we therefore want to remove older ones
      * top-down we cannot do this before we know their count, thus we cannot do

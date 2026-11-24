@@ -37,8 +37,7 @@ import org.kitodo.config.enums.ParameterCore;
  * upon server startup. Its job is to connect to the Active MQ server and
  * register the listeners configured.
  *
- * <p>
- * The Active MQ services are intended to be run in case that
+ * <p>The Active MQ services are intended to be run in case that
  * {@code activeMQ.hostURL} is configured in the kitodo_config.properties file.
  * To disable the service, the entry there should be commented out.
  */
@@ -129,8 +128,7 @@ public class ActiveMQDirector implements Runnable {
     /**
      * This method registers the listeners with the active MQ server.
      *
-     * <p>
-     * If a queue name was configured for a service, a MessageConsumer is set up
+     * <p>If a queue name was configured for a service, a MessageConsumer is set up
      * to listen on that queue and, in case of incoming messages, make the
      * service process the message. The message checker is saved inside the
      * service to be able to shut it down later.

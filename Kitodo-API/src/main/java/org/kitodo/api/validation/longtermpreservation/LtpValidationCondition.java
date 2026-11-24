@@ -71,8 +71,7 @@ public class LtpValidationCondition implements LtpValidationConditionInterface {
      * Return a list of values that are checked against the property of the
      * file.
      * 
-     * <p>
-     * May be a single value (comparing via equal), two values (comparing as
+     * <p>May be a single value (comparing via equal), two values (comparing as
      * interval) or multiple values (comparing as set) depending on the
      * operation
      * </p>
